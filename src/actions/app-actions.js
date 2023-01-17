@@ -597,10 +597,11 @@ function subscribeToURL(): Action {
           return;
         }
         usage.trackEvent('app', 'Open issue in app by URL');
+        const navigateToActivity: ?string = url.split('#focus=Comments-').pop();
         if (issueId) {
-          Router.Issue({issueId}, {forceReset: true});
+          Router.Issue({issueId, navigateToActivity}, {forceReset: true});
         } else if (articleId) {
-          Router.Article({articlePlaceholder: {id: articleId}}, {forceReset: true});
+          Router.Article({articlePlaceholder: {id: articleId}, navigateToActivity}, {forceReset: true});
         } else {
           Router.navigateToDefaultRoute();
         }
