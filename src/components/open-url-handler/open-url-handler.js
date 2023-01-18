@@ -6,15 +6,15 @@ import log from '../log/log';
 const issueIdReg = /issue\/([\w-\d]+)/;
 const articleIdReg = /articles\/([\w-\d]+)/;
 
-export function extractIssueId(issueUrl: string = ''): string | null {
+const extractIssueId = (issueUrl: string = ''): string | null => {
   const match = decodeURIComponent(issueUrl).match(issueIdReg);
   return match && match[1];
-}
+};
 
-export function extractArticleId(issueUrl: string = ''): string | null {
+const extractArticleId = (issueUrl: string = ''): string | null => {
   const match = decodeURIComponent(issueUrl).match(articleIdReg);
   return match && match[1];
-}
+};
 
 function extractIssuesQuery(issuesUrl: ?string) {
   if (!issuesUrl) {
@@ -55,10 +55,10 @@ function parseUrl(url: string, onIssueIdDetected, onQueryDetected) {
   DeviceEventEmitter.emit('openWithUrl', decodeURIComponent(url));
 }
 
-export default function openByUrlDetector(
+const openByUrlDetector = (
   onIssueIdDetected: (url: string, issueId: ?string, articleId: ?string) => any,
   onQueryDetected: (url: string, query: string) => any
-): (() => void) {
+): (() => void) => {
   Linking.getInitialURL().then((url: ?string) => {
     log.debug(`App has been initially started with URL "${url || 'NOPE'}"`);
     if (!url) {
@@ -80,4 +80,10 @@ export default function openByUrlDetector(
   return function unsubscribe() {
     Linking.removeEventListener('url', onOpenWithUrl);
   };
-}
+};
+
+export {
+  extractArticleId,
+  extractIssueId,
+  openByUrlDetector,
+};

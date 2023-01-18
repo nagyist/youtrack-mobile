@@ -9,7 +9,7 @@ import * as types from './action-types';
 import Api from 'components/api/api';
 import OAuth2 from 'components/auth/oauth2';
 import log from 'components/log/log';
-import openByUrlDetector from 'components/open-url-handler/open-url-handler';
+import {openByUrlDetector} from 'components/open-url-handler/open-url-handler';
 import packageJson from '../../package.json';
 import PermissionsStore from 'components/permissions-store/permissions-store';
 import PushNotifications from 'components/push-notifications/push-notifications';
@@ -588,7 +588,7 @@ export function cacheProjects(): ((
   };
 }
 
-function subscribeToURL(): Action {
+export function subscribeToURL(): Action {
   return async (dispatch: (any) => any, getState: () => AppState, getApi: () => Api) => {
     openByUrlDetector(
       (url, issueId: ?string, articleId: ?string) => {
@@ -597,7 +597,7 @@ function subscribeToURL(): Action {
           return;
         }
         usage.trackEvent('app', 'Open issue in app by URL');
-        const navigateToActivity: ?string = url.split('#focus=Comments-').pop();
+        const navigateToActivity: ?string = url.split('#focus=Comments-')[1];
         if (issueId) {
           Router.Issue({issueId, navigateToActivity}, {forceReset: true});
         } else if (articleId) {
