@@ -35,6 +35,8 @@ import {notify, notifyError} from 'components/notification/notification';
 import {openByUrlDetector} from 'components/open-url-handler/open-url-handler';
 import {SET_DRAFT_COMMENT_DATA, SET_PROGRESS} from './action-types';
 import {setApi} from 'components/api/api__instance';
+import {navigate} from 'components/navigation/navigator';
+import {routeMap} from 'app-routes';
 
 import type {Activity} from 'types/Activity';
 import type {AppConfig, EndUserAgreement} from 'types/AppConfig';
@@ -303,11 +305,9 @@ function endAccountChange() {
 
 async function connectToOneMoreServer(
   serverUrl: string,
-  onBack: (...args: any[]) => any,
 ): Promise<AppConfig> {
   return new Promise(resolve => {
     Router.EnterServer({
-      onCancel: onBack,
       serverUrl,
       connectToYoutrack: async (newURL: string) =>
         resolve(await doConnect(newURL)),
@@ -373,10 +373,7 @@ export function addAccount(serverUrl: string = ''): Action {
     log.info('Adding new account started');
 
     try {
-      const config: AppConfig = await connectToOneMoreServer(serverUrl, () => {
-        log.info('Adding new server canceled by user');
-        Router.navigateToDefaultRoute();
-      });
+      const config: AppConfig = await connectToOneMoreServer(serverUrl);
       log.info(
         `Config loaded for new server (${config.backendUrl}), logging in...`,
       );
@@ -892,17 +889,17 @@ export function redirectToRoute(
         if (cachedPermissions && !isGuest) {
           if (isSplitView() || !issueId) {
             isRedirected = true;
-            Router.Issues({
-              issueId,
-              navigateToActivity,
-            });
+            // Router.Issues({
+            //   issueId,
+            //   navigateToActivity,
+            // });
           } else if (issueId) {
             isRedirected = true;
-            Router.Issue({
-              issueId,
-              navigateToActivity,
-              forceReset: true,
-            });
+            // Router.Issue({
+            //   issueId,
+            //   navigateToActivity,
+            //   forceReset: true,
+            // });
           }
         }
       }
@@ -1031,21 +1028,21 @@ export function initializeApp(
 export async function doConnect(newURL: string): Promise<any> {
   return await loadConfig(newURL);
 }
-export function connectToNewYoutrack(newURL: string): Action {
-  return async (
-    dispatch: (arg0: any) => any,
-    getState: () => AppState,
-    getApi: () => Api,
-  ) => {
-    const config = await doConnect(newURL);
-    await storeConfig(config);
-    const auth: OAuth2 = await createAuthInstance(config);
-    dispatch(setAuthInstance(auth));
-    Router.LogIn({
-      config,
-    });
-  };
-}
+
+const connectToNewYoutrack = (newURL: string): Action => async (
+  dispatch: (arg0: any) => any,
+  getState: () => AppState,
+  getApi: () => Api,
+) => {
+  const config = await doConnect(newURL);
+  await storeConfig(config);
+  const auth: OAuth2 = await createAuthInstance(config);
+  dispatch(setAuthInstance(auth));
+  Router.LogIn({
+    config,
+  });
+};
+
 export function setAccount(
   notificationRouteData: NotificationRouteData | Record<string, any> = {},
 ): Action {
@@ -1092,11 +1089,7 @@ export function setAccount(
     } else {
       log.info('App is not configured, entering server URL');
 
-      const navigateTo = (serverUrl: string | null) =>
-        Router.EnterServer({
-          serverUrl,
-        });
-
+      const navigateTo = (serverUrl: string | null) => navigate(routeMap.EnterServer, {serverUrl});
       try {
         const url = await Linking.getInitialURL();
 
@@ -1282,6 +1275,7 @@ const getDraftCommentData = () => {
 
 export {
   addMentionToDraftComment,
+  connectToNewYoutrack,
   getDraftCommentData,
   inboxCheckUpdateStatus,
   setGlobalInProgress,

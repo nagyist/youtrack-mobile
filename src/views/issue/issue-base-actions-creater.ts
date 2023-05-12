@@ -118,7 +118,7 @@ export const createActions = (
       };
     },
     loadIssue: function (
-      issuePlaceholder: Partial<IssueFull> | null | undefined,
+      issuePlaceholder: IssueOnList | Partial<IssueFull> | undefined,
     ): (
       dispatch: (arg0: any) => any,
       getState: StateGetter,

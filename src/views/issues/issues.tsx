@@ -1,3 +1,4 @@
+import React, {Component} from 'react';
 import {
   Dimensions,
   View,
@@ -6,9 +7,16 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import React, {Component} from 'react';
+
+import {
+  withNavigation,
+  NavigationScreenProp,
+  NavigationState,
+  NavigationRoute,
+} from 'react-navigation';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+
 import * as issueActions from './issues-actions';
 import CreateIssue from 'views/create-issue/create-issue';
 import ErrorMessage from 'components/error-message/error-message';
@@ -47,7 +55,9 @@ import {routeMap} from 'app-routes';
 import {SkeletonIssues} from 'components/skeleton/skeleton';
 import {ThemeContext} from 'components/theme/theme-context';
 import {UNIT} from 'components/variables';
+
 import styles from './issues.styles';
+
 import type Api from 'components/api/api';
 import type Auth from 'components/auth/oauth2';
 import type {AnyIssue, IssueOnList} from 'types/Issue';
@@ -57,6 +67,7 @@ import type {EventSubscription} from 'react-native/Libraries/vendor/emitter/Even
 import type {Folder} from 'types/User';
 import type {IssuesState} from './issues-reducers';
 import type {Theme, UIThemeColors} from 'types/Theme';
+
 type IssuesActions = typeof issueActions;
 type Props = IssuesState &
   IssuesActions & {
@@ -65,6 +76,7 @@ type Props = IssuesState &
     onOpenContextSelect: () => any;
     issueId?: string;
     searchQuery?: string;
+    navigation: NavigationScreenProp<NavigationState>,
   };
 type State = {
   isEditQuery: boolean;
@@ -75,7 +87,7 @@ type State = {
 };
 export class Issues extends Component<Props, State> {
   searchPanelNode: Record<string, any>;
-  unsubscribeOnDispatch: (...args: any[]) => any;
+  unsubscribeOnDispatch: (...args: any[]) => Function;
   unsubscribeOnDimensionsChange: EventSubscription;
   theme: Theme;
   goOnlineSubscription: EventSubscription;
@@ -105,39 +117,31 @@ export class Issues extends Component<Props, State> {
   }
 
   async componentDidMount() {
+    const {navigation, issuesCount, refreshIssuesCount, updateIssue} = this.props;
     this.unsubscribeOnDimensionsChange = Dimensions.addEventListener(
       'change',
       this.onDimensionsChange,
     );
     this.onDimensionsChange();
     this.refresh();
-    this.unsubscribeOnDispatch = Router.setOnDispatchCallback(
-      (
-        routeName: string,
-        prevRouteName: string,
-        options: Record<string, any>,
-      ) => {
-        if (
-          prevRouteName === routeMap.Issues &&
-          routeName !== routeMap.Issues
-        ) {
-          requestController.cancelIssuesRequests();
-        }
 
-        if (
-          routeName === routeMap.Issues &&
-          prevRouteName === routeMap.Issue &&
-          options?.issueId
-        ) {
-          this.props.updateIssue(options.issueId);
-
-          if (this.props.issuesCount === null) {
-            this.props.refreshIssuesCount();
+    this.unsubscribeOnDispatch = navigation.addListener('focus', (e) => {
+      try {
+        const route: NavigationRoute = navigation.getState()?.routes.slice(-1)[0];
+        if (route?.params?.prev?.name === routeMap.Issue) {
+          updateIssue(route?.params?.prev?.issueId);
+          if (issuesCount === null) {
+            refreshIssuesCount();
           }
         }
-      },
-    );
-    const issueId: string | null | undefined = this.props.issueId;
+        if (route?.params?.prev?.name === routeMap.Issues) {
+          requestController.cancelIssuesRequests();
+        }
+      } catch (e) {
+      }
+    });
+
+    const issueId: string | undefined = this.issueId;
 
     if (issueId) {
       const targetIssue: AnyIssue =
@@ -180,10 +184,13 @@ export class Issues extends Component<Props, State> {
       return;
     }
 
-    Router.Issue({
-      issuePlaceholder: issue,
-      issueId: issue.id,
-    });
+    this.props.navigation.navigate(
+      routeMap.Issue,
+      {
+        issuePlaceholder: issue,
+        issueId: issue.id,
+      }
+    );
   }
 
   isMatchesQuery: (issueId: string) => Promise<boolean> = async (
@@ -541,7 +548,7 @@ export class Issues extends Component<Props, State> {
       return (
         <View style={styles.list}>
           {contextButton}
-          {searchQuery}
+          {this.renderSearchQuery()}
 
           <SkeletonIssues />
         </View>
@@ -711,4 +718,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Issues);
+export default connect(mapStateToProps, mapDispatchToProps)(withNavigation(Issues));

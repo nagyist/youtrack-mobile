@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   ScrollView,
   Text,
@@ -5,7 +6,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {Component} from 'react';
 import AttachmentAddPanel from 'components/attachments-row/attachments-add-panel';
 import AttachmentsRow from 'components/attachments-row/attachments-row';
 import CreateUpdateInfo from 'components/issue-tabbed/issue-tabbed__created-updated';
@@ -15,7 +15,6 @@ import IssueCustomFieldText from 'components/custom-field/issue-custom-field-tex
 import IssueMarkdown from './issue__markdown';
 import IssueVotes from 'components/issue-actions/issue-votes';
 import KeyboardSpacerIOS from 'components/platform/keyboard-spacer.ios';
-import LinkedIssues from 'components/linked-issues/linked-issues';
 import LinkedIssuesTitle from 'components/linked-issues/linked-issues-title';
 import log from 'components/log/log';
 import Router from 'components/router/router';
@@ -58,10 +57,12 @@ import type {ScrollData} from 'types/Markdown';
 import type {Theme, UITheme} from 'types/Theme';
 import type {Visibility} from 'types/Visibility';
 import type {YouTrackWiki} from 'types/Wiki';
+import {routeMap} from 'app-routes';
+import {NavigationScreenProp, NavigationState} from 'react-navigation';
 
 export type IssueDetailsProps = {
   loadIssue: () => any;
-  openNestedIssueView: (arg0: {issue?: IssueFull; issueId?: string}) => any;
+  openNestedIssueView: (arg0: { issue?: IssueFull; issueId?: string }) => any;
   attachingImage: Record<string, any> | null | undefined;
   refreshIssue: () => any;
   issuePermissions: IssuePermissions;
@@ -108,8 +109,11 @@ export type IssueDetailsProps = {
   ) => any;
   modal?: boolean;
   scrollData: ScrollData;
+  navigation: NavigationScreenProp<NavigationState>,
 };
-export default class IssueDetails extends Component<IssueDetailsProps, void> {
+
+
+class IssueDetails extends React.Component<IssueDetailsProps, void> {
   imageHeaders: any = getApi().auth.getAuthorizationHeaders();
   backendUrl: any = getApi().config.backendUrl;
   uiTheme: UITheme;
@@ -117,6 +121,7 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
   constructor(props: IssueDetailsProps) {
     super(props);
     this.renderContent = this.renderContent.bind(this);
+    this.renderLinksBlock = this.renderLinksBlock.bind(this);
   }
 
   UNSAFE_componentWillUpdate(nextProps: IssueDetailsProps) {
@@ -141,40 +146,23 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
     return false;
   }
 
-  renderLinksBlock: () => void | Node = () => {
-    const {issuePermissions, getIssueLinksTitle} = this.props;
+  renderLinksBlock: () => React.ReactNode = () => {
+    const {issuePermissions, getIssueLinksTitle, navigation} = this.props;
     const issue: AnyIssue = this.getIssue();
+    const props = {
+      issuesGetter: this.props.issuesGetter,
+      linksGetter: this.props.linksGetter,
+      onUnlink: this.props.onUnlink,
+      onLinkIssue: this.props.onLinkIssue,
+      onUpdate: (issues?: IssueLink[]) => getIssueLinksTitle(issues),
+      canLink: (issuePermissions.canLink(issue) ? (linkedIssue: AnyIssue) => issuePermissions.canLink(linkedIssue) : undefined),
+      subTitle: `${issue.idReadable} ${issue.summary}`,
+      onHide: () => Router.pop(),
+    };
     return (
       <LinkedIssuesTitle
         issueLinks={issue.links}
-        onPress={() =>
-          Router.Page({
-            children: (
-              <LinkedIssues
-                issuesGetter={this.props.issuesGetter}
-                linksGetter={this.props.linksGetter}
-                onUnlink={this.props.onUnlink}
-                onLinkIssue={this.props.onLinkIssue}
-                onUpdate={(issues?: IssueLink[]) => {
-                  getIssueLinksTitle(issues);
-                }}
-                canLink={
-                  issuePermissions.canLink(issue)
-                    ? (linkedIssue: AnyIssue) =>
-                        issuePermissions.canLink(linkedIssue)
-                    : undefined
-                }
-                subTitle={`${issue.idReadable} ${issue.summary}`}
-                onHide={() => Router.pop()}
-                onAddLink={(renderChildren: (arg0: () => any) => any) =>
-                  Router.Page({
-                    children: renderChildren(),
-                  })
-                }
-              />
-            ),
-          })
-        }
+        onPress={() => navigation.push(routeMap.LinkedIssues, props)}
       />
     );
   };
@@ -262,7 +250,7 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
             key={`issueCustomFieldText${index}`}
             onLongPress={() => {
               textField?.value?.text &&
-                onLongPress(textField.value.text, i18n('Copy field text'));
+              onLongPress(textField.value.text, i18n('Copy field text'));
             }}
             delayLongPress={250}
           >
@@ -290,9 +278,9 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
   renderMarkdown() {
     const {
       issue,
-      openNestedIssueView,
       onCheckboxUpdate,
       scrollData,
+      navigation,
     } = this.props;
 
     if (!issue) {
@@ -303,7 +291,7 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
       issue.description &&
       (issue.hasEmail || isPureHTMLBlock(issue.description))
     ) {
-      return <HTML html={prepareHTML(issue.description)} />;
+      return <HTML html={prepareHTML(issue.description)}/>;
     }
 
     const ytWikiProps: {
@@ -315,10 +303,9 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
         backendUrl: this.backendUrl,
         attachments: issue.attachments,
         imageHeaders: this.imageHeaders,
-        onIssueIdTap: (issueId: string) =>
-          openNestedIssueView({
-            issueId,
-          }),
+        onIssueIdTap: (issueId: string) => {
+          navigation.push(routeMap.LinkedIssues, {issueId});
+        },
         title: getReadableID(issue),
         description: issue.wikifiedDescription,
       },
@@ -349,7 +336,7 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
     const issue: AnyIssue = this.getIssue();
 
     if (!issue) {
-      return <SkeletonIssueContent />;
+      return <SkeletonIssueContent/>;
     }
 
     return (
@@ -423,20 +410,20 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
 
         {editMode && (
           <>
-            <Separator fitWindow indent />
-            <AttachmentAddPanel showAddAttachDialog={() => onAttach(true)} />
+            <Separator fitWindow indent/>
+            <AttachmentAddPanel showAddAttachDialog={() => onAttach(true)}/>
           </>
         )}
 
         {issue?.attachments && this.renderAttachments(issue.attachments)}
 
-        {editMode && <KeyboardSpacerIOS />}
+        {editMode && <KeyboardSpacerIOS/>}
       </View>
     );
   }
 
   getIssue(): AnyIssue {
-    return this.props.issue || this.props.issuePlaceholder;
+    return this.props.issue || this.issuePlaceholder;
   }
 
   getIssuePermissions: () => IssuePermissions = (): IssuePermissions => {
@@ -466,7 +453,7 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
   onUpdateProject: (project: IssueProject) => Promise<any> = async (
     project: IssueProject,
   ) => await this.props.updateProject(project);
-  renderCustomFieldPanel: ()=> React.ReactNode = () => {
+  renderCustomFieldPanel: () => React.ReactNode = () => {
     const _issue: AnyIssue = this.getIssue();
 
     return (
@@ -527,3 +514,5 @@ export default class IssueDetails extends Component<IssueDetailsProps, void> {
     );
   }
 }
+
+export default IssueDetails;

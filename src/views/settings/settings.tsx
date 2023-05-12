@@ -115,13 +115,12 @@ class Settings extends PureComponent<Props, State> {
                   this.toggleModalChildren(
                     <SettingsAppearance
                       backIcon={backIcon}
-                      onHide={this.toggleModalChildren}
                     />,
                   );
                 } else {
                   Router.Page({
                     children: (
-                      <SettingsAppearance onHide={() => Router.pop()} />
+                      <SettingsAppearance/>
                     ),
                   });
                 }
@@ -134,7 +133,7 @@ class Settings extends PureComponent<Props, State> {
             {
               title: i18n('Send feedback'),
               onPress: () =>
-                Router.PageModal({
+                Router.Page({
                   children: <SettingsFeedbackForm uiTheme={uiTheme} />,
                 }),
             },
@@ -151,7 +150,7 @@ class Settings extends PureComponent<Props, State> {
                   onLogOut={onLogOut}
                   openDebugView={() =>
                     clicksToShowCounter(() =>
-                      Router.PageModal({
+                      Router.Page({
                         children: <FeaturesDebugSettings />,
                       }),
                     )

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {
+  EventSubscription,
   RefreshControl,
   SectionList,
   Text,
@@ -25,7 +26,6 @@ import Star from 'components/star/star';
 import usage from 'components/usage/usage';
 import {addListenerGoOnline} from 'components/network/network-events';
 import {ANALYTICS_ARTICLES_PAGE} from 'components/analytics/analytics-ids';
-import type {EventSubscription} from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import {HIT_SLOP} from 'components/common-styles';
 import {getGroupedByFieldNameAlphabetically} from 'components/search/sorting';
 import {getStorageState} from 'components/storage/storage';
@@ -42,13 +42,16 @@ import {
   IconNoProjectFound,
   IconNothingFound,
 } from 'components/icon/icon-pictogram';
-import {routeMap} from '../../app-routes';
+import {INavigationParams, spreadNavigationProps} from 'components/navigation';
+import {routeMap} from 'app-routes';
 import {SkeletonIssues} from 'components/skeleton/skeleton';
 import {ThemeContext} from 'components/theme/theme-context';
 import {UNIT} from 'components/variables';
+
 import styles from './knowledge-base.styles';
+
 import type IssuePermissions from 'components/issue-permissions/issue-permissions';
-import type {AppState} from '../../reducers';
+import type {AppState} from 'reducers';
 import type {
   Article as ArticleSingle,
   ArticlesList,
@@ -62,13 +65,15 @@ import type {KnowledgeBaseActions} from './knowledge-base-actions';
 import type {KnowledgeBaseState} from './knowledge-base-reducers';
 import type {ISelectProps} from 'components/select/select';
 import type {Theme, UITheme} from 'types/Theme';
-type Props = KnowledgeBaseActions &
+
+type Props = INavigationParams & KnowledgeBaseActions &
   KnowledgeBaseState & {
-    issuePermissions: IssuePermissions;
-    project?: ArticleProject;
-    preventReload?: boolean;
-    lastVisitedArticle?: ArticleSingle;
-  };
+  issuePermissions: IssuePermissions;
+  project?: ArticleProject;
+  preventReload?: boolean;
+  lastVisitedArticle?: ArticleSingle;
+};
+
 type State = {
   focusedArticle: ArticleSingle | null | undefined;
   isHeaderPinned: boolean;
@@ -85,12 +90,14 @@ const ERROR_MESSAGE_DATA: Record<string, any> = {
     title: i18n('No articles found'),
   },
 };
+
+
 export class KnowledgeBase extends Component<Props, State> {
   static contextTypes: any = {
     actionSheet: Function,
   };
   listRef: any;
-  uiTheme: UITheme;
+  uiTheme: UITheme | undefined;
   unsubscribe: (...args: any[]) => any = () => null;
   unsubscribeOnDimensionsChange: EventSubscription;
   goOnlineSubscription: EventSubscription;
@@ -155,9 +162,11 @@ export class KnowledgeBase extends Component<Props, State> {
       isSplitView: isSplitView(),
     });
   };
-  loadArticlesList: (reset?: boolean) => Promise<any> = async (
-    reset?: boolean,
-  ) => this.props.loadArticleList(reset);
+
+  loadArticlesList: (reset?: boolean) => Promise<any> = async (reset?: boolean) => {
+    this.props.loadArticleList(reset);
+  };
+
   scrollToProject: (project: ArticleProject) => void = (
     project: ArticleProject,
   ) => {
@@ -182,6 +191,7 @@ export class KnowledgeBase extends Component<Props, State> {
       }
     }
   };
+
   updateFocusedArticle: (
     focusedArticle: ArticleSingle | null | undefined,
   ) => void = (focusedArticle: ArticleSingle | null | undefined): void => {
@@ -189,11 +199,8 @@ export class KnowledgeBase extends Component<Props, State> {
       focusedArticle,
     });
   };
-  renderProject: (arg0: {
-    section: ArticlesListItem;
-  }) => null | React.ReactElement<React.ComponentProps<any>, any> = ({
-    section,
-  }: {
+
+  renderProject: (arg0: { section: ArticlesListItem; }) => React.ReactNode = ({section}: {
     section: ArticlesListItem;
   }) => {
     const project: ArticleProject | null | undefined = section.title;
@@ -269,6 +276,7 @@ export class KnowledgeBase extends Component<Props, State> {
       );
     }
   };
+
   renderArticle: (arg0: {
     item: ArticleNode;
   }) => null | React.ReactElement<React.ComponentProps<any>, any> = ({
@@ -296,6 +304,7 @@ export class KnowledgeBase extends Component<Props, State> {
       }
     />
   );
+
   renderSubArticlesPage: (article: ArticleSingle) => Promise<void> = async (
     article: ArticleSingle,
   ) => {
@@ -333,6 +342,7 @@ export class KnowledgeBase extends Component<Props, State> {
         </TouchableOpacity>
       ),
     });
+
     const tree: React.ReactNode = this.renderArticlesList(
       [
         {
@@ -356,6 +366,7 @@ export class KnowledgeBase extends Component<Props, State> {
       });
     }
   };
+
   renderHeader: (arg0: {
     leftButton?: React.ReactElement<React.ComponentProps<any>, any>;
     title: string;
@@ -416,6 +427,7 @@ export class KnowledgeBase extends Component<Props, State> {
       isHeaderPinned: nativeEvent.contentOffset.y >= UNIT,
     });
   };
+
   renderRefreshControl: () => React.ReactElement<
     React.ComponentProps<typeof RefreshControl>,
     typeof RefreshControl
@@ -431,13 +443,15 @@ export class KnowledgeBase extends Component<Props, State> {
       />
     );
   };
-  getListItemKey = (item: ArticleNode, index: number) =>
-    item?.data?.id || `${index}`;
+
+  getListItemKey = (item: ArticleNode, index: number) => item?.data?.id || `${index}`;
+
   setListRef = (listRef: any) => {
     if (listRef) {
       this.listRef = listRef;
     }
   };
+
   renderArticlesList: (
     articlesList: ArticlesList | Partial<ArticlesList>,
     hideSearchPanel?: boolean,
@@ -566,14 +580,17 @@ export class KnowledgeBase extends Component<Props, State> {
       </View>
     );
   };
+
   closeProjectSelect: () => void = () =>
     this.setState({
       isSelectVisible: false,
     });
+
   openProjectSelect: () => void = () =>
     this.setState({
       isSelectVisible: true,
     });
+
   renderProjectSelect: ()=> React.ReactNode = () => {
     const {updateProjectsFavorites} = this.props;
     const projects: ArticleProject[] = getStorageState().projects as ArticleProject[];
@@ -643,6 +660,7 @@ export class KnowledgeBase extends Component<Props, State> {
     };
     return <SelectSectioned {...selectProps} />;
   };
+
   renderNoFavouriteProjects: ()=> React.ReactNode = () => {
     return (
       <View style={styles.noProjects}>
@@ -738,6 +756,7 @@ export class KnowledgeBase extends Component<Props, State> {
       </>
     );
   };
+
   renderFocusedArticle: ()=> React.ReactNode = (): React.ReactNode => {
     const {focusedArticle} = this.state;
 
@@ -755,6 +774,7 @@ export class KnowledgeBase extends Component<Props, State> {
       />
     );
   };
+
   renderSplitView: ()=> React.ReactNode = (): React.ReactNode => {
     return (
       <View style={styles.splitViewContainer}>
@@ -796,10 +816,11 @@ export class KnowledgeBase extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: AppState) => {
+const mapStateToProps = (state: AppState, ownProps: INavigationParams) => {
   return {
     ...state.app,
     ...state.articles,
+    ...spreadNavigationProps(ownProps),
     issuePermissions: state.app.issuePermissions,
   };
 };

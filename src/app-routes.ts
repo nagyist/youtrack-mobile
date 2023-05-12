@@ -1,32 +1,37 @@
-export const routeMap = {
-  AgileBoard: 'AgileBoard',
-  Article: 'Article',
-  ArticleSingle: 'ArticleSingle',
-  ArticleCreate: 'ArticleCreate',
-  KnowledgeBase: 'KnowledgeBase',
-  AttachmentPreview: 'AttachmentPreview',
-  CreateIssue: 'CreateIssue',
-  EnterServer: 'EnterServer',
-  Home: 'Home',
-  Inbox: 'Inbox',
-  InboxThreads: 'InboxThreads',
-  Issues: 'Issues',
-  LogIn: 'LogIn',
-  Page: 'Page',
-  PageModal: 'PageModal',
-  Settings: 'Settings',
-  Modal: 'Modal',
-  PreviewFile: 'PreviewFile',
-  Issue: 'Issue',
-  Issue2: 'Issue2',
-  WikiPage: 'WikiPage',
-};
-export const rootRoutesList = [
-  routeMap.Issues,
-  routeMap.AgileBoard,
-  routeMap.Inbox,
-  routeMap.InboxThreads,
-  routeMap.Settings,
-  routeMap.KnowledgeBase,
-  routeMap.ArticleSingle,
-];
+import {NavigationRootNames} from 'components/navigation';
+
+export enum RootRoutesList {
+  AgileBoard = 'AgileBoard',
+  Article = 'Article',
+  ArticleSingle = 'ArticleSingle',
+  Inbox = 'Inbox',
+  InboxThreads = 'InboxThreads',
+  Issues = 'Issues',
+  KnowledgeBase = 'KnowledgeBase',
+  Settings = 'Settings',
+  Tickets = 'Tickets',
+}
+
+enum SecondaryRoutes {
+  ArticleCreate = 'ArticleCreate',
+  AttachmentPreview = 'AttachmentPreview',
+  CreateIssue = 'CreateIssue',
+  EnterServer = 'EnterServer',
+  Home = 'Home',
+  Issue = 'Issue',
+  LinkedIssues = 'LinkedIssues',
+  LinkedIssuesAddLink = 'LinkedIssuesAddLink',
+  LogIn = 'LogIn',
+  Modal = 'Modal',
+  Page = 'Page',
+  PageModal = 'PageModal',
+  PreviewFile = 'PreviewFile',
+  SettingsAppearance = 'SettingsAppearance',
+  SettingsFeedbackForm = 'SettingsFeedbackForm',
+  Ticket = 'Ticket',
+  WikiPage = 'WikiPage',
+}
+
+export const defaultRootRoute: NavigationRootNames = RootRoutesList.Issues;
+
+export const routeMap = {...RootRoutesList, ...SecondaryRoutes};

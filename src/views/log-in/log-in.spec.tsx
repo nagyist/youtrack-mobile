@@ -1,6 +1,6 @@
 import React from 'react';
 import {NativeModules} from 'react-native';
-import {LogIn} from './log-in';
+import {LogIn_} from './log-in';
 import {shallow} from 'enzyme';
 import sinon from 'sinon';
 describe.skip('LogIn', () => {
@@ -33,7 +33,7 @@ describe.skip('LogIn', () => {
   });
 
   function shallowRender(props) {
-    return shallow(<LogIn {...defaultProps} {...props} />);
+    return shallow(<LogIn_ {...defaultProps} {...props} />);
   }
 
   it('should render', () => {

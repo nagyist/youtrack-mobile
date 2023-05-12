@@ -9,12 +9,12 @@ import {IconBack, IconCheck} from 'components/icon/icon';
 import {ThemeContext} from 'components/theme/theme-context';
 import styles from './settings.styles';
 import type {Theme} from 'types/Theme';
+import Router from 'components/router/router';
 type Props = {
-  onHide: () => any;
   backIcon?: any;
 };
 
-const SettingsAppearance = (props: Props): React.ReactNode => {
+const SettingsAppearance = (props: Props): JSX.Element => {
   const renderThemeCheckbox = (
     currentTheme: Theme,
     uiTheme: Record<string, any>,
@@ -64,7 +64,7 @@ const SettingsAppearance = (props: Props): React.ReactNode => {
             leftButton={
               props.backIcon || <IconBack color={theme.uiTheme.colors.$link} />
             }
-            onBack={props.onHide}
+            onBack={Router.pop}
           />
 
           <View style={styles.settingsAppearance}>

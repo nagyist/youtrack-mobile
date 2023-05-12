@@ -9,8 +9,6 @@ import {
 import {View as AnimatedView} from 'react-native-animatable';
 import Header from '../header/header';
 import IssueRow from 'views/issues/issues__row';
-import LinkedIssuesAddLink from './linked-issues-add-link';
-import Router from '../router/router';
 import {createLinksList} from './linked-issues-helper';
 import {i18n, i18nPlural} from 'components/i18n/i18n';
 import {IconAdd, IconBack, IconClose} from '../icon/icon';
@@ -21,6 +19,10 @@ import type {IssueOnList} from 'types/Issue';
 import type {LinksListData} from './linked-issues-helper';
 import type {Theme} from 'types/Theme';
 import type {ViewStyleProp} from 'types/Internal';
+import {mixinNavigationProps, INavigationParams} from 'components/navigation';
+import {routeMap} from 'app-routes';
+import {goBack} from 'components/navigation/navigator';
+
 type Props = {
   canLink?: (issue: IssueOnList) => boolean;
   issuesGetter: (linkTypeName: string, query: string) => any;
@@ -30,25 +32,25 @@ type Props = {
   onUpdate: (linkedIssues?: IssueLink[]) => void;
   style?: ViewStyleProp;
   subTitle?: any;
-  onHide: () => void;
-  onAddLink?: (arg0: (onHide: () => any) => any) => any;
   closeIcon?: any;
   onIssueLinkPress?: (issue: IssueOnList) => any;
 };
 
-const LinkedIssues = (props: Props): React.ReactNode => {
-  // update UI on theme change
+const LinkedIssues = (props: Props & INavigationParams): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme: Theme = useContext(ThemeContext);
+
   const [sections, updateSections] = useState([]);
-  const [pressedButtonId, updatePressedButtonId] = useState(null);
+  const [pressedButtonId, updatePressedButtonId] = useState<string | null>(null);
   const [isLoading, updateLoading] = useState(false);
+
   const getLinkedIssues = useCallback(async (): Promise<Array<IssueLink>> => {
     const linkedIssues: IssueLink[] = await props.linksGetter();
     const linksListData: LinksListData[] = createLinksList(linkedIssues);
     updateSections(linksListData);
     return linkedIssues;
   }, [props]);
+
   useEffect(() => {
     updateLoading(true);
     getLinkedIssues().then(() => {
@@ -79,8 +81,7 @@ const LinkedIssues = (props: Props): React.ReactNode => {
 
   const renderLinkedIssue = (linkedIssue: IssueOnList, linkTypeId: string) => {
     const isButtonPressed: boolean = pressedButtonId !== null;
-    const isCurrentButtonPressed: boolean =
-      isButtonPressed && pressedButtonId === linkedIssue.id + linkTypeId;
+    const isCurrentButtonPressed: boolean = isButtonPressed && pressedButtonId === linkedIssue.id + linkTypeId;
     return (
       <AnimatedView
         useNativeDriver
@@ -95,10 +96,13 @@ const LinkedIssues = (props: Props): React.ReactNode => {
             if (props.onIssueLinkPress) {
               props.onIssueLinkPress(linkedIssue);
             } else {
-              Router.Issue({
-                issuePlaceholder: linkedIssue,
-                issueId: linkedIssue.id,
-              });
+              props.navigation.push(
+                routeMap.Issue,
+                {
+                  issuePlaceholder: linkedIssue,
+                  issueId: linkedIssue.id,
+                }
+              );
             }
           }}
         />
@@ -121,14 +125,14 @@ const LinkedIssues = (props: Props): React.ReactNode => {
                 props.onUpdate();
 
                 if (updatedLinksList.length === 0) {
-                  props.onHide();
+                  goBack();
                 }
               }
             }}
             style={styles.linkedIssueRemoveAction}
           >
             {isCurrentButtonPressed && (
-              <ActivityIndicator color={styles.link.color} />
+              <ActivityIndicator color={styles.link.color}/>
             )}
             {!isCurrentButtonPressed && (
               <IconClose
@@ -146,7 +150,7 @@ const LinkedIssues = (props: Props): React.ReactNode => {
     );
   };
 
-  const renderSectionTitle = (it: {section: LinksListData}) => {
+  const renderSectionTitle = (it: { section: LinksListData }) => {
     const section: LinksListData = it.section;
     const issuesAmount: number = section.data.length;
     return (
@@ -164,35 +168,26 @@ const LinkedIssues = (props: Props): React.ReactNode => {
     );
   };
 
-  const renderAddIssueLink = (onHide: () => any) => (
-    <LinkedIssuesAddLink
-      onLinkIssue={props.onLinkIssue}
-      issuesGetter={props.issuesGetter}
-      onUpdate={async () => {
-        const linkedIssues: IssueLink[] = await getLinkedIssues();
-        props.onUpdate(linkedIssues);
-      }}
-      subTitle={props.subTitle}
-      onHide={onHide}
-    />
-  );
-
   const onAddIssueLink = () => {
-    if (props.onAddLink) {
-      return props.onAddLink((onHide: () => any) => renderAddIssueLink(onHide));
-    } else {
-      //TODO: use `props.onAddLink`
-      Router.Page({
-        children: renderAddIssueLink(props.onHide),
-      });
-    }
+    props.navigation.navigate(
+      routeMap.LinkedIssuesAddLink,
+      {
+        onLinkIssue: props.onLinkIssue,
+        issuesGetter: props.issuesGetter,
+        onUpdate: async () => {
+          const linkedIssues: IssueLink[] = await getLinkedIssues();
+          props.onUpdate(linkedIssues);
+        },
+        subTitle: props.subTitle,
+      }
+    );
   };
 
   return (
     <View style={[styles.container, props.style]}>
       <Header
         showShadow={true}
-        leftButton={props.closeIcon || <IconBack color={styles.link.color} />}
+        leftButton={props.closeIcon || <IconBack color={styles.link.color}/>}
         rightButton={
           props.canLink ? (
             <IconAdd
@@ -203,7 +198,7 @@ const LinkedIssues = (props: Props): React.ReactNode => {
           ) : null
         }
         onRightButtonClick={onAddIssueLink}
-        onBack={props.onHide}
+        onBack={goBack}
       >
         <Text style={styles.headerSubTitle} numberOfLines={1}>
           {props.subTitle}
@@ -217,22 +212,19 @@ const LinkedIssues = (props: Props): React.ReactNode => {
         sections={sections}
         scrollEventThrottle={10}
         keyExtractor={(issue: IssueOnList) => issue.id}
-        renderItem={(info: {item: any; section: LinksListData & any}) =>
+        renderItem={(info: { item: any; section: LinksListData & any }) =>
           renderLinkedIssue(info.item, info.section.linkTypeId)
         }
         renderSectionHeader={renderSectionTitle}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={() => <View style={styles.separator}/>}
         stickySectionHeadersEnabled={true}
       />
 
       {isLoading && (
-        <ActivityIndicator style={styles.loader} color={styles.link.color} />
+        <ActivityIndicator style={styles.loader} color={styles.link.color}/>
       )}
     </View>
   );
 };
 
-export default React.memo<Props>(LinkedIssues) as React$AbstractComponent<
-  Props,
-  unknown
->;
+export default mixinNavigationProps(LinkedIssues);

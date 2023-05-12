@@ -21,7 +21,7 @@ export type IssueState = {
   isAttachFileDialogVisible: boolean;
   isRefreshing: boolean;
   isSavingEditedIssue: boolean;
-  issue: IssueFull;
+  issue: IssueFull | null;
   issueId: string;
   issueLoaded: boolean;
   issueLoadingError: Error | null | undefined;

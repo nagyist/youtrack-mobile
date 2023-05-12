@@ -326,7 +326,7 @@ class CreateIssue extends PureComponent<Props, State> {
     if (this.props.onHide) {
       this.props.onHide();
     } else {
-      Router.pop(true);
+      Router.pop();
     }
   };
   renderLinkedIssuesAddLink = () => {
@@ -348,14 +348,13 @@ class CreateIssue extends PureComponent<Props, State> {
       />
     );
 
-    const renderAddLinkedIssue = (onHide: () => void) => (
+    const renderAddLinkedIssue = () => (
       <LinkedIssuesAddLink
         issuesGetter={loadIssuesXShort}
         onLinkIssue={onLinkIssue}
         onUpdate={(issues?: IssueLink[]) => {
           getIssueLinksTitle(issues);
         }}
-        onHide={onHide}
       />
     );
 
@@ -369,9 +368,7 @@ class CreateIssue extends PureComponent<Props, State> {
                 renderAddLinkedIssue(this.toggleSetModalChildren),
               );
             } else {
-              Router.Page({
-                children: renderAddLinkedIssue(() => Router.pop()),
-              });
+              Router.Page({children: renderAddLinkedIssue()});
             }
           }}
         >

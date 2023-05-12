@@ -1,22 +1,30 @@
-import React from 'react';
+import * as React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
+
 import {View as AnimatedView} from 'react-native-animatable';
-import {i18n} from 'components/i18n/i18n';
-import {IconAngleRight} from '../icon/icon';
+
 import {getLinkedIssuesTitle} from './linked-issues-helper';
+import {i18n} from 'components/i18n/i18n';
+import {IconAngleRight} from 'components/icon/icon';
+
 import styles from './linked-issues.style';
+
 import type {IssueLink} from 'types/CustomFields';
+
 type Props = {
   issueLinks: IssueLink[];
-  onPress: () => any;
+  onPress: (...args: any[]) => any;
 };
 
-const LinkedIssuesTitle = (props: Props): React.ReactNode => {
+const LinkedIssuesTitle = (props: Props): JSX.Element | null => {
   const {issueLinks = [], onPress} = props;
-  const linkedIssuesTitle: string =
-    issueLinks.length > 0 ? getLinkedIssuesTitle(issueLinks) : '';
+  const linkedIssuesTitle: string = issueLinks.length > 0 ? getLinkedIssuesTitle(issueLinks) : '';
+
   return linkedIssuesTitle ? (
-    <TouchableOpacity style={styles.linkedIssuesButton} onPress={onPress}>
+    <TouchableOpacity
+      style={styles.linkedIssuesButton}
+      onPress={onPress}
+    >
       <View style={styles.linkedIssuesTitle}>
         <Text style={styles.linkedIssuesTitleText}>
           {i18n('Linked issues')}
@@ -37,7 +45,4 @@ const LinkedIssuesTitle = (props: Props): React.ReactNode => {
   ) : null;
 };
 
-export default React.memo<Props>(LinkedIssuesTitle) as React$AbstractComponent<
-  Props,
-  unknown
->;
+export default React.memo<Props>(LinkedIssuesTitle);

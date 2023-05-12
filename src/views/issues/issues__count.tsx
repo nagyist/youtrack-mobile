@@ -35,4 +35,4 @@ const IssuesCount = ({issuesCount}: { issuesCount: number | null }) => {
 };
 
 
-export default IssuesCount;
+export default React.memo(IssuesCount);

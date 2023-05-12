@@ -1,17 +1,19 @@
-import React, {PureComponent} from 'react';
+import * as React from 'react';
 import {Text, Dimensions, View, EventSubscription} from 'react-native';
 
-import {i18n} from 'components/i18n/i18n';
-import {IconComment} from 'components/icon/icon';
-import {isSplitView} from '../responsive/responsive-helper';
 import {TabView, TabBar} from 'react-native-tab-view';
+
+import {i18n} from 'components/i18n/i18n';
+import {isSplitView} from 'components/responsive/responsive-helper';
+
+import {IconComment} from 'components/icon/icon';
 
 import styles from './issue-tabbed.style';
 
 import type {TabRoute} from 'types/Issue';
 import type {UITheme, UIThemeColors} from 'types/Theme';
 
-export type IssueTabbedState = {
+export type IIssueTabbedState = {
   index: number;
   routes: TabRoute[];
   isTransitionInProgress: boolean;
@@ -20,7 +22,7 @@ export type IssueTabbedState = {
 };
 
 
-export default class IssueTabbed extends PureComponent<void, IssueTabbedState> {
+export default class IssueTabbed<P, S extends IIssueTabbedState> extends React.PureComponent<P, S> {
   initialWindowDimensions: any = Dimensions.get('window');
   tabRoutes: TabRoute[] = [
     this.getMainTabText(),
@@ -30,7 +32,7 @@ export default class IssueTabbed extends PureComponent<void, IssueTabbedState> {
     title: name,
   }));
   unsubscribeOnDimensionsChange: EventSubscription;
-  state: IssueTabbedState = {
+  state: IIssueTabbedState = {
     index: 0,
     routes: this.tabRoutes,
     isTransitionInProgress: false,
@@ -75,7 +77,7 @@ export default class IssueTabbed extends PureComponent<void, IssueTabbedState> {
     });
   };
 
-  getRouteBadge(isVisible: boolean, children: string | React.ReactNode): any {
+  getRouteBadge(isVisible: boolean, children: string | React.ReactNode): React.ReactNode {
     if (!isVisible) {
       return null;
     }

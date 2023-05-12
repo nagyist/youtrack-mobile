@@ -34,39 +34,41 @@ import type {IssueLinkType} from 'types/CustomFields';
 import type {IssueOnList, TransformedSuggestion} from 'types/Issue';
 import type {Theme} from 'types/Theme';
 import type {ViewStyleProp} from 'types/Internal';
-type Props = {
+import {mixinNavigationProps, INavigationParams} from 'components/navigation';
+import {goBack} from 'components/navigation/navigator';
+import {IssueFull} from 'types/Issue';
+
+interface Props extends INavigationParams {
   issuesGetter: (linkTypeName: string, q: string) => any;
   onLinkIssue: (linkedIssueIdReadable: string, linkTypeName: string) => any;
   onUpdate: () => any;
   style?: ViewStyleProp;
   subTitle?: any;
-  onHide: () => any;
   closeIcon?: any;
-};
+}
 
-const LinkedIssuesAddLink = (props: Props): React.ReactNode => {
-  // update UI on theme change
+
+const LinkedIssuesAddLink = (props: Props): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme: Theme = useContext(ThemeContext);
-  const [issues, updateIssues] = useState([]);
+
+  const [issues, updateIssues] = useState<IssueOnList[]>([]);
   const [isLoading, updateLoading] = useState(false);
-  const [issueLinkTypes, updateIssueLinkTypes] = useState([]);
+  const [issueLinkTypes, updateIssueLinkTypes] = useState<IssueLinkTypeExtended[]>([]);
   const [
     currentIssueLinkTypeExtended,
     updateCurrentIssueLinkTypeExtended,
-  ] = useState(null);
-  const [isSelectVisible, updateSelectVisible] = useState(false);
-  const [isScrolling, updateScrolling] = useState(false);
+  ] = useState<IssueLinkTypeExtended | null>(null);
+  const [isSelectVisible, updateSelectVisible] = useState<boolean>(false);
+  const [isScrolling, updateScrolling] = useState<boolean>(false);
   const [queryData, updateQueryData] = useState({
     query: '',
     _query: '',
   });
   const [isQASelectVisible, updateQASelectVisible] = useState(false);
-  const [suggestions, updateSuggestions] = useState([]);
+  const [suggestions, updateSuggestions] = useState<TransformedSuggestion[]>([]);
   const loadLinkTypes = useCallback(async (): Promise<Array<IssueLinkType>> => {
-    const linkTypes: IssueLinkType[] = await issueCommonLinksActions(
-      {} as any,
-    ).loadIssueLinkTypes();
+    const linkTypes: IssueLinkType[] = await issueCommonLinksActions({} as Partial<IssueFull>).loadIssueLinkTypes();
     return linkTypes.filter((it: IssueLinkType) => !it.readOnly);
   }, []);
   const doLinkIssue = useCallback(
@@ -79,7 +81,7 @@ const LinkedIssuesAddLink = (props: Props): React.ReactNode => {
         );
         updateLoading(false);
         props.onUpdate();
-        props.onHide();
+        goBack();
       }
     },
     [currentIssueLinkTypeExtended, props],
@@ -99,10 +101,7 @@ const LinkedIssuesAddLink = (props: Props): React.ReactNode => {
         .split('')
         .some((char: string) => char >= '0' && char <= '9');
     return isSingleIssueQuery
-      ? _issues.find(
-          (issue: IssueOnList) =>
-            issue.idReadable.toLowerCase() === issueToLinkIdReadable,
-        )
+      ? _issues.find((issue: IssueOnList) => issue.idReadable.toLowerCase() === issueToLinkIdReadable)
       : null;
   }, []);
   const doSearch = useCallback(
@@ -250,7 +249,7 @@ const LinkedIssuesAddLink = (props: Props): React.ReactNode => {
         title={i18n('Link issue')}
         showShadow={true}
         leftButton={props.closeIcon || <IconBack color={styles.link.color} />}
-        onBack={props.onHide}
+        onBack={goBack}
       />
 
       {!!currentIssueLinkTypeExtended && (
@@ -292,7 +291,7 @@ const LinkedIssuesAddLink = (props: Props): React.ReactNode => {
           />
         }
         scrollEventThrottle={50}
-        keyExtractor={(issue: Partial<IssueOnList>) => issue.id}
+        keyExtractor={(issue: Partial<IssueOnList>) => issue.id as string}
         renderItem={(info: {item: any}) => renderIssue(info.item)}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListFooterComponent={
@@ -320,6 +319,5 @@ const LinkedIssuesAddLink = (props: Props): React.ReactNode => {
   );
 };
 
-export default React.memo<Props>(
-  LinkedIssuesAddLink,
-) as React$AbstractComponent<Props, unknown>;
+
+export default mixinNavigationProps(LinkedIssuesAddLink);

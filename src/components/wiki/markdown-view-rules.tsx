@@ -156,12 +156,12 @@ function getMarkdownRules(
         parent,
         hasCheckbox
           ? {
-              ...style,
-              bullet_list_icon: {
-                ...style.bullet_list_icon,
-                ...style.bullet_list_icon_checkbox,
-              },
-            }
+            ...style,
+            bullet_list_icon: {
+              ...style.bullet_list_icon,
+              ...style.bullet_list_icon_checkbox,
+            },
+          }
           : style,
         inheritedStyles
       );

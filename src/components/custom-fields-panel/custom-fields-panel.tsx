@@ -342,7 +342,7 @@ export default class CustomFieldsPanel extends Component<Props, State> {
         dataSource: () => {
           if (field.hasStateMachine) {
             return this.api
-              .getStateMachineEvents(this.props.issueId, field.id)
+              .getStateMachineEvents(this.issueId, field.id)
               .then(items =>
                 items.map(it =>
                   Object.assign(it, {

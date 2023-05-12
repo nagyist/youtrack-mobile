@@ -9,10 +9,11 @@ import {
 import Gallery from 'react-native-image-gallery';
 import Video from 'react-native-video';
 import {SvgFromUri} from 'react-native-svg';
+import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {View as AnimatedView} from 'react-native-animatable';
+
 import Header from 'components/header/header';
 import ImageWithProgress from 'components/image/image-with-progress';
-import Router from 'components/router/router';
 import usage from 'components/usage/usage';
 import {ANALYTICS_PREVIEW_PAGE} from 'components/analytics/analytics-ids';
 import {hasMimeType} from 'components/mime-type/mime-type';
@@ -20,24 +21,29 @@ import {IconClose} from 'components/icon/icon';
 import {IconNoProjectFound} from 'components/icon/icon-pictogram';
 import {isAndroidPlatform} from 'util/util';
 import {logEvent} from 'components/log/log-helper';
+
 import styles from './preview-file.styles';
+
 import type {Attachment} from 'types/CustomFields';
-type FileSource = {
+import {NavigationProp} from 'react-navigation';
+import {mixinNavigationProps} from 'components/navigation';
+
+interface FileSource {
   id: string;
   uri: string;
   headers: Record<string, any>;
   mimeType: string;
-};
-type Props = {
+}
+
+interface Props {
   imageAttachments: Attachment[];
   current: Attachment;
   imageHeaders: Record<string, any> | null | undefined;
   onRemoveImage?: (index: number) => any;
   onHide?: () => any;
-};
-const isAndroid: boolean = isAndroidPlatform();
-const ERROR_MESSAGE: string = 'Cannot load a preview';
-type VideoError = {
+}
+
+interface VideoError {
   error: {
     code: number;
     domain: string;
@@ -45,9 +51,14 @@ type VideoError = {
     localizedFailureReason: string;
     localizedRecoverySuggestion: string;
   };
-};
+}
 
-const ImagePreview = (props: Props): React.ReactNode => {
+const isAndroid: boolean = isAndroidPlatform();
+const ERROR_MESSAGE: string = 'Cannot load a preview';
+
+const ImagePreview = (props: Props): JSX.Element => {
+  const navigation: NavigationProp<ParamListBase> = useNavigation();
+
   const [index, updateCurrentIndex] = useState(0);
   const [error, updateError] = useState(null);
   const [isLoading, updateIsLoading] = useState(false);
@@ -56,7 +67,7 @@ const ImagePreview = (props: Props): React.ReactNode => {
     if (props.onHide) {
       props.onHide();
     } else {
-      Router.pop(true);
+      navigation.pop();
     }
   };
 
@@ -67,6 +78,7 @@ const ImagePreview = (props: Props): React.ReactNode => {
       ) || 0,
     [props.imageAttachments],
   );
+
   useEffect(() => {
     updateError(null);
     updateIsLoading(false);
@@ -76,25 +88,18 @@ const ImagePreview = (props: Props): React.ReactNode => {
     }
   }, [getCurrentIndex, props]);
 
-  const renderLoader = (): React.ReactElement<
-    React.ComponentProps<typeof ActivityIndicator>,
-    typeof ActivityIndicator
-  > => <ActivityIndicator color={styles.loader.color} style={styles.loader} />;
+  const renderLoader = (): React.ReactNode => <ActivityIndicator color={styles.loader.color} style={styles.loader}/>;
 
-  const renderImage: (imageProps: any)=> React.ReactNode = (imageProps: {
-    source: Attachment;
-  }): React.ReactNode => {
+  const renderImage = (imageProps: { source: Attachment; }): React.ReactNode => {
     usage.trackEvent(ANALYTICS_PREVIEW_PAGE, 'Open image');
 
     if (error) {
       return renderError();
     }
 
-    const attach: Attachment =
-      imageProps.source &&
-      props.imageAttachments[getCurrentIndex(imageProps.source)];
+    const attach: Attachment = imageProps.source && props.imageAttachments[getCurrentIndex(imageProps.source)];
     return hasMimeType.svg(attach) ? (
-      <SvgFromUri width="100%" height="100%" uri={attach.url} />
+      <SvgFromUri width="100%" height="100%" uri={attach.url}/>
     ) : (
       <ImageWithProgress
         renderError={renderError}
@@ -103,9 +108,9 @@ const ImagePreview = (props: Props): React.ReactNode => {
           styles.preview,
           attach.imageDimensions
             ? {
-                width: attach.imageDimensions.width,
-                height: attach.imageDimensions.height,
-              }
+              width: attach.imageDimensions.width,
+              height: attach.imageDimensions.height,
+            }
             : {},
         ]}
       />
@@ -165,7 +170,7 @@ const ImagePreview = (props: Props): React.ReactNode => {
 
   const renderError = (): React.ReactNode => (
     <View style={[styles.container, styles.error]}>
-      <IconNoProjectFound />
+      <IconNoProjectFound/>
       <Text style={styles.errorTitle}>{error || ERROR_MESSAGE}</Text>
       {renderOpenButton()}
     </View>
@@ -186,14 +191,9 @@ const ImagePreview = (props: Props): React.ReactNode => {
     );
   };
 
-  const renderOpenButton = (): React.ReactElement<
-    React.ComponentProps<typeof TouchableOpacity>,
-    typeof TouchableOpacity
-  > => {
+  const renderOpenButton = (): React.ReactNode => {
     usage.trackEvent(ANALYTICS_PREVIEW_PAGE, 'Preview file externally');
-    const attach: Attachment = isImageAttach()
-      ? props.imageAttachments[index]
-      : props.current;
+    const attach: Attachment = isImageAttach() ? props.imageAttachments[index] : props.current;
     return (
       <TouchableOpacity onPress={() => Linking.openURL(attach.url)}>
         <Text style={styles.link} numberOfLines={2}>
@@ -235,7 +235,4 @@ const ImagePreview = (props: Props): React.ReactNode => {
   );
 };
 
-export default React.memo<Props>(ImagePreview) as React$AbstractComponent<
-  Props,
-  unknown
->;
+export default React.memo<Props>(mixinNavigationProps(ImagePreview));

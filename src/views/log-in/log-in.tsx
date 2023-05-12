@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Image,
   View,
@@ -9,15 +10,14 @@ import {
   Linking,
   TouchableWithoutFeedback,
 } from 'react-native';
-import React, {Component} from 'react';
+
+import KeyboardSpacer from 'react-native-keyboard-spacer';
+
 import clicksToShowCounter from 'components/debug-view/clicks-to-show-counter';
 import ErrorMessageInline from 'components/error-message/error-message-inline';
-import KeyboardSpacer from 'react-native-keyboard-spacer';
 import log from 'components/log/log';
 import OAuth2 from 'components/auth/oauth2';
-import Router from 'components/router/router';
 import usage from 'components/usage/usage';
-import {connect} from 'react-redux';
 import {ERROR_MESSAGE_DATA} from 'components/error/error-message-data';
 import {formatYouTrackURL} from 'components/config/config';
 import {formStyles} from 'components/common-styles/form';
@@ -27,339 +27,316 @@ import {logo, IconBack} from 'components/icon/icon';
 import {openDebugView, onLogIn} from 'actions/app-actions';
 import {resolveErrorMessage} from 'components/error/error-resolver';
 import {ThemeContext} from 'components/theme/theme-context';
+
 import styles from './log-in.styles';
+
 import type {AppConfig} from 'types/AppConfig';
-import type {AuthParams, OAuthParams2} from 'types/Auth';
+import type {OAuthParams2} from 'types/Auth';
 import type {CustomError} from 'types/Error';
 import type {Theme, UIThemeColors} from 'types/Theme';
-type Props = {
+import {INavigationParams, mixinNavigationProps} from 'components/navigation';
+import {useDispatch} from 'react-redux';
+import {routeMap} from 'app-routes';
+
+interface Props extends INavigationParams {
   config: AppConfig;
-  onLogIn: (authParams: OAuthParams2) => any;
-  onShowDebugView: (...args: any[]) => any;
-  onChangeServerUrl: (currentUrl: string) => any;
+  onChangeServerUrl: (url: string) => any;
   errorMessage?: string;
   error?: CustomError;
-};
-type State = {
+}
+
+interface State {
   username: string;
   password: string;
   errorMessage: string;
   loggingIn: boolean;
   youTrackBackendUrl: string;
-};
+}
+
 
 const CATEGORY_NAME = 'Login form';
-export class LogIn extends Component<Props, State> {
-  passInputRef: any;
+const logMsg: string = 'Login via browser PKCE';
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      username: '',
-      password: '',
-      errorMessage: props.errorMessage || '',
-      loggingIn: false,
-      youTrackBackendUrl: props.config.backendUrl,
-    };
-    this.passInputRef = React.createRef();
-    usage.trackScreenView('Login form');
-  }
 
-  async componentDidMount() {
-    if (!this.isConfigHasClientSecret()) {
-      await this.logInViaHub();
-    }
-  }
+const LogIn = (props: Props) => {
+  const dispatch = useDispatch();
+  const passInputRef: React.RefObject<TextInput> = React.useRef(null);
+  const {config, navigation} = props;
+  const [state, updateState] = React.useState<State>({
+    username: '',
+    password: '',
+    errorMessage: props.errorMessage || '',
+    loggingIn: false,
+    youTrackBackendUrl: props.config?.backendUrl,
+  });
 
-  isConfigHasClientSecret(): boolean {
-    return !!this.props?.config?.auth?.clientSecret;
-  }
-
-  focusOnPassword: () => void = () => {
-    this.passInputRef.current.focus();
+  const setState = (statePartial: Partial<State> | State) => {
+    updateState((st: State) => ({...st, ...statePartial}));
   };
-  logInViaCredentials: () => Promise<void> | Promise<any> = async () => {
-    const {config, onLogIn} = this.props;
-    const {username, password} = this.state;
-    this.setState({
-      loggingIn: true,
-    });
 
+  const isConfigHasClientSecret = React.useCallback((): boolean => {
+    return !!config?.auth?.clientSecret;
+  }, [config?.auth?.clientSecret]);
+
+  const changeYouTrackUrl = React.useCallback(() => {
+    const serverUrl: string = props.config.backendUrl;
+    if (props?.onChangeServerUrl) {
+      props.onChangeServerUrl(serverUrl);
+    } else {
+      navigation.navigate(routeMap.EnterServer, {serverUrl});
+    }
+  }, [navigation, props]);
+
+  const logInViaHub = React.useCallback(async () => {
+    try {
+      setState({loggingIn: true});
+      const authParams: OAuthParams2 = await OAuth2.obtainTokenWithOAuthCode(config) as OAuthParams2;
+      usage.trackEvent(CATEGORY_NAME, logMsg, 'Success');
+      dispatch(onLogIn(authParams));
+    } catch (err) {
+      usage.trackEvent(CATEGORY_NAME, logMsg, 'Error');
+      log.warn(logMsg, err);
+
+      if (err.code === 'authentication_failed') {
+        changeYouTrackUrl();
+      } else {
+        const errorMessage = await resolveErrorMessage(err);
+        setState({
+          loggingIn: false,
+          errorMessage: errorMessage,
+        });
+      }
+    }
+  }, [changeYouTrackUrl, config, dispatch]);
+
+  React.useEffect(() => {
+    const doLogInViaHub = async () => {
+      if (!isConfigHasClientSecret()) {
+        await logInViaHub();
+      }
+    };
+    usage.trackScreenView('Login form');
+    doLogInViaHub();
+  }, [isConfigHasClientSecret, logInViaHub]);
+
+  const logInViaCredentials = async () => {
+    const {username, password} = state;
+    setState({loggingIn: true});
     try {
       const authParams: OAuthParams2 = await OAuth2.obtainTokenByCredentials(
         username,
         password,
         config,
-      );
+      ) as OAuthParams2;
       usage.trackEvent(CATEGORY_NAME, 'Login via credentials', 'Success');
       authParams.inAppLogin = true;
 
       if (!authParams.accessTokenExpirationDate && authParams.expires_in) {
-        authParams.accessTokenExpirationDate =
-          Date.now() + authParams.expires_in * 1000;
+        authParams.accessTokenExpirationDate = Date.now() + authParams.expires_in * 1000;
       }
-
       onLogIn(authParams);
+
     } catch (err) {
       usage.trackEvent(CATEGORY_NAME, 'Login via credentials', 'Error');
       const errorMessage: string = ERROR_MESSAGE_DATA[err.error]
         ? ERROR_MESSAGE_DATA[err.error].title
         : err.error_description || err.message;
-      this.setState({
+      setState({
         errorMessage: errorMessage,
         loggingIn: false,
       });
     }
   };
 
-  changeYouTrackUrl() {
-    this.props.onChangeServerUrl(this.props.config.backendUrl);
-  }
-
-  async logInViaHub(): Promise<void> | Promise<any> {
-    const {config, onLogIn} = this.props;
-    const msg: string = 'Login via browser PKCE';
-
-    try {
-      this.setState({
-        loggingIn: true,
-      });
-      const authParams: OAuthParams2 = await OAuth2.obtainTokenWithOAuthCode(
-        config,
-      );
-      usage.trackEvent(CATEGORY_NAME, msg, 'Success');
-      onLogIn(authParams);
-    } catch (err) {
-      usage.trackEvent(CATEGORY_NAME, msg, 'Error');
-      log.warn(msg, err);
-
-      if (err.code === 'authentication_failed') {
-        this.changeYouTrackUrl();
-      } else {
-        const errorMessage = await resolveErrorMessage(err);
-        this.setState({
-          loggingIn: false,
-          errorMessage: errorMessage,
-        });
-      }
-    }
-  }
-
-  render(): React.ReactNode {
-    const {onShowDebugView, config} = this.props;
-    const {password, username, loggingIn, errorMessage} = this.state;
-    const isLoginWithCreds: boolean = this.isConfigHasClientSecret();
-    return (
-      <ThemeContext.Consumer>
-        {(theme: Theme) => {
-          const uiThemeColors: UIThemeColors = theme.uiTheme.colors;
-          const hasNoCredentials: boolean = !username && !password;
-          return (
-            <ScrollView
-              contentContainerStyle={styles.scrollContainer}
-              keyboardShouldPersistTaps="handled"
-              keyboardDismissMode="on-drag"
+  const {password, username, loggingIn, errorMessage} = state;
+  const isLoginWithCreds: boolean = isConfigHasClientSecret();
+  return (
+    <ThemeContext.Consumer>
+      {(theme: Theme) => {
+        const uiThemeColors: UIThemeColors = theme.uiTheme.colors;
+        const hasNoCredentials: boolean = !username && !password;
+        return (
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+          >
+            <View
+              style={[
+                styles.container,
+                isLoginWithCreds ? null : styles.loadingContainer,
+              ]}
             >
-              <View
-                style={[
-                  styles.container,
-                  isLoginWithCreds ? null : styles.loadingContainer,
-                ]}
-              >
-                <View style={styles.backIconButtonContainer}>
-                  <TouchableOpacity
-                    onPress={() => this.changeYouTrackUrl()}
-                    style={styles.backIconButton}
-                    testID="back-to-url"
-                  >
-                    <IconBack />
-                  </TouchableOpacity>
-                </View>
-
-                <View
-                  style={
-                    isLoginWithCreds
-                      ? styles.formContent
-                      : styles.formContentCenter
-                  }
+              <View style={styles.backIconButtonContainer}>
+                <TouchableOpacity
+                  onPress={changeYouTrackUrl}
+                  style={styles.backIconButton}
+                  testID="back-to-url"
                 >
-                  <TouchableWithoutFeedback
-                    onPress={() => clicksToShowCounter(onShowDebugView)}
-                  >
-                    <Image style={styles.logoImage} source={logo} />
-                  </TouchableWithoutFeedback>
+                  <IconBack/>
+                </TouchableOpacity>
+              </View>
 
-                  <TouchableOpacity
-                    style={styles.formContentText}
-                    onPress={() => this.changeYouTrackUrl()}
-                    testID="youtrack-url"
-                  >
-                    <Text style={styles.title}>
-                      {i18n('Log in to YouTrack')}
-                    </Text>
-                    <Text style={styles.hintText}>
-                      {formatYouTrackURL(config.backendUrl)}
-                    </Text>
-                  </TouchableOpacity>
+              <View
+                style={
+                  isLoginWithCreds
+                    ? styles.formContent
+                    : styles.formContentCenter
+                }
+              >
+                <TouchableWithoutFeedback
+                  //TODO: add route
+                  onPress={() => clicksToShowCounter(dispatch(openDebugView()))}
+                >
+                  <Image style={styles.logoImage} source={logo}/>
+                </TouchableWithoutFeedback>
 
-                  {isLoginWithCreds && (
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      editable={!loggingIn}
-                      testID="test:id/login-input"
-                      accessibilityLabel="login-input"
-                      accessible={true}
-                      style={styles.inputUser}
-                      placeholder={i18n('Username or email')}
-                      placeholderTextColor={uiThemeColors.$icon}
-                      returnKeyType="next"
-                      underlineColorAndroid="transparent"
-                      onSubmitEditing={() => this.focusOnPassword()}
-                      value={username}
-                      onChangeText={(username: string) =>
-                        this.setState({
-                          username,
-                        })
-                      }
-                    />
-                  )}
+                <TouchableOpacity
+                  style={styles.formContentText}
+                  onPress={changeYouTrackUrl}
+                  testID="youtrack-url"
+                >
+                  <Text style={styles.title}>
+                    {i18n('Log in to YouTrack')}
+                  </Text>
+                  <Text style={styles.hintText}>
+                    {formatYouTrackURL(config.backendUrl)}
+                  </Text>
+                </TouchableOpacity>
 
-                  {isLoginWithCreds && (
-                    <TextInput
-                      ref={this.passInputRef}
-                      editable={!loggingIn}
-                      testID="test:id/password-input"
-                      accessibilityLabel="password-input"
-                      accessible={true}
-                      style={styles.inputPass}
-                      placeholder={i18n('Password')}
-                      placeholderTextColor={uiThemeColors.$icon}
-                      returnKeyType="done"
-                      underlineColorAndroid="transparent"
-                      value={this.state.password}
-                      onSubmitEditing={() => {
-                        this.logInViaCredentials();
-                      }}
-                      secureTextEntry={true}
-                      onChangeText={(password: string) =>
-                        this.setState({
-                          password,
-                        })
-                      }
-                    />
-                  )}
+                {isLoginWithCreds && (
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!loggingIn}
+                    testID="test:id/login-input"
+                    accessibilityLabel="login-input"
+                    accessible={true}
+                    style={styles.inputUser}
+                    placeholder={i18n('Username or email')}
+                    placeholderTextColor={uiThemeColors.$icon}
+                    returnKeyType="next"
+                    underlineColorAndroid="transparent"
+                    onSubmitEditing={() => passInputRef?.current?.focus()}
+                    value={username}
+                    onChangeText={(username: string) =>
+                      setState({
+                        username,
+                      })
+                    }
+                  />
+                )}
 
-                  {isLoginWithCreds && (
-                    <TouchableOpacity
-                      style={[
-                        formStyles.button,
-                        (loggingIn || hasNoCredentials) &&
-                          formStyles.buttonDisabled,
-                      ]}
-                      disabled={loggingIn || hasNoCredentials}
-                      testID="test:id/log-in"
-                      accessibilityLabel="log-in"
-                      accessible={true}
-                      onPress={this.logInViaCredentials}
-                    >
-                      <Text
-                        style={[
-                          formStyles.buttonText,
-                          hasNoCredentials && formStyles.buttonTextDisabled,
-                        ]}
-                      >
-                        {i18n('Log in')}
-                      </Text>
-                      {this.state.loggingIn && (
-                        <ActivityIndicator style={styles.progressIndicator} />
-                      )}
-                    </TouchableOpacity>
-                  )}
+                {isLoginWithCreds && (
+                  <TextInput
+                    ref={passInputRef}
+                    editable={!loggingIn}
+                    testID="test:id/password-input"
+                    accessibilityLabel="password-input"
+                    accessible={true}
+                    style={styles.inputPass}
+                    placeholder={i18n('Password')}
+                    placeholderTextColor={uiThemeColors.$icon}
+                    returnKeyType="done"
+                    underlineColorAndroid="transparent"
+                    value={state.password}
+                    onSubmitEditing={() => {
+                      logInViaCredentials();
+                    }}
+                    secureTextEntry={true}
+                    onChangeText={(password: string) =>
+                      setState({
+                        password,
+                      })
+                    }
+                  />
+                )}
 
-                  {!isLoginWithCreds &&
-                    this.state.loggingIn &&
-                    !this.state.errorMessage && (
-                      <View style={styles.loadingMessage}>
-                        <ActivityIndicator
-                          style={styles.loadingMessageIndicator}
-                          color={styles.loadingMessageIndicator.color}
-                        />
-                      </View>
-                    )}
-
-                  {isLoginWithCreds && (
-                    <Text style={styles.hintText}>
-                      {i18n('You need a YouTrack account to use the app.\n')}
-                      <Text
-                        style={formStyles.link}
-                        onPress={() =>
-                          Linking.openURL(
-                            'https://www.jetbrains.com/company/privacy.html',
-                          )
-                        }
-                      >
-                        {i18n(
-                          'By logging in, you agree to the Privacy Policy.',
-                        )}
-                      </Text>
-                    </Text>
-                  )}
-
-                  {Boolean(errorMessage || hasNoCredentials) && (
-                    <View style={styles.error}>
-                      <ErrorMessageInline error={this.state.errorMessage} />
-                    </View>
-                  )}
-                </View>
                 {isLoginWithCreds && (
                   <TouchableOpacity
-                    hitSlop={HIT_SLOP}
-                    style={styles.support}
-                    testID="test:id/log-in-via-browser"
-                    accessibilityLabel="log-in-via-browser"
+                    style={[
+                      formStyles.button,
+                      (loggingIn || hasNoCredentials) &&
+                      formStyles.buttonDisabled,
+                    ]}
+                    disabled={loggingIn || hasNoCredentials}
+                    testID="test:id/log-in"
+                    accessibilityLabel="log-in"
                     accessible={true}
-                    onPress={() => this.logInViaHub()}
+                    onPress={logInViaCredentials}
                   >
-                    <Text style={styles.action}>
-                      {i18n('Log in with Browser')}
+                    <Text
+                      style={[
+                        formStyles.buttonText,
+                        hasNoCredentials && formStyles.buttonTextDisabled,
+                      ]}
+                    >
+                      {i18n('Log in')}
                     </Text>
+                    {state.loggingIn && (
+                      <ActivityIndicator style={styles.progressIndicator}/>
+                    )}
                   </TouchableOpacity>
                 )}
 
-                <KeyboardSpacer />
+                {!isLoginWithCreds &&
+                  state.loggingIn &&
+                  !state.errorMessage && (
+                    <View style={styles.loadingMessage}>
+                      <ActivityIndicator
+                        style={styles.loadingMessageIndicator}
+                        color={styles.loadingMessageIndicator.color}
+                      />
+                    </View>
+                  )}
+
+                {isLoginWithCreds && (
+                  <Text style={styles.hintText}>
+                    {i18n('You need a YouTrack account to use the app.\n')}
+                    <Text
+                      style={formStyles.link}
+                      onPress={() =>
+                        Linking.openURL(
+                          'https://www.jetbrains.com/company/privacy.html',
+                        )
+                      }
+                    >
+                      {i18n(
+                        'By logging in, you agree to the Privacy Policy.',
+                      )}
+                    </Text>
+                  </Text>
+                )}
+
+                {Boolean(errorMessage || hasNoCredentials) && (
+                  <View style={styles.error}>
+                    <ErrorMessageInline error={state.errorMessage}/>
+                  </View>
+                )}
               </View>
-            </ScrollView>
-          );
-        }}
-      </ThemeContext.Consumer>
-    );
-  }
-}
+              {isLoginWithCreds && (
+                <TouchableOpacity
+                  hitSlop={HIT_SLOP}
+                  style={styles.support}
+                  testID="test:id/log-in-via-browser"
+                  accessibilityLabel="log-in-via-browser"
+                  accessible={true}
+                  onPress={() => logInViaHub()}
+                >
+                  <Text style={styles.action}>
+                    {i18n('Log in with Browser')}
+                  </Text>
+                </TouchableOpacity>
+              )}
 
-const mapStateToProps = (state, ownProps) => {
-  return {...ownProps};
+              <KeyboardSpacer/>
+            </View>
+          </ScrollView>
+        );
+      }}
+    </ThemeContext.Consumer>
+  );
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    onChangeServerUrl: youtrackUrl => {
-      if (ownProps.onChangeServerUrl) {
-        return ownProps.onChangeServerUrl(youtrackUrl);
-      }
 
-      Router.EnterServer({
-        serverUrl: youtrackUrl,
-      });
-    },
-    onLogIn: (authParams: AuthParams) => dispatch(onLogIn(authParams)),
-    onShowDebugView: () => dispatch(openDebugView()),
-  };
-};
-
-// Needed to have a possibility to override callback by own props
-const mergeProps = (stateProps, dispatchProps) => {
-  return {...dispatchProps, ...stateProps};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(LogIn);
+export default mixinNavigationProps(LogIn);

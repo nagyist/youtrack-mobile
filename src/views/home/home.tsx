@@ -7,7 +7,7 @@ import {i18n} from 'components/i18n/i18n';
 import {logo, IconPencil} from 'components/icon/icon';
 import styles from './home.styles';
 type Props = {
-  backendUrl: string;
+  backendUrl?: string;
   message?: string;
   error?: {
     message: string;
@@ -16,7 +16,7 @@ type Props = {
   onRetry: () => any;
 };
 
-const Home = (props: Props): React.ReactNode => {
+const Home = (props: Props): JSX.Element => {
   usage.trackScreenView('Loading');
   const {backendUrl, onChangeBackendUrl, error, message, onRetry} = props;
   const errorMessage: string | null | undefined = error?.message || message;
@@ -33,7 +33,7 @@ const Home = (props: Props): React.ReactNode => {
           <TouchableOpacity
             hitSlop={HIT_SLOP}
             style={styles.urlButton}
-            onPress={() => onChangeBackendUrl(backendUrl)}
+            onPress={() => onChangeBackendUrl?.(backendUrl)}
           >
             <Text style={styles.url}>{formatYouTrackURL(backendUrl)}</Text>
             <IconPencil
@@ -53,7 +53,4 @@ const Home = (props: Props): React.ReactNode => {
   );
 };
 
-export default React.memo<Props>(Home) as React$AbstractComponent<
-  Props,
-  unknown
->;
+export default React.memo<Props>(Home);

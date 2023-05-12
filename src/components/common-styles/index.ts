@@ -14,6 +14,8 @@ export {
   monospaceFontIOS,
 } from './typography';
 
+export {menuHeight} from './header';
+
 export {
   elevation1,
   elevationBottom,

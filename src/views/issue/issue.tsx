@@ -1,13 +1,14 @@
 import React from 'react';
-import {FlatList, RefreshControl, Text, View} from 'react-native';
+import {EventSubscription, FlatList, RefreshControl, Text, View} from 'react-native';
+
 import {bindActionCreatorsExt} from 'util/redux-ext';
 import {connect} from 'react-redux';
-import createIssueActions, {dispatchActions} from './issue-actions';
+import {withNavigation} from 'react-navigation';
+
 import AttachFileDialog from 'components/attach-file/attach-file-dialog';
 import ColorField from 'components/color-field/color-field';
-import CommandDialog, {
-  CommandDialogModal,
-} from 'components/command-dialog/command-dialog';
+import CommandDialog, {CommandDialogModal} from 'components/command-dialog/command-dialog';
+import createIssueActions, {dispatchActions} from './issue-actions';
 import ErrorMessage from 'components/error-message/error-message';
 import Header from 'components/header/header';
 import IssueActivity from './activity/issue__activity';
@@ -20,6 +21,7 @@ import Router from 'components/router/router';
 import Star from 'components/star/star';
 import usage from 'components/usage/usage';
 import {addListenerGoOnline} from 'components/network/network-events';
+import {ANALYTICS_ISSUE_PAGE} from 'components/analytics/analytics-ids';
 import {attachmentActions} from './issue__attachment-actions-and-types';
 import {DEFAULT_ISSUE_STATE_FIELD_NAME} from './issue-base-actions-creater';
 import {getApi} from 'components/api/api__instance';
@@ -34,16 +36,18 @@ import {
 import {isIOSPlatform} from 'util/util';
 import {isSplitView} from 'components/responsive/responsive-helper';
 import {IssueContext} from './issue-context';
+import {routeMap} from 'app-routes';
 import {Select, SelectModal} from 'components/select/select';
 import {Skeleton} from 'components/skeleton/skeleton';
 import {ThemeContext} from 'components/theme/theme-context';
+
 import styles from './issue.styles';
+
 import type IssuePermissions from 'components/issue-permissions/issue-permissions';
 import type {AnyIssue, IssueFull, TabRoute} from 'types/Issue';
 import type {Attachment, IssueLink, Tag} from 'types/CustomFields';
 import type {AttachmentActions} from 'components/attachments-row/attachment-actions';
-import type {EventSubscription} from 'react-native/Libraries/vendor/emitter/EventEmitter';
-import type {IssueTabbedState} from 'components/issue-tabbed/issue-tabbed';
+import type {IIssueTabbedState} from 'components/issue-tabbed/issue-tabbed';
 import type {NormalizedAttachment} from 'types/Attachment';
 import type {RequestHeaders} from 'types/Auth';
 import type {RootState} from 'reducers/app-reducer';
@@ -51,7 +55,9 @@ import type {ScrollData} from 'types/Markdown';
 import type {State as IssueState} from './issue-reducers';
 import type {Theme, UITheme} from 'types/Theme';
 import type {User} from 'types/User';
-const isIOS: boolean = isIOSPlatform();
+import {INavigationParams, spreadNavigationProps} from 'components/navigation';
+import {IssueOnList} from 'types/Issue';
+
 type AdditionalProps = {
   issuePermissions: IssuePermissions;
   issuePlaceholder: Record<string, any>;
@@ -64,33 +70,38 @@ type AdditionalProps = {
   onCommandApply: () => any;
   commentId?: string;
 };
+
 export type IssueProps = IssueState &
   typeof dispatchActions &
   AttachmentActions &
-  AdditionalProps;
-//@ts-expect-error
-export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
-  static contextTypes: {
-    actionSheet: (...args: any[]) => any;
-  } = {
+  AdditionalProps  &
+  INavigationParams
+
+const isIOS: boolean = isIOSPlatform();
+
+
+export class Issue extends IssueTabbed<IssueProps, IIssueTabbedState> {
+  static contextTypes: { actionSheet: (...args: any[]) => any; } = {
     actionSheet: Function,
   };
-  CATEGORY_NAME: string = 'Issue';
+
   imageHeaders: RequestHeaders = getApi().auth.getAuthorizationHeaders();
   backendUrl: string = getApi().config.backendUrl;
   renderRefreshControl: (
     ...args: any[]
   ) => any = this._renderRefreshControl.bind(this);
-  goOnlineSubscription: EventSubscription;
+  goOnlineSubscription: EventSubscription | undefined;
+  uiTheme: UITheme | undefined;
 
   constructor(props: IssueProps) {
-        super(props);
-        this.onAddIssueLink = this.onAddIssueLink.bind(this);
-        this.toggleModalChildren = this.toggleModalChildren.bind(this);
+    super(props);
+    this.onAddIssueLink = this.onAddIssueLink.bind(this);
+    this.toggleModalChildren = this.toggleModalChildren.bind(this);
+    this.handleOnBack = this.handleOnBack.bind(this);
   }
 
   async init() {
-    usage.trackScreenView(this.CATEGORY_NAME);
+    usage.trackScreenView(ANALYTICS_ISSUE_PAGE);
     await this.props.unloadIssueIfExist();
     await this.props.setIssueId(
       this.props.issueId || this.props?.issuePlaceholder?.id,
@@ -117,12 +128,6 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
     this.goOnlineSubscription?.remove();
   }
 
-  async UNSAFE_componentWillReceiveProps(nextProps: IssueProps): Promise<void> {
-    if (nextProps.issueId !== this.props.issueId) {
-      await this.init();
-    }
-  }
-
   componentDidUpdate(prevProps: IssueProps): void {
     if (
       prevProps.navigateToActivity !== this.props.navigateToActivity ||
@@ -145,13 +150,11 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
     }
   }
 
-  getRouteBadge(
-    route: TabRoute,
-  ): React.ReactElement<React.ComponentProps<typeof View>, typeof View> | null {
+  getRouteBadge(route: TabRoute) {
     return super.getRouteBadge(route.title === this.tabRoutes[1].title, this.props?.commentsCounter);
   }
 
-  async loadIssue(issuePlaceholder: Partial<IssueFull> | null | undefined) {
+  async loadIssue(issuePlaceholder: IssueOnList | Partial<IssueFull> | undefined) {
     await this.props.loadIssue(issuePlaceholder);
   }
 
@@ -190,6 +193,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
       onShowCopyTextContextActions,
       getIssueLinksTitle,
       setCustomFieldValue,
+      navigation,
     } = this.props;
     const Component: any = isSplitView ? IssueDetailsModal : IssueDetails;
     return (
@@ -211,7 +215,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
         descriptionCopy={descriptionCopy}
         setIssueSummaryCopy={setIssueSummaryCopy}
         setIssueDescriptionCopy={setIssueDescriptionCopy}
-        analyticCategory={this.CATEGORY_NAME}
+        analyticCategory={ANALYTICS_ISSUE_PAGE}
         renderRefreshControl={() =>
           this.renderRefreshControl(() => this.loadIssue(), uiTheme)
         }
@@ -237,6 +241,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
         setCustomFieldValue={setCustomFieldValue}
         isSplitView={isSplitView}
         scrollData={scrollData}
+        navigation={navigation}
       />
     );
   };
@@ -321,11 +326,13 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
   }
 
   handleOnBack() {
-    const hasParentRoute: boolean = Router.pop();
-
-    if (!hasParentRoute) {
-      Router.Issues();
+    const {navigation} = this.props;
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate(routeMap.Issues);
     }
+
   }
 
   renderBackIcon: () => null | React.ReactElement<
@@ -333,7 +340,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
     any
   > = () => {
     return isSplitView() ? null : (
-      <IconBack color={this.uiTheme.colors.$link} />
+      <IconBack color={this.uiTheme.colors.$link}/>
     );
   };
   canStar: () => boolean = (): boolean => {
@@ -348,16 +355,16 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
     typeof Skeleton | typeof Text
   > {
     if (!this.isIssueLoaded()) {
-      return <Skeleton width={24} />;
+      return <Skeleton width={24}/>;
     }
 
     return (
       <Text style={styles.iconMore}>
         {isIOS ? (
-          <IconMoreOptions size={18} color={uiTheme.colors.$link} />
+          <IconMoreOptions size={18} color={uiTheme.colors.$link}/>
         ) : (
           <Text>
-            <IconDrag size={18} color={uiTheme.colors.$link} />
+            <IconDrag size={18} color={uiTheme.colors.$link}/>
           </Text>
         )}
         <Text> </Text>
@@ -365,13 +372,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
     );
   }
 
-  renderStar: () => React.ReactElement<
-    React.ComponentProps<typeof Star | typeof Skeleton>,
-    typeof Star | typeof Skeleton
-  > = (): React.ReactElement<
-    React.ComponentProps<typeof Star | typeof Skeleton>,
-    typeof Star | typeof Skeleton
-  > => {
+  renderStar = (): JSX.Element => {
     const {issue, toggleStar} = this.props;
 
     if (issue && this.isIssueLoaded()) {
@@ -385,7 +386,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
       );
     }
 
-    return <Skeleton width={24} />;
+    return <Skeleton width={24}/>;
   };
 
   renderHeaderIssueTitle(): React.ReactElement<
@@ -415,7 +416,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
 
     return this.isIssueLoaded()
       ? null
-      : (!issueLoadingError && <Skeleton width={120} />) || null;
+      : (!issueLoadingError && <Skeleton width={120}/>) || null;
   }
 
   toggleModalChildren(modalChildren?: any): void {
@@ -443,7 +444,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
       this.toggleModalChildren(
         render(
           this.toggleModalChildren,
-          <IconClose size={21} color={styles.link.color} />,
+          <IconClose size={21} color={styles.link.color}/>,
         ),
       );
     } else {
@@ -516,7 +517,8 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
             />
           }
           onRightButtonClick={
-            canSave ? saveIssueSummaryAndDescriptionChange : () => {}
+            canSave ? saveIssueSummaryAndDescriptionChange : () => {
+            }
           }
         >
           {issueIdReadable}
@@ -527,7 +529,6 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
 
   _renderRefreshControl(
     onRefresh?: (...args: any[]) => any,
-    uiTheme: UITheme,
   ) {
     return (
       <RefreshControl
@@ -535,7 +536,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
         accessibilityLabel="refresh-control"
         accessible={true}
         refreshing={this.props.isRefreshing}
-        tintColor={uiTheme.colors.$link}
+        tintColor={this.uiTheme.colors.$link}
         onRefresh={() => {
           if (onRefresh) {
             onRefresh();
@@ -682,7 +683,7 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
 
                 {issueLoadingError && (
                   <View style={styles.error}>
-                    <ErrorMessage error={issueLoadingError} />
+                    <ErrorMessage error={issueLoadingError}/>
                   </View>
                 )}
 
@@ -709,7 +710,8 @@ export class Issue extends IssueTabbed<IssueProps, IssueTabbedState> {
     );
   }
 }
-export type OwnProps = {
+
+export type OwnProps = INavigationParams & {
   issuePermissions: IssuePermissions;
   issuePlaceholder: Partial<IssueFull>;
   issueId: string;
@@ -725,14 +727,14 @@ const mapStateToProps = (
   ownProps: OwnProps,
 ): Partial<IssueState & OwnProps> => {
   const isConnected: boolean = !!state.app?.networkState?.isConnected;
+  const spreadedOwnParams = spreadNavigationProps(ownProps);
   return {
     issuePermissions: state.app.issuePermissions,
     ...state.issueState,
-    issuePlaceholder: ownProps.issuePlaceholder,
-    issueId: ownProps.issueId,
+    ...spreadedOwnParams,
     user: state.app.user,
     isConnected,
-    navigateToActivity: isConnected === true || isConnected === undefined ? ownProps.navigateToActivity : undefined,
+    navigateToActivity: isConnected || isConnected === undefined ? spreadedOwnParams.navigateToActivity : undefined,
   };
 };
 
@@ -754,7 +756,5 @@ const mapDispatchToProps = dispatch => {
 export function connectIssue(Component: any): any {
   return connect(mapStateToProps, mapDispatchToProps)(Component);
 }
-export default connectIssue(Issue) as React$AbstractComponent<
-  IssueProps,
-  unknown
->;
+
+export default connectIssue(withNavigation(Issue));

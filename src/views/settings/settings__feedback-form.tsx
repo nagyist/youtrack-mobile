@@ -15,7 +15,7 @@ import {
   sendFeedback,
 } from './settings-helper';
 import {i18n} from 'components/i18n/i18n';
-import {IconAngleRight, IconCheck, IconClose} from 'components/icon/icon';
+import {IconAngleRight, IconBack, IconCheck} from 'components/icon/icon';
 import {notify, notifyError} from 'components/notification/notification';
 import {showActions} from 'components/action-sheet/action-sheet';
 import {until} from 'util/util';
@@ -40,6 +40,8 @@ type State = {
   isLogsSelectorVisible: boolean;
   feedback: Feedback;
 };
+
+
 export default class SettingsFeedbackForm extends PureComponent<Props, State> {
   static contextTypes: any = {
     actionSheet: Function,
@@ -99,7 +101,7 @@ export default class SettingsFeedbackForm extends PureComponent<Props, State> {
       selectedAction.execute();
     }
   };
-  close: () => any = () => Router.pop(true);
+  close: () => any = Router.pop;
   onSendFeedback: () => Promise<void> | Promise<any> = async () => {
     this.setSendingProgress(true);
     const [error] = await until(sendFeedback(this.state.feedback));
@@ -151,8 +153,7 @@ export default class SettingsFeedbackForm extends PureComponent<Props, State> {
           style={styles.elevation1}
           title={i18n('Send Feedback')}
           leftButton={
-            <IconClose
-              size={21}
+            <IconBack
               color={
                 isFeedbackFormSending
                   ? uiThemeColors.$disabled

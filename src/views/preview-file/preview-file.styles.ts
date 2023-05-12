@@ -6,7 +6,7 @@ import {UNIT} from 'components/variables';
 export default EStyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '$background',
   },
   header: {
     backgroundColor: 'transparent',

@@ -44,13 +44,14 @@ import type {Attachment} from 'types/CustomFields';
 import type {CustomError} from 'types/Error';
 import type {EventSubscription} from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import type {HeaderProps} from 'components/header/header';
-import type {IssueTabbedState} from 'components/issue-tabbed/issue-tabbed';
+import type {IIssueTabbedState} from 'components/issue-tabbed/issue-tabbed';
 import type {KnowledgeBaseState} from '../knowledge-base/knowledge-base-reducers';
 import type {RootState} from 'reducers/app-reducer';
 import type {Theme, UITheme, UIThemeColors} from 'types/Theme';
 import type {ViewStyleProp} from 'types/Internal';
 import type {Visibility} from 'types/Visibility';
 import {TabRoute} from 'types/Issue';
+import {INavigationParams, spreadNavigationProps} from 'components/navigation';
 
 type Props = ArticleState & {
   articlePlaceholder: ArticleEntity;
@@ -59,9 +60,10 @@ type Props = ArticleState & {
   lastVisitedArticle: Article | null | undefined;
   commentId?: string;
 } & typeof articleActions;
-type State = IssueTabbedState & {
+
+type State = IIssueTabbedState & {
   modalChildren: any;
-}; //@ts-expect-error
+};
 
 class Article extends IssueTabbed<Props, State> {
   static contextTypes = {
@@ -143,9 +145,7 @@ class Article extends IssueTabbed<Props, State> {
     return i18n('Content');
   }
 
-  getRouteBadge(
-    route: TabRoute,
-  ): React.ReactElement<React.ComponentProps<typeof View>, typeof View> | null {
+  getRouteBadge(route: TabRoute) {
     return super.getRouteBadge(route.title === this.tabRoutes[1].title, this.props?.article?.comments?.length);
   }
 
@@ -422,16 +422,7 @@ class Article extends IssueTabbed<Props, State> {
       leftButton: this.state.isSplitView ? null : (
         <IconBack color={isProcessing ? textSecondaryColor : linkColor} />
       ),
-      onBack: () => {
-        if (!this.state.isSplitView) {
-          if (isProcessing) {
-            return;
-          }
-
-          const hasParent: boolean = Router.pop();
-          !hasParent && Router.KnowledgeBase();
-        }
-      },
+      onBack: Router.pop,
       rightButton:
         isArticleLoaded && !isProcessing ? (
           <IconContextActions size={18} color={linkColor} />
@@ -500,11 +491,11 @@ const mapStateToProps = (
     app: RootState;
     articles: KnowledgeBaseState;
   },
-  ownProps: Props,
-): ArticleState => {
+  ownProps: Props & INavigationParams,
+): ArticleState & Props & INavigationParams => {
   return {
     ...state.article,
-    articlePlaceholder: ownProps.articlePlaceholder,
+    ...spreadNavigationProps(ownProps),
     issuePermissions: state.app.issuePermissions,
     lastVisitedArticle: state.app?.user?.profiles?.articles?.lastVisitedArticle,
     articlesList: createArticleList(

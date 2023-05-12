@@ -1,14 +1,17 @@
 import React, {Component} from 'react';
 import {
+  EventSubscription,
   View,
   RefreshControl,
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
+
 import isEqual from 'react-fast-compare';
 import {connect} from 'react-redux';
 import {View as AnimatedView} from 'react-native-animatable';
+
 import * as boardActions from './board-actions';
 import AgileBoardSprint from './agile-board__sprint';
 import Api from 'components/api/api';
@@ -16,6 +19,7 @@ import Auth from 'components/auth/oauth2';
 import BoardHeader from './board-header';
 import BoardScroller from 'components/board-scroller/board-scroller';
 import CreateIssue from '../create-issue/create-issue';
+import DeviceInfo from 'react-native-device-info';
 import ErrorMessage from 'components/error-message/error-message';
 import IssueModal from '../issue/modal/issue.modal';
 import log from 'components/log/log';
@@ -28,26 +32,28 @@ import {addListenerGoOnline} from 'components/network/network-events';
 import {ANALYTICS_AGILE_PAGE} from 'components/analytics/analytics-ids';
 import {DragContainer} from 'components/draggable';
 import {flushStoragePart, getStorageState} from 'components/storage/storage';
-import {i18n} from 'components/i18n/i18n';
 import {getScrollableWidth} from 'components/board-scroller/board-scroller__math';
 import {hasType} from 'components/api/api__resource-types';
+import {HIT_SLOP} from 'components/common-styles';
+import {i18n} from 'components/i18n/i18n';
 import {IconException, IconMagnifyZoom} from 'components/icon/icon';
 import {isSplitView} from 'components/responsive/responsive-helper';
+import {INavigationParams, spreadNavigationProps} from 'components/navigation';
 import {notify} from 'components/notification/notification';
 import {renderSelector} from './agile-board__renderer';
-import {routeMap} from '../../app-routes';
+import {routeMap} from 'app-routes';
 import {Select, SelectModal} from 'components/select/select';
 import {SkeletonAgile} from 'components/skeleton/skeleton';
 import {ThemeContext} from 'components/theme/theme-context';
-import {HIT_SLOP} from 'components/common-styles';
 import {UNIT} from 'components/variables';
+
 import styles from './agile-board.styles';
+
 import type IssuePermissions from 'components/issue-permissions/issue-permissions';
 import type {AgilePageState} from './board-reducers';
 import type {AnyIssue, IssueOnList} from 'types/Issue';
-import type {AppState} from '../../reducers';
+import type {AppState} from 'reducers';
 import type {CustomError} from 'types/Error';
-import type {EventSubscription} from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import type {
   SprintFull,
   AgileBoardRow,
@@ -56,9 +62,8 @@ import type {
   Sprint,
 } from 'types/Agile';
 import type {Theme, UITheme} from 'types/Theme';
-import DeviceInfo from 'react-native-device-info';
-const CATEGORY_NAME = 'Agile board';
-type Props = AgilePageState & {
+
+type Props = INavigationParams & AgilePageState & {
   auth: Auth;
   api: Api;
   isLoadingMore: boolean;
@@ -80,6 +85,7 @@ type Props = AgilePageState & {
   storeLastQuery: (query: string) => any;
   updateIssue: (issueId: string, sprint?: SprintFull) => any;
 };
+
 type State = {
   zoomedIn: boolean;
   stickElement: {
@@ -92,6 +98,9 @@ type State = {
   isSplitView: boolean;
   modalChildren: any;
 };
+
+const CATEGORY_NAME = 'Agile board';
+
 
 class AgileBoard extends Component<Props, State> {
   boardHeader: BoardHeader | null | undefined;
@@ -452,9 +461,9 @@ class AgileBoard extends Component<Props, State> {
           ...sprint,
           agile: sprint?.agile
             ? {
-                ...sprint?.agile,
-                hideOrphansSwimlane: agile?.hideOrphansSwimlane,
-              }
+              ...sprint?.agile,
+              hideOrphansSwimlane: agile?.hideOrphansSwimlane,
+            }
             : agile,
         }}
         zoomedIn={this.state.zoomedIn}
@@ -464,25 +473,25 @@ class AgileBoard extends Component<Props, State> {
           networkState?.isConnected === false
             ? null
             : async (...args): Promise<void> => {
-                const draft: Partial<IssueOnList> = await createCardForCell.apply(
-                  null,
-                  [...args, this.state.isSplitView],
-                );
+              const draft: Partial<IssueOnList> = await createCardForCell.apply(
+                null,
+                [...args, this.state.isSplitView],
+              );
 
-                if (this.state.isSplitView) {
-                  this.toggleModalChildren(
-                    <CreateIssue
-                      isSplitView={this.state.isSplitView}
-                      onHide={this.clearModalChildren}
-                      predefinedDraftId={draft.id}
-                    />,
-                  );
-                } else {
-                  Router.CreateIssue({
-                    predefinedDraftId: draft.id,
-                  });
-                }
+              if (this.state.isSplitView) {
+                this.toggleModalChildren(
+                  <CreateIssue
+                    isSplitView={this.state.isSplitView}
+                    onHide={this.clearModalChildren}
+                    predefinedDraftId={draft.id}
+                  />,
+                );
+              } else {
+                Router.CreateIssue({
+                  predefinedDraftId: draft.id,
+                });
               }
+            }
         }
         onCollapseToggle={onRowCollapseToggle}
         uiTheme={this.uiTheme}
@@ -509,8 +518,8 @@ class AgileBoard extends Component<Props, State> {
       columnId: dropZone.data.columnId,
       cellId: dropZone.data.cellId,
       leadingId: dropZone.data.issueIds.filter(id => id !== movedId)[
-        dropZone.placeholderIndex - 1
-      ],
+      dropZone.placeholderIndex - 1
+        ],
       movedId,
     });
   };
@@ -688,8 +697,8 @@ class AgileBoard extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: AppState) => {
-  return {...state.agile, ...state.app};
+const mapStateToProps = (state: AppState, ownProps: INavigationParams) => {
+  return {...state.agile, ...state.app, ...spreadNavigationProps(ownProps)};
 };
 
 const mapDispatchToProps = dispatch => {

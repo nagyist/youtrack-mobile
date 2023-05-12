@@ -106,17 +106,17 @@ export class IssueActivity extends PureComponent<IssueActivityProps, State> {
   }
 
   getCurrentIssueId(): string {
-    return this.props.issuePlaceholder?.id || this.props.issue?.id;
+    return this.issuePlaceholder?.id || this.props.issue?.id;
   }
 
   componentDidUpdate(prevProps: IssueActivityProps): void {
     if (
-      (!prevProps.issuePlaceholder && this.props.issuePlaceholder) ||
+      (!prevProps.issuePlaceholder && this.issuePlaceholder) ||
       (prevProps.issuePlaceholder &&
-        this.props.issuePlaceholder &&
-        prevProps.issuePlaceholder.id !== this.props.issuePlaceholder.id)
+        this.issuePlaceholder &&
+        prevProps.issuePlaceholder.id !== this.issuePlaceholder.id)
     ) {
-      this.load(this.props.issuePlaceholder.id);
+      this.load(this.issuePlaceholder.id);
     }
   }
 
