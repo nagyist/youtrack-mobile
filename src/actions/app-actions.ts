@@ -422,7 +422,6 @@ export function switchAccount(
     cacheUserLastVisitedArticle(null);
 
     try {
-      redirectToHome(account.config?.backendUrl);
       await dispatch(changeAccount(account, dropCurrentAccount, issueId));
     } catch (e) {}
   };
@@ -1117,8 +1116,9 @@ export function subscribeToPushNotifications(): Action {
 
     PushNotificationsProcessor.init();
 
-    const onSwitchAccount = async (account: StorageState, issueId: string) =>
+    const onSwitchAccount = async (account: StorageState, issueId: string) => {
       await dispatch(switchAccount(account, false, issueId));
+    };
 
     if (isRegisteredForPush()) {
       log.info(
