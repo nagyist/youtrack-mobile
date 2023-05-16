@@ -52,9 +52,6 @@ describe('EnterServer', () => {
 
       await waitFor(() => {
         expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(`https://${urlNoProtocol}`);
-        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(`https://${urlNoProtocol}/youtrack`);
-        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(`http://${urlNoProtocol}`);
-        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(`http://${urlNoProtocol}/youtrack`);
       });
     });
 
@@ -81,7 +78,7 @@ describe('EnterServer', () => {
     it('should try next URL on failure if protocol is entered', async () => {
       appActions.connectToNewYoutrack.mockImplementationOnce((url: string) => {
         if (!url.includes('youtrack') || url.includes('https://')) {
-          return Promise.reject('Server is not exist');
+          throw ('Server is not exist');
         }
         return Promise.resolve();
       });
@@ -94,9 +91,9 @@ describe('EnterServer', () => {
     });
 
     it('should try next URL on failure if no protocol entered', async () => {
-      appActions.connectToNewYoutrack.mockImplementation((url: string) => {
+      appActions.connectToNewYoutrack.mockImplementationOnce((url: string) => {
         if (!url.includes('youtrack') || url.includes('https://')) {
-          return Promise.reject('Server is not exist');
+          throw 'Server is not exist';
         }
         return Promise.resolve();
       });

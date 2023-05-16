@@ -85,7 +85,7 @@ const EnterServer = (props: Props) => {
       try {
         await dispatch(connectToNewYoutrack(url));
         log.log(`Successfully connected to ${url}`);
-
+        break;
       } catch (error) {
         log.log(`Failed to connect to ${url}`, error);
         if (error?.isIncompatibleYouTrackError) {
