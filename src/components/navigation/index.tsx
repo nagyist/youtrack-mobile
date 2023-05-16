@@ -1,6 +1,12 @@
 import * as React from 'react';
 
-import {NavigationNavigateActionPayload, NavigationScreenProp, NavigationState} from 'react-navigation';
+import Router from 'components/router/router';
+import {
+  NavigationNavigateActionPayload,
+  NavigationRoute,
+  NavigationScreenProp,
+  NavigationState,
+} from 'react-navigation';
 
 import {routeMap} from 'app-routes';
 
@@ -17,10 +23,16 @@ enum Navigators {
   SettingsRoot = 'SettingsRoot',
 }
 
+export type NavigatorKey = keyof Navigators;
+
 export interface INavigationParams {
   navigation: NavigationScreenProp<NavigationState>,
   route: NavigationNavigateActionPayload
 }
+
+export type INavigationRoute = NavigationRoute & {
+  name: string
+} | undefined;
 
 const defaultScreenOptions = {
   gestureEnabled: true,
@@ -37,11 +49,20 @@ const mixinNavigationProps = (Component: any): any => (props: INavigationParams)
   return <Component {...spreadNavigationProps(props)}/>;
 };
 
+const subscribeToScreenListeners = (routerKey: NavigatorKey): any => {
+  return ({
+    state: (e: { data?: { state: NavigationState } }) => {
+      if (e?.data?.state) {
+        Router[routerKey] = e?.data?.state;
+      }
+    },
+  });
+};
 
 export {
   mixinNavigationProps,
   Navigators,
   defaultScreenOptions,
   spreadNavigationProps,
+  subscribeToScreenListeners,
 };
-

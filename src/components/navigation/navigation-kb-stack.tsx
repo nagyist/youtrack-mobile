@@ -9,7 +9,7 @@ import AttachmentPreview from 'views/attachment-preview/attachment-preview';
 import KnowledgeBase from 'views/knowledge-base/knowledge-base';
 import Page from 'views/page/page';
 import PreviewFile from 'views/preview-file/preview-file';
-import {defaultScreenOptions} from 'components/navigation/index';
+import {defaultScreenOptions, Navigators, subscribeToScreenListeners} from 'components/navigation';
 import {getStorageState} from 'components/storage/storage';
 import {routeMap} from 'app-routes';
 
@@ -27,6 +27,7 @@ type KnowledgeBaseStackParams = {
 
 const KnowledgeBaseStack = createNativeStackNavigator<KnowledgeBaseStackParams>();
 
+
 export default function KnowledgeBaseStackNavigator({navigation}: NativeStackScreenProps<ParamListBase>) {
   const articleLastVisited: {
     article?: ArticleSingle;
@@ -35,8 +36,9 @@ export default function KnowledgeBaseStackNavigator({navigation}: NativeStackScr
   const initialRouteName = articleLastVisited ? routeMap.ArticleSingle : routeMap.KnowledgeBase;
   return (
     <KnowledgeBaseStack.Navigator
-      screenOptions={defaultScreenOptions}
       initialRouteName={initialRouteName}
+      screenOptions={defaultScreenOptions}
+      screenListeners={() => subscribeToScreenListeners(Navigators.KnowledgeBaseRoot)}
     >
       <KnowledgeBaseStack.Screen
         name={routeMap.KnowledgeBase}
@@ -54,6 +56,10 @@ export default function KnowledgeBaseStackNavigator({navigation}: NativeStackScr
       <KnowledgeBaseStack.Screen
         name={routeMap.Page}
         component={Page}
+      />
+      <KnowledgeBaseStack.Screen
+        name={routeMap.ArticleDraft}
+        component={ArticleCreate}
       />
 
       <KnowledgeBaseStack.Group

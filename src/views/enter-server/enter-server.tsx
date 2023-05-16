@@ -141,7 +141,7 @@ const EnterServer = (props: Props) => {
               <View style={styles.backIconButtonContainer}>
                 <TouchableOpacity
                   testID="test:id/enterServerBackButton"
-                  onPress={Router.onBack}
+                  onPress={Router.pop}
                   style={styles.backIconButton}
                 >
                   <IconBack/>

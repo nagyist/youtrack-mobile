@@ -1,12 +1,18 @@
-import { createNavigationContainerRef, NavigationContainerRefWithCurrent } from '@react-navigation/native';
+import {createNavigationContainerRef, NavigationContainerRefWithCurrent} from '@react-navigation/native';
 
-import {NavigationRootNames} from 'components/navigation/index';
+import {NavigationRootNames} from 'components/navigation';
 
 type NavigationOptions = Record<any, any>;
 
 const navigationRef: NavigationContainerRefWithCurrent<{}> = createNavigationContainerRef();
 
 const navigate = (routeName: NavigationRootNames, options?: NavigationOptions) => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(routeName, options);
+  }
+};
+
+const replace = (routeName: NavigationRootNames, options?: NavigationOptions) => {
   if (navigationRef.isReady()) {
     navigationRef.navigate(routeName, options);
   }
@@ -23,5 +29,6 @@ export {
   goBack,
   navigate,
   navigationRef,
+  replace,
 };
 

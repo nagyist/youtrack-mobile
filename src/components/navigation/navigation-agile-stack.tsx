@@ -9,7 +9,7 @@ import Issue from 'views/issue/issue';
 import LinkedIssues from 'components/linked-issues/linked-issues';
 import LinkedIssuesAddLink from 'components/linked-issues/linked-issues-add-link';
 import PreviewFile from 'views/preview-file/preview-file';
-import {defaultScreenOptions} from 'components/navigation/index';
+import {defaultScreenOptions, Navigators, subscribeToScreenListeners} from 'components/navigation';
 import {routeMap} from 'app-routes';
 
 type IssueLinksStackParams = {
@@ -51,6 +51,7 @@ export default function AgileStackNavigator({navigation}: NativeStackScreenProps
     <AgileStack.Navigator
       initialRouteName={routeMap.AgileBoard}
       screenOptions={defaultScreenOptions}
+      screenListeners={() => subscribeToScreenListeners(Navigators.AgileRoot)}
     >
       <AgileStack.Screen
         name={routeMap.AgileBoard}

@@ -7,41 +7,46 @@ import {
   Text,
   ActivityIndicator,
 } from 'react-native';
+
+import IconTrash from '@jetbrains/icons/trash.svg';
+import {useFocusEffect} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
+import {View as AnimatedView} from 'react-native-animatable';
+
 import ArticleWithChildren from 'components/articles/article-item-with-children';
 import ErrorMessage from 'components/error-message/error-message';
 import Header from 'components/header/header';
-import IconTrash from '@jetbrains/icons/trash.svg';
 import Router from 'components/router/router';
 import Select from 'components/select/select';
-import {
-  confirmDeleteAllDrafts,
-  confirmDeleteArticleDraft,
-} from '../article/arcticle-helper';
+import {confirmDeleteAllDrafts, confirmDeleteArticleDraft} from '../article/arcticle-helper';
 import {deleteArticle} from '../article/arcticle-actions';
 import {i18n} from 'components/i18n/i18n';
 import {IconBack, IconKnowledgeBase} from 'components/icon/icon';
 import {loadArticlesDrafts} from './knowledge-base-actions';
-import {routeMap} from '../../app-routes';
 import {SkeletonList} from 'components/skeleton/skeleton';
 import {until} from 'util/util';
-import {View as AnimatedView} from 'react-native-animatable';
+
 import styles from './knowledge-base.styles';
+
 import type {Article, ArticleDraft} from 'types/Article';
-type Props = {
+import {mixinNavigationProps, Navigators} from 'components/navigation';
+import {routeMap} from 'app-routes';
+
+interface Props {
   backIcon?: any;
-  onBack?: () => any;
   onArticleCreate: (
     articleDraft: ArticleDraft | null | undefined,
     isNew: boolean,
   ) => any;
-};
+  navigation: any;
+}
 
 const KnowledgeBaseDrafts = (props: Props) => {
   const dispatch = useDispatch();
   const [drafts, updateDrafts] = useState(null);
   const [isLoading, updateLoading] = useState(false);
   const [isDeleting, updateDeleting] = useState(false);
+
   const loadDrafts = useCallback(async () => {
     updateLoading(true);
     const articleDrafts: ArticleDraft[] = await dispatch(
@@ -69,17 +74,14 @@ const KnowledgeBaseDrafts = (props: Props) => {
 
   useEffect(() => {
     loadDrafts();
-    return Router.setOnDispatchCallback(
-      (routeName: string, prevRouteName: string) => {
-        if (
-          routeName === routeMap.Page &&
-          prevRouteName === routeMap.ArticleCreate
-        ) {
-          loadDrafts();
-        }
-      },
-    );
   }, [loadDrafts]);
+
+  useFocusEffect(() => {
+    const prevRoute = Router.getLastRouteByNavigatorKey(Navigators.KnowledgeBaseRoot);
+    if (prevRoute.name === routeMap.ArticleCreate) {
+      loadDrafts();
+    }
+  });
 
   const renderArticle = ({item}) => {
     return (
@@ -100,14 +102,13 @@ const KnowledgeBaseDrafts = (props: Props) => {
     );
   };
 
-  const {onBack = () => Router.pop()} = props;
   return (
     <View style={styles.content}>
       <Header
         title={'Drafts'}
         showShadow={true}
         leftButton={
-          <TouchableOpacity disabled={isDeleting} onPress={onBack}>
+          <TouchableOpacity disabled={isDeleting} onPress={Router.pop}>
             {props.backIcon || (
               <IconBack
                 color={isDeleting ? styles.icon.color : styles.link.color}
@@ -193,7 +194,5 @@ const KnowledgeBaseDrafts = (props: Props) => {
   );
 };
 
-export default React.memo<any>(KnowledgeBaseDrafts) as React$AbstractComponent<
-  any,
-  unknown
->;
+
+export default React.memo<any>(mixinNavigationProps(KnowledgeBaseDrafts));

@@ -1,17 +1,15 @@
 import * as React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {ParamListBase} from '@react-navigation/native';
 
 import EnterServer from 'views/enter-server/enter-server';
 import LogIn from 'views/log-in/log-in';
+import Page from 'views/page/page';
 import Settings from 'views/settings/settings';
 import SettingsAppearance from 'views/settings/settings__appearance';
 import SettingsFeedbackForm from 'views/settings/settings__feedback-form';
 import {defaultScreenOptions} from 'components/navigation/index';
 import {routeMap} from 'app-routes';
-import Page from 'views/page/page';
 
 type SettingsStackParams = {
   [routeMap.Settings]: any;
@@ -22,7 +20,8 @@ type SettingsStackParams = {
 
 const SettingsStack = createNativeStackNavigator<SettingsStackParams>();
 
-export default function SettingsStackNavigator({navigation}: NativeStackScreenProps<ParamListBase>) {
+
+export default function SettingsStackNavigator() {
   return (
     <SettingsStack.Navigator
       initialRouteName={routeMap.Settings}

@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  EventSubscription,
   RefreshControl,
   View,
   FlatList,
@@ -42,7 +43,6 @@ import type {Article as ArticleEntity, ArticleNode} from 'types/Article';
 import type {ArticleState} from './article-reducers';
 import type {Attachment} from 'types/CustomFields';
 import type {CustomError} from 'types/Error';
-import type {EventSubscription} from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import type {HeaderProps} from 'components/header/header';
 import type {IIssueTabbedState} from 'components/issue-tabbed/issue-tabbed';
 import type {KnowledgeBaseState} from '../knowledge-base/knowledge-base-reducers';
@@ -50,38 +50,41 @@ import type {RootState} from 'reducers/app-reducer';
 import type {Theme, UITheme, UIThemeColors} from 'types/Theme';
 import type {ViewStyleProp} from 'types/Internal';
 import type {Visibility} from 'types/Visibility';
+import {INavigationParams, INavigationRoute, Navigators, spreadNavigationProps} from 'components/navigation';
+import {NavigationEventSubscription} from 'react-navigation';
 import {TabRoute} from 'types/Issue';
-import {INavigationParams, spreadNavigationProps} from 'components/navigation';
 
-type Props = ArticleState & {
+type Props = INavigationParams & ArticleState & {
   articlePlaceholder: ArticleEntity;
   storePrevArticle?: boolean;
   updateArticlesList: () => (...args: any[]) => any;
-  lastVisitedArticle: Article | null | undefined;
+  lastVisitedArticle: ArticleEntity | null | undefined;
   commentId?: string;
+  navigateToActivity: string | undefined;
 } & typeof articleActions;
 
 type State = IIssueTabbedState & {
   modalChildren: any;
 };
 
+
 class Article extends IssueTabbed<Props, State> {
   static contextTypes = {
     actionSheet: Function,
   };
-  props: Props;
-  uiTheme: UITheme;
-  unsubscribe: (...args: any[]) => any;
-  articleDetailsList: Record<string, any>;
-  goOnlineSubscription: EventSubscription;
+  uiTheme: UITheme | undefined;
+  focusListener: NavigationEventSubscription | undefined;
+  articleDetailsList: Record<string, any> | undefined;
+  goOnlineSubscription: EventSubscription | undefined;
+
   componentWillUnmount = () => {
-    this.unsubscribe && this.unsubscribe();
+    this?.focusListener?.remove?.();
 
     if (!this.props.storePrevArticle) {
       this.props.clearArticle();
     }
 
-    this.goOnlineSubscription.remove();
+    this.goOnlineSubscription?.remove?.();
   };
 
   componentDidUpdate(prevProps: Props) {
@@ -101,6 +104,19 @@ class Article extends IssueTabbed<Props, State> {
     }
   }
 
+  setFocusListener() {
+    this.focusListener = this.props.navigation.addListener('focus', () => {
+      const prevRoute: INavigationRoute = Router.getLastRouteByNavigatorKey(Navigators.KnowledgeBaseRoot);
+      if (
+        prevRoute &&
+        prevRoute.name === routeMap.ArticleSingle &&
+        prevRoute.name === routeMap.ArticleCreate
+      ) {
+        this.loadArticle(currentArticle.id, false);
+      }
+    });
+  }
+
   componentDidMount() {
     logEvent({
       message: 'Navigate to article',
@@ -114,24 +130,14 @@ class Article extends IssueTabbed<Props, State> {
       this.props.setPreviousArticle();
     }
 
-    const currentArticle: Article = this.getArticle();
-    const canLoadArticle: boolean =
-      currentArticle && (currentArticle.id || currentArticle.idReadable);
+    const currentArticle: ArticleEntity = this.getArticle();
+    const canLoadArticle: boolean = currentArticle && Boolean(currentArticle.id || currentArticle.idReadable);
 
     if (canLoadArticle) {
       this.switchToDetailsTab();
       this.props.loadArticleFromCache(currentArticle);
       this.loadArticle(currentArticle.id || currentArticle.idReadable, false);
-      this.unsubscribe = Router.setOnDispatchCallback(
-        (routeName: string, prevRouteName: string) => {
-          if (
-            routeName === routeMap.ArticleSingle &&
-            prevRouteName === routeMap.ArticleCreate
-          ) {
-            this.loadArticle(currentArticle.id, false);
-          }
-        },
-      );
+      this.setFocusListener();
     }
 
     if (canLoadArticle && this.props.navigateToActivity) {
@@ -149,24 +155,26 @@ class Article extends IssueTabbed<Props, State> {
     return super.getRouteBadge(route.title === this.tabRoutes[1].title, this.props?.article?.comments?.length);
   }
 
+  loadArticle = (articleId: string, reset?: boolean) => this.props.loadArticle(articleId, reset);
 
-  loadArticle = (articleId: string, reset: boolean) =>
-    this.props.loadArticle(articleId, reset);
-  getArticle = (): Article => {
+  getArticle = (): ArticleEntity => {
     const {articlePlaceholder, lastVisitedArticle} = this.props;
     return articlePlaceholder || lastVisitedArticle;
   };
+
   refresh = () => {
-    const article: Article | null | undefined = this.getArticle();
+    const article: ArticleEntity | null | undefined = this.getArticle();
     const articleId: string | null | undefined = article?.id;
 
     if (articleId) {
       this.loadArticle(articleId, false);
     }
   };
+
   renderError = (error: CustomError) => {
     return <ErrorMessage error={error} />;
   };
+
   renderRefreshControl = (
     onRefresh: (...args: any[]) => any = this.refresh,
   ) => {
@@ -176,11 +184,12 @@ class Article extends IssueTabbed<Props, State> {
         accessibilityLabel="refresh-control"
         accessible={true}
         refreshing={false}
-        tintColor={this.uiTheme.colors.$link}
+        tintColor={this.uiTheme?.colors?.$link}
         onRefresh={onRefresh}
       />
     );
   };
+
   renderBreadCrumbs = ({
     style,
     withSeparator,
@@ -205,11 +214,11 @@ class Article extends IssueTabbed<Props, State> {
       />
     );
   };
+
   toggleModalChildren = (modalChildren: any = null) => {
-    this.setState({
-      modalChildren,
-    });
+    this.setState({modalChildren});
   };
+
   createArticleDetails = (
     articleData: ArticleEntity,
     scrollData: Record<string, any>,
@@ -225,9 +234,9 @@ class Article extends IssueTabbed<Props, State> {
       onCheckboxUpdate,
     } = this.props;
     const breadCrumbsElement = article ? this.renderBreadCrumbs() : null;
-    const articleNode: ArticleNode | null | undefined =
-      articleData?.project &&
-      findArticleNode(articlesList, articleData.project.id as string, articleData?.id);
+    const articleNode: ArticleNode | null | undefined = articleData?.project && findArticleNode(
+      articlesList, articleData.project.id as string, articleData?.id
+    );
     let visibility: Visibility | null | undefined = articleData?.visibility;
 
     if (articleData?.visibility) {
@@ -311,7 +320,6 @@ class Article extends IssueTabbed<Props, State> {
                     this.toggleModalChildren(
                       <ArticleCreate
                         {...createParams}
-                        onHide={this.toggleModalChildren}
                         isSplitView={this.state.isSplitView}
                       />,
                     );
@@ -336,6 +344,7 @@ class Article extends IssueTabbed<Props, State> {
       </View>
     );
   };
+
   renderDetails = () => {
     const {article, articlePlaceholder, error} = this.props;
 
@@ -365,6 +374,7 @@ class Article extends IssueTabbed<Props, State> {
       />
     );
   };
+
   renderActivity = (uiTheme: UITheme) => {
     const {
       article,
@@ -390,16 +400,20 @@ class Article extends IssueTabbed<Props, State> {
         }}
       />
     );
+
   };
   isTabChangeEnabled = () => !this.props.isProcessing;
+
   canEditArticle = (): boolean => {
     const {article, issuePermissions} = this.props;
     return issuePermissions.canUpdateArticle(article);
   };
+
   canDeleteArticle = (): boolean => {
     const {article, issuePermissions} = this.props;
     return issuePermissions.articleCanDeleteArticle(article.project.ringId);
   };
+
   renderHeader = () => {
     const {
       article,
@@ -422,7 +436,13 @@ class Article extends IssueTabbed<Props, State> {
       leftButton: this.state.isSplitView ? null : (
         <IconBack color={isProcessing ? textSecondaryColor : linkColor} />
       ),
-      onBack: Router.pop,
+      onBack: () => {
+        if (Router?.[Navigators.KnowledgeBaseRoot]?.length > 1) {
+          Router.pop();
+        } else {
+          Router.KnowledgeBase();
+        }
+      },
       rightButton:
         isArticleLoaded && !isProcessing ? (
           <IconContextActions size={18} color={linkColor} />

@@ -9,8 +9,10 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
+
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+
 import * as knowledgeBaseActions from './knowledge-base-actions';
 import Article from 'views/article/article';
 import ArticleCreate from 'views/article-create/article-create';
@@ -26,9 +28,9 @@ import Star from 'components/star/star';
 import usage from 'components/usage/usage';
 import {addListenerGoOnline} from 'components/network/network-events';
 import {ANALYTICS_ARTICLES_PAGE} from 'components/analytics/analytics-ids';
-import {HIT_SLOP} from 'components/common-styles';
 import {getGroupedByFieldNameAlphabetically} from 'components/search/sorting';
 import {getStorageState} from 'components/storage/storage';
+import {HIT_SLOP} from 'components/common-styles';
 import {
   IconAngleDown,
   IconAngleRight,
@@ -42,7 +44,7 @@ import {
   IconNoProjectFound,
   IconNothingFound,
 } from 'components/icon/icon-pictogram';
-import {INavigationParams, spreadNavigationProps} from 'components/navigation';
+import {INavigationParams, INavigationRoute, Navigators, spreadNavigationProps} from 'components/navigation';
 import {routeMap} from 'app-routes';
 import {SkeletonIssues} from 'components/skeleton/skeleton';
 import {ThemeContext} from 'components/theme/theme-context';
@@ -61,10 +63,11 @@ import type {
   ArticleNodeList,
   ArticleDraft,
 } from 'types/Article';
+import type {ISelectProps} from 'components/select/select';
 import type {KnowledgeBaseActions} from './knowledge-base-actions';
 import type {KnowledgeBaseState} from './knowledge-base-reducers';
-import type {ISelectProps} from 'components/select/select';
 import type {Theme, UITheme} from 'types/Theme';
+import {NavigationEventSubscription} from 'react-navigation';
 
 type Props = INavigationParams & KnowledgeBaseActions &
   KnowledgeBaseState & {
@@ -98,9 +101,9 @@ export class KnowledgeBase extends Component<Props, State> {
   };
   listRef: any;
   uiTheme: UITheme | undefined;
-  unsubscribe: (...args: any[]) => any = () => null;
-  unsubscribeOnDimensionsChange: EventSubscription;
-  goOnlineSubscription: EventSubscription;
+  focusListener: NavigationEventSubscription | undefined;
+  unsubscribeOnDimensionsChange: EventSubscription | undefined;
+  goOnlineSubscription: EventSubscription | undefined;
 
   constructor(props: Props) {
     super(props);
@@ -118,9 +121,26 @@ export class KnowledgeBase extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    this.unsubscribeOnDimensionsChange.remove();
-    this.unsubscribe();
-    this.goOnlineSubscription.remove();
+    this.unsubscribeOnDimensionsChange?.remove?.();
+    this.focusListener?.remove?.();
+    this.goOnlineSubscription?.remove?.();
+  }
+
+  setFocusListener() {
+    const {navigation, preventReload} = this.props;
+    this.focusListener = navigation.addListener('focus', () => {
+        const prevRoute: INavigationRoute = Router.getLastRouteByNavigatorKey(Navigators.KnowledgeBaseRoot);
+        if (
+          !preventReload && (
+            prevRoute.name === routeMap.Article ||
+            prevRoute.name === routeMap.ArticleCreate ||
+            prevRoute.name === routeMap.Page
+          )
+        ) {
+          this.loadArticlesList(false);
+        }
+      }
+    );
   }
 
   async componentDidMount() {
@@ -128,19 +148,7 @@ export class KnowledgeBase extends Component<Props, State> {
       'change',
       this.setSplitView,
     );
-    this.unsubscribe = Router.setOnDispatchCallback(
-      (routeName: string, prevRouteName: string) => {
-        if (
-          !this.props.preventReload &&
-          routeName === routeMap.KnowledgeBase &&
-          (prevRouteName === routeMap.Article ||
-            prevRouteName === routeMap.ArticleCreate ||
-            prevRouteName === routeMap.Page)
-        ) {
-          this.loadArticlesList(false);
-        }
-      },
-    );
+    this.setFocusListener();
     this.props.clearUserLastVisitedArticle();
     this.props.loadCachedArticleList();
 
@@ -561,14 +569,15 @@ export class KnowledgeBase extends Component<Props, State> {
               this.toggleModal(
                 <KnowledgeBaseDrafts
                   backIcon={<IconClose size={21} color={styles.link.color} />}
-                  onBack={() => this.toggleModal()}
                   onArticleCreate={this.onArticleCreate}
                 />,
               );
             } else {
               Router.Page({
                 children: (
-                  <KnowledgeBaseDrafts onArticleCreate={this.onArticleCreate} />
+                  <KnowledgeBaseDrafts
+                    navigation={this.props.navigation}
+                    onArticleCreate={this.onArticleCreate} />
                 ),
               });
             }
@@ -699,7 +708,6 @@ export class KnowledgeBase extends Component<Props, State> {
         <ArticleCreate
           isNew={isNew}
           isSplitView={this.state.isSplitView}
-          onHide={this.toggleModal}
           articleDraft={articleDraft}
         />,
       );
@@ -707,12 +715,12 @@ export class KnowledgeBase extends Component<Props, State> {
       Router.ArticleCreate({
         articleDraft,
         isNew,
-        onHide: () => Router.pop(true),
+        onHide: Router.pop,
       });
     }
   }
 
-  renderArticleList: ()=> React.ReactNode = (): React.ReactNode => {
+  renderArticleList: () => React.ReactNode = (): React.ReactNode => {
     const {
       isLoading,
       articlesList,

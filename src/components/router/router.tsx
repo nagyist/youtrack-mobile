@@ -1,41 +1,56 @@
-import log from 'components/log/log';
+import * as navigator from 'components/navigation/navigator';
 import {defaultRootRoute, RootRoutesList, routeMap} from 'app-routes';
-import {goBack, navigate, navigationRef} from 'components/navigation/navigator';
-import {NavigationRootNames} from 'components/navigation';
 
+import {NavigationParams, NavigationState} from 'react-navigation';
+import {INavigationRoute, NavigationRootNames, NavigatorKey, Navigators} from 'components/navigation';
 
-import {NavigationParams} from 'react-navigation';
+type NavigationRouteState = {
+  [key in NavigatorKey]: NavigationState;
+}
 
-type RouterMethods = {
+type NavigationRouteNavigator = {
   [key in NavigationRootNames]: (options?: NavigationParams) => void;
 };
 
-interface RouterAPI extends RouterMethods {
-  onBack: () => void;
+interface RouterAPI {
+  doNavigate: (routeName: string, options?: NavigationParams) => void;
+  getLastRouteByNavigatorKey: (key: NavigatorKey) => INavigationRoute;
+  navigateToDefaultRoute: (options?: NavigationParams) => void;
   pop: () => void;
   rootRoutes: typeof RootRoutesList;
-  navigateToDefaultRoute: (options?: NavigationParams) => void;
-  setOnDispatchCallback: (...args: any[]) => void;
 }
 
-const Router: RouterAPI = {
-  onBack: goBack,
-  pop: goBack,
+const doNavigate = (routeName: string, options?: NavigationParams, replace?: boolean) => {
+  (replace ? navigator.replace : navigator.navigate)(routeName as NavigationRootNames, options);
+};
+
+
+// @ts-ignore
+const Router: RouterAPI & NavigationRouteState & NavigationRouteNavigator = {
+  doNavigate,
+  pop: navigator.goBack,
+  getLastRouteByNavigatorKey: (navigatorKey: NavigatorKey): INavigationRoute => (
+    Router?.[navigatorKey]?.routes?.slice?.(-1)?.[0] as INavigationRoute
+  ),
+  navigateToDefaultRoute: function (options?: NavigationParams) {
+    doNavigate(options?.issueId ? routeMap.Issue : defaultRootRoute, options);
+  },
   rootRoutes: RootRoutesList,
-  navigateToDefaultRoute: (options?: NavigationParams) => {
-    navigate(options?.issueId ? routeMap.Issue : defaultRootRoute, options);
-  },
-  setOnDispatchCallback: () => {
-    //TODO(route): implement it via RNav
-    log.warn('Remove return callback setOnDispatchCallback', navigationRef.getCurrentRoute?.()?.name);
-    return () => null;
-  },
-  ...Object.keys(routeMap).reduce((akk, routeName: string) => {
+  ...(Object.keys(Navigators).reduce((akk, it) => {
+    return ({
+      ...akk,
+      [it]: {},
+    });
+  }, {}) as NavigationRouteState),
+
+  ...(Object.keys(routeMap).reduce(function (akk, routeName: string) {
     return {
       ...akk,
-      [routeName]: (options?: NavigationParams) => navigate(routeName as NavigationRootNames, options),
+      [routeName]: (options?: NavigationParams) => {
+        doNavigate(routeName, options);
+      },
     };
-  }, {}),
+  }, {}) as NavigationRouteNavigator),
 };
 
 

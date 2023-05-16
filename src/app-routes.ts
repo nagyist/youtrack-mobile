@@ -14,6 +14,7 @@ export enum RootRoutesList {
 
 enum SecondaryRoutes {
   ArticleCreate = 'ArticleCreate',
+  ArticleDraft = 'ArticleDraft',
   AttachmentPreview = 'AttachmentPreview',
   CreateIssue = 'CreateIssue',
   EnterServer = 'EnterServer',
@@ -34,4 +35,4 @@ enum SecondaryRoutes {
 
 export const defaultRootRoute: NavigationRootNames = RootRoutesList.Issues;
 
-export const routeMap = {...RootRoutesList, ...SecondaryRoutes};
+export const routeMap: typeof RootRoutesList & typeof SecondaryRoutes = {...RootRoutesList, ...SecondaryRoutes};

@@ -3,7 +3,6 @@ import {EventSubscription, FlatList, RefreshControl, Text, View} from 'react-nat
 
 import {bindActionCreatorsExt} from 'util/redux-ext';
 import {connect} from 'react-redux';
-import {withNavigation} from 'react-navigation';
 
 import AttachFileDialog from 'components/attach-file/attach-file-dialog';
 import ColorField from 'components/color-field/color-field';
@@ -36,7 +35,6 @@ import {
 import {isIOSPlatform} from 'util/util';
 import {isSplitView} from 'components/responsive/responsive-helper';
 import {IssueContext} from './issue-context';
-import {routeMap} from 'app-routes';
 import {Select, SelectModal} from 'components/select/select';
 import {Skeleton} from 'components/skeleton/skeleton';
 import {ThemeContext} from 'components/theme/theme-context';
@@ -326,13 +324,7 @@ export class Issue extends IssueTabbed<IssueProps, IIssueTabbedState> {
   }
 
   handleOnBack() {
-    const {navigation} = this.props;
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate(routeMap.Issues);
-    }
-
+    Router.pop();
   }
 
   renderBackIcon: () => null | React.ReactElement<
@@ -733,7 +725,7 @@ const mapStateToProps = (
     ...state.issueState,
     ...spreadedOwnParams,
     user: state.app.user,
-    isConnected,
+    isConnected: true,
     navigateToActivity: isConnected || isConnected === undefined ? spreadedOwnParams.navigateToActivity : undefined,
   };
 };
@@ -757,4 +749,4 @@ export function connectIssue(Component: any): any {
   return connect(mapStateToProps, mapDispatchToProps)(Component);
 }
 
-export default connectIssue(withNavigation(Issue));
+export default connectIssue(Issue);

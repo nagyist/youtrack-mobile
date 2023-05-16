@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import {createNativeStackNavigator, NativeStackScreenProps} from '@react-navigation/native-stack';
-import {ParamListBase} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import EnterServer from 'views/enter-server/enter-server';
 import Home from 'views/home/home';
@@ -17,8 +16,8 @@ type ServerLoginStackParams = {
 
 const ServerLogin = createNativeStackNavigator<ServerLoginStackParams>();
 
-export default function LoginStackNavigator(props: NativeStackScreenProps<ParamListBase>) {
 
+export default function LoginStackNavigator() {
   return (
     <ServerLogin.Navigator
       initialRouteName={routeMap.Home}

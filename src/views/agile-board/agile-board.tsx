@@ -38,7 +38,7 @@ import {HIT_SLOP} from 'components/common-styles';
 import {i18n} from 'components/i18n/i18n';
 import {IconException, IconMagnifyZoom} from 'components/icon/icon';
 import {isSplitView} from 'components/responsive/responsive-helper';
-import {INavigationParams, spreadNavigationProps} from 'components/navigation';
+import {INavigationParams, INavigationRoute, Navigators, spreadNavigationProps} from 'components/navigation';
 import {notify} from 'components/notification/notification';
 import {renderSelector} from './agile-board__renderer';
 import {routeMap} from 'app-routes';
@@ -62,6 +62,7 @@ import type {
   Sprint,
 } from 'types/Agile';
 import type {Theme, UITheme} from 'types/Theme';
+import {NavigationEventSubscription} from 'react-navigation';
 
 type Props = INavigationParams & AgilePageState & {
   auth: Auth;
@@ -105,10 +106,10 @@ const CATEGORY_NAME = 'Agile board';
 class AgileBoard extends Component<Props, State> {
   boardHeader: BoardHeader | null | undefined;
   query: string;
-  unsubscribeOnDispatch: (...args: any[]) => any;
-  uiTheme: UITheme;
-  unsubscribeOnDimensionsChange: EventSubscription;
-  goOnlineSubscription: EventSubscription;
+  focusListener: NavigationEventSubscription | undefined;
+  uiTheme: UITheme | undefined;
+  unsubscribeOnDimensionsChange: EventSubscription | undefined;
+  goOnlineSubscription: EventSubscription | undefined;
 
   constructor(props: Props) {
     super(props);
@@ -128,6 +129,20 @@ class AgileBoard extends Component<Props, State> {
     };
   }
 
+  setFocusListener() {
+    const {navigation, updateIssue, sprint} = this.props;
+    this.focusListener = navigation.addListener('focus', () => {
+      const prevRoute: INavigationRoute = Router.getLastRouteByNavigatorKey(Navigators.AgileRoot);
+      if (
+        prevRoute?.name === routeMap.AgileBoard &&
+        prevRoute?.name === routeMap.Issue &&
+        prevRoute?.params?.issueId
+      ) {
+        updateIssue(prevRoute?.params?.issueId, sprint);
+      }
+    });
+  }
+
   componentDidMount() {
     usage.trackScreenView(CATEGORY_NAME);
     this.unsubscribeOnDimensionsChange = Dimensions.addEventListener(
@@ -135,22 +150,7 @@ class AgileBoard extends Component<Props, State> {
       this.onDimensionsChange,
     );
     this.loadBoard();
-    this.unsubscribeOnDispatch = Router.setOnDispatchCallback(
-      (
-        routeName: string,
-        prevRouteName: string,
-        options: Record<string, any>,
-      ) => {
-        if (
-          routeName === routeMap.AgileBoard &&
-          prevRouteName === routeMap.Issue &&
-          options?.issueId
-        ) {
-          options.issueId &&
-            this.props.updateIssue(options.issueId, this.props?.sprint);
-        }
-      },
-    );
+    this.setFocusListener();
     this.goOnlineSubscription = addListenerGoOnline(() => {
       this.loadBoard(true);
     });
@@ -164,9 +164,9 @@ class AgileBoard extends Component<Props, State> {
 
   componentWillUnmount() {
     boardActions.destroySSE();
-    this.unsubscribeOnDispatch();
-    this.unsubscribeOnDimensionsChange.remove();
-    this.goOnlineSubscription.remove();
+    this.focusListener?.remove?.();
+    this.unsubscribeOnDimensionsChange?.remove?.();
+    this.goOnlineSubscription?.remove?.();
   }
 
   onDimensionsChange: () => Promise<void> = async (): Promise<void> => {

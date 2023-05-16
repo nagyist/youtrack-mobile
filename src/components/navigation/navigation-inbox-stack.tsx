@@ -8,11 +8,11 @@ import Article from 'views/article/article';
 import Inbox from 'views/inbox/inbox';
 import InboxThreads from 'views/inbox-threads/inbox-threads';
 import Issue from 'views/issue/issue';
-import {checkVersion, FEATURE_VERSION} from 'components/feature/feature';
-import {defaultScreenOptions} from 'components/navigation/index';
-import {routeMap} from 'app-routes';
 import LinkedIssues from 'components/linked-issues/linked-issues';
 import LinkedIssuesAddLink from 'components/linked-issues/linked-issues-add-link';
+import {checkVersion, FEATURE_VERSION} from 'components/feature/feature';
+import {defaultScreenOptions, Navigators, subscribeToScreenListeners} from 'components/navigation';
+import {routeMap} from 'app-routes';
 
 type InboxStackParams = {
   [routeMap.Article]: any;
@@ -24,6 +24,7 @@ type InboxStackParams = {
 };
 
 const InboxStack = createNativeStackNavigator<InboxStackParams>();
+
 
 const getCommonIssueStack = (StackName, postfix: string = '') => {
   return (
@@ -50,6 +51,7 @@ export default function InboxStackNavigator({navigation}: NativeStackScreenProps
     <InboxStack.Navigator
       initialRouteName={isInboxThreadsEnabled ? routeMap.InboxThreads : routeMap.Inbox}
       screenOptions={defaultScreenOptions}
+      screenListeners={() => subscribeToScreenListeners(Navigators.InboxRoot)}
     >
       <InboxStack.Screen
         name={routeMap.Inbox}

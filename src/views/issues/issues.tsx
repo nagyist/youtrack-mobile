@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {
   Dimensions,
+  EventSubscription,
   View,
   Text,
   FlatList,
@@ -12,7 +13,7 @@ import {
   withNavigation,
   NavigationScreenProp,
   NavigationState,
-  NavigationRoute,
+  NavigationEventSubscription,
 } from 'react-navigation';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -63,10 +64,10 @@ import type Auth from 'components/auth/oauth2';
 import type {AnyIssue, IssueOnList} from 'types/Issue';
 import type {AppState} from 'reducers';
 import type {ErrorMessageProps} from 'components/error-message/error-message';
-import type {EventSubscription} from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import type {Folder} from 'types/User';
 import type {IssuesState} from './issues-reducers';
 import type {Theme, UIThemeColors} from 'types/Theme';
+import {INavigationRoute, Navigators} from 'components/navigation';
 
 type IssuesActions = typeof issueActions;
 type Props = IssuesState &
@@ -86,11 +87,12 @@ type State = {
   isCreateModalVisible: boolean;
 };
 export class Issues extends Component<Props, State> {
-  searchPanelNode: Record<string, any>;
-  unsubscribeOnDispatch: (...args: any[]) => Function;
-  unsubscribeOnDimensionsChange: EventSubscription;
-  theme: Theme;
-  goOnlineSubscription: EventSubscription;
+  issueId: string | undefined;
+  searchPanelNode: Record<string, any> | undefined;
+  focusListener: NavigationEventSubscription | undefined;
+  unsubscribeOnDimensionsChange: EventSubscription | undefined;
+  theme: Theme | undefined;
+  goOnlineSubscription: EventSubscription | undefined;
 
   constructor(props: Props) {
     super(props);
@@ -116,38 +118,35 @@ export class Issues extends Component<Props, State> {
     this.props.initializeIssuesList(this.props.searchQuery);
   }
 
-  async componentDidMount() {
+  setFocusListener() {
     const {navigation, issuesCount, refreshIssuesCount, updateIssue} = this.props;
+    this.focusListener = navigation.addListener('focus', () => {
+      const prevRoute: INavigationRoute = Router.getLastRouteByNavigatorKey(Navigators.IssuesRoot);
+      if (prevRoute?.name === routeMap.Issue) {
+        updateIssue(prevRoute?.params?.issueId);
+        if (issuesCount === null) {
+          refreshIssuesCount();
+        }
+      }
+      if (prevRoute?.name === routeMap.Issues) {
+        requestController.cancelIssuesRequests();
+      }
+    });
+  }
+
+  async componentDidMount() {
     this.unsubscribeOnDimensionsChange = Dimensions.addEventListener(
       'change',
       this.onDimensionsChange,
     );
     this.onDimensionsChange();
     this.refresh();
-
-    this.unsubscribeOnDispatch = navigation.addListener('focus', (e) => {
-      try {
-        const route: NavigationRoute = navigation.getState()?.routes.slice(-1)[0];
-        if (route?.params?.prev?.name === routeMap.Issue) {
-          updateIssue(route?.params?.prev?.issueId);
-          if (issuesCount === null) {
-            refreshIssuesCount();
-          }
-        }
-        if (route?.params?.prev?.name === routeMap.Issues) {
-          requestController.cancelIssuesRequests();
-        }
-      } catch (e) {
-      }
-    });
-
-    const issueId: string | undefined = this.issueId;
-
-    if (issueId) {
+    this.setFocusListener();
+    if (this.issueId) {
       const targetIssue: AnyIssue =
-        getIssueFromCache(issueId) ||
+        getIssueFromCache(this.issueId) ||
         ({
-          id: issueId,
+          id: this.issueId,
         } as any);
       this.updateFocusedIssue(targetIssue);
     }
@@ -158,9 +157,9 @@ export class Issues extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    this.unsubscribeOnDimensionsChange.remove();
-    this.unsubscribeOnDispatch();
-    this.goOnlineSubscription.remove();
+    this.unsubscribeOnDimensionsChange?.remove?.();
+    this.focusListener?.remove?.();
+    this.goOnlineSubscription?.remove?.();
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State): boolean {

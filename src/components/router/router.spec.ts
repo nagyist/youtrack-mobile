@@ -1,5 +1,6 @@
 import Router from './router';
 import {routeMap} from 'app-routes';
+import {Navigators} from 'components/navigation';
 
 
 describe('Router', () => {
@@ -9,13 +10,19 @@ describe('Router', () => {
 
   it('should provide API', () => {
     Object.keys(routeMap).concat([
-      'onBack',
+      'doNavigate',
       'pop',
       'rootRoutes',
+      'getLastRouteByNavigatorKey',
       'navigateToDefaultRoute',
-      'setOnDispatchCallback',
     ]).forEach((routeName: string) => {
       expect(Router[routeName]).toBeTruthy();
+    });
+  });
+
+  it('should store native stacks routing data', () => {
+    Object.keys(Navigators).forEach((routeName: string) => {
+      expect(Router[routeName as keyof Navigators]).toBeTruthy();
     });
   });
 });

@@ -6,12 +6,14 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
+
 import {useDebouncedCallback} from 'use-debounce';
 import {useDispatch, useSelector} from 'react-redux';
+
 import * as articleCreateActions from './arcticle-create-actions';
 import AttachFileDialog from 'components/attach-file/attach-file-dialog';
-import AttachmentsRow from 'components/attachments-row/attachments-row';
 import AttachmentAddPanel from 'components/attachments-row/attachments-add-panel';
+import AttachmentsRow from 'components/attachments-row/attachments-row';
 import Badge from 'components/badge/badge';
 import Header from 'components/header/header';
 import IssuePermissions from 'components/issue-permissions/issue-permissions';
@@ -25,12 +27,15 @@ import {getApi} from 'components/api/api__instance';
 import {getStorageState} from 'components/storage/storage';
 import {i18n} from 'components/i18n/i18n';
 import {IconAngleDown, IconCheck, IconClose} from 'components/icon/icon';
+import {mixinNavigationProps} from 'components/navigation';
 import {PanelWithSeparator} from 'components/panel/panel-with-separator';
 import {SkeletonCreateArticle} from 'components/skeleton/skeleton';
 import {ThemeContext} from 'components/theme/theme-context';
 import {View as AnimatedView} from 'react-native-animatable';
+
 import styles from './article-create.styles';
-import type {AppState} from '../../reducers';
+
+import type {AppState} from 'reducers';
 import type {Article, ArticleDraft, ArticleProject} from 'types/Article';
 import type {ArticleCreateState} from './article-create-reducers';
 import type {Attachment, IssueProject} from 'types/CustomFields';
@@ -38,6 +43,7 @@ import type {CustomError} from 'types/Error';
 import type {NormalizedAttachment} from 'types/Attachment';
 import type {Theme, UIThemeColors} from 'types/Theme';
 import type {Visibility} from 'types/Visibility';
+
 type Props = {
   articleDraft?:
     | (Article & {
@@ -48,8 +54,8 @@ type Props = {
   originalArticleId?: string;
   breadCrumbs?: React.ReactElement<React.ComponentProps<any>, any> | null;
   isSplitView: boolean;
-  onHide: () => any;
 };
+
 
 const ArticleCreate = (props: Props) => {
   const articleDraftDataInitial = Object.freeze({
@@ -65,7 +71,7 @@ const ArticleCreate = (props: Props) => {
   const dispatch = useDispatch();
   const theme: Theme = useContext(ThemeContext);
   const isConnected: boolean = useSelector(
-    (state: AppState) => state.app.networkState.isConnected,
+    (state: AppState) => !!state.app.networkState.isConnected,
   );
   const articleDraft: ArticleDraft = useSelector(
     (state: AppState) => state.articleCreate.articleDraft,
@@ -165,15 +171,13 @@ const ArticleCreate = (props: Props) => {
   };
 
   const closeCreateArticleScreen = () => {
-    const {onHide = () => Router.pop(true)} = props;
-
     if (!isProcessing) {
-      onHide();
+      Router.pop();
     }
   };
 
   const renderHeader = () => {
-    const draft: ArticleDraft = {...articleDraft, ...articleDraftData} as any;
+    const draft: ArticleDraft = {...articleDraft, ...articleDraftData} as any as ArticleDraft;
     const isSubmitDisabled: boolean =
       !draft.id ||
       isProcessing ||
@@ -425,6 +429,4 @@ const ArticleCreate = (props: Props) => {
   );
 };
 
-export default React.memo<ArticleCreateState>(
-  ArticleCreate,
-) as React$AbstractComponent<ArticleCreateState, unknown>;
+export default React.memo<ArticleCreateState>(mixinNavigationProps(ArticleCreate));

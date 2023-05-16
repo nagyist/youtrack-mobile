@@ -5,17 +5,17 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ParamListBase} from '@react-navigation/native';
 
 import AttachmentPreview from 'views/attachment-preview/attachment-preview';
+import CreateIssue from 'views/create-issue/create-issue';
+import EnterServer from 'views/enter-server/enter-server';
 import Issue from 'views/issue/issue';
 import Issues from 'views/issues/issues';
 import LinkedIssues from 'components/linked-issues/linked-issues';
 import LinkedIssuesAddLink from 'components/linked-issues/linked-issues-add-link';
-import PreviewFile from 'views/preview-file/preview-file';
-import Page from 'views/page/page';
-import {defaultScreenOptions} from 'components/navigation/index';
-import {routeMap} from 'app-routes';
-import EnterServer from 'views/enter-server/enter-server';
 import LogIn from 'views/log-in/log-in';
-import CreateIssue from 'views/create-issue/create-issue';
+import Page from 'views/page/page';
+import PreviewFile from 'views/preview-file/preview-file';
+import {defaultScreenOptions, Navigators, subscribeToScreenListeners} from 'components/navigation';
+import {routeMap} from 'app-routes';
 
 type IssueLinksStackParams = {
   [routeMap.AttachmentPreview]: any;
@@ -58,8 +58,10 @@ const getCommonIssueStack = (StackName, postfix: string = '') => {
 export default function IssuesStackNavigator({navigation}: NativeStackScreenProps<ParamListBase>) {
   return (
     <IssuesStack.Navigator
+      key={Navigators.IssuesRoot}
       initialRouteName={routeMap.Issues}
       screenOptions={defaultScreenOptions}
+      screenListeners={() => subscribeToScreenListeners(Navigators.IssuesRoot)}
     >
       <IssuesStack.Group>
         <IssuesStack.Screen
