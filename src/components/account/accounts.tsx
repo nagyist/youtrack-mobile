@@ -10,9 +10,11 @@ import {
 import Swiper from 'react-native-swiper';
 
 import Avatar from 'components/avatar/avatar';
+import Router from 'components/router/router';
 import {formatYouTrackURL} from 'components/config/config';
 import {getStorageState} from 'components/storage/storage';
 import {HIT_SLOP} from 'components/common-styles/button';
+import {i18n} from 'components/i18n/i18n';
 import {IconLogout, IconAdd} from 'components/icon/icon';
 
 import avatarStyles from 'components/avatar/default-avatar.styles';
@@ -22,14 +24,12 @@ import type {AppConfig} from 'types/AppConfig';
 import type {StorageState} from 'components/storage/storage';
 import type {UITheme} from 'types/Theme';
 import type {ViewStyleProp} from 'types/Internal';
-import {i18n} from 'components/i18n/i18n';
 
 type Props = {
   otherAccounts: StorageState[];
   isChangingAccount: boolean | null | undefined;
   onClose: () => any;
   onLogOut: () => any;
-  onAddAccount: () => any;
   onChangeAccount: (account: StorageState) => any;
   openDebugView: () => any;
   style?: ViewStyleProp;
@@ -79,7 +79,7 @@ export default class Accounts extends PureComponent<Props, void> {
     const config: AppConfig = account.config;
     const user = account.currentUser;
 
-    if (!user) {
+    if (!user || !config) {
       throw new Error(`Account of ${config.backendUrl} has no currentUser`);
     }
 
@@ -140,9 +140,12 @@ export default class Accounts extends PureComponent<Props, void> {
   }
 
   render(): React.ReactNode {
-    const {onAddAccount, isChangingAccount, uiTheme} = this.props;
+    const {isChangingAccount, uiTheme} = this.props;
     return (
-      <View style={styles.accountContainer} testID="accounts">
+      <View
+        style={styles.accountContainer}
+        testID="accounts"
+      >
         <TouchableOpacity
           testID="test:id/accountsAddAccount"
           accessibilityLabel="accountsAddAccount"
@@ -150,7 +153,9 @@ export default class Accounts extends PureComponent<Props, void> {
           hitSlop={HIT_SLOP}
           style={styles.accountAction}
           disabled={isChangingAccount}
-          onPress={onAddAccount}
+          onPress={() => {
+            Router.EnterServer({currentAccount: getStorageState()});
+          }}
         >
           <IconAdd size={24} color={uiTheme.colors.$link} />
         </TouchableOpacity>

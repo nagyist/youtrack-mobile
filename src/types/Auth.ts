@@ -29,7 +29,6 @@ export type OAuthParams = {
   tokenAdditionalParameters: Record<string, any>;
   tokenType: string;
 };
-//@ts-expect-error
 export type OAuthConfig = AuthConfiguration;
 export type OAuthParams2 = AuthParams &
   OAuthParams & {

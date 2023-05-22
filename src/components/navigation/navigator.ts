@@ -3,32 +3,40 @@ import {createNavigationContainerRef, NavigationContainerRefWithCurrent} from '@
 import {NavigationRootNames} from 'components/navigation';
 
 type NavigationOptions = Record<any, any>;
+type NavigateRouteNameParams<P = NavigationRootNames> = P;
 
 const navigationRef: NavigationContainerRefWithCurrent<{}> = createNavigationContainerRef();
 
-const navigate = (routeName: NavigationRootNames, options?: NavigationOptions) => {
+
+const navigate = (routeName: NavigateRouteNameParams<string>, options?: NavigationOptions) => {
   if (navigationRef.isReady()) {
+    // @ts-ignore
     navigationRef.navigate(routeName, options);
   }
 };
 
-const replace = (routeName: NavigationRootNames, options?: NavigationOptions) => {
+const replace = (routeName: NavigateRouteNameParams<string>, options?: NavigationOptions) => {
   if (navigationRef.isReady()) {
+    // @ts-ignore
     navigationRef.navigate(routeName, options);
   }
 };
 
-function goBack() {
+const goBack = () => {
   if (navigationRef.isReady()) {
     navigationRef.goBack();
   }
-}
+};
+
+const canGoBack = navigationRef.canGoBack;
+const isNavigatorReady = navigationRef.isReady;
 
 
 export {
+  canGoBack,
   goBack,
+  isNavigatorReady,
   navigate,
   navigationRef,
   replace,
 };
-

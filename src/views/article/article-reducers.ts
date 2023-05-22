@@ -1,12 +1,12 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import IssuePermissions from 'components/issue-permissions/issue-permissions';
 import {issuePermissionsNull} from 'components/issue-permissions/issue-permissions-helper';
-import {ON_NAVIGATE_BACK} from 'actions/action-types';
-import {routeMap} from '../../app-routes';
+
 import type {Activity} from 'types/Activity';
 import type {Article, ArticlesList} from 'types/Article';
 import type {CustomError} from 'types/Error';
 import type {IssueComment} from 'types/CustomFields';
+
 export type ArticleState = {
   activityPage: Activity[] | null;
   article: Article;
@@ -63,27 +63,7 @@ const {reducer, actions} = createSlice({
       state.articleCommentDraft = action.payload;
     },
   },
-  extraReducers: {
-    [ON_NAVIGATE_BACK]: (
-      state: ArticleState,
-      action: {
-        closingView: {
-          routeName: string;
-          params: {
-            articlePlaceholder: Article;
-          };
-        };
-      },
-    ): ArticleState => {
-      if (action.closingView.routeName === routeMap.Article) {
-        return state.prevArticleState
-          ? state.prevArticleState
-          : articleInitialState;
-      }
-
-      return state;
-    },
-  },
+  extraReducers: {},
 }) as any;
 export const {
   setError,

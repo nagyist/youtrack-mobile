@@ -33,7 +33,7 @@ const Router: RouterAPI & NavigationRouteState & NavigationRouteNavigator = {
     Router?.[navigatorKey]?.routes?.slice?.(-1)?.[0] as INavigationRoute
   ),
   navigateToDefaultRoute: function (options?: NavigationParams) {
-    doNavigate(options?.issueId ? routeMap.Issue : defaultRootRoute, options);
+    doNavigate(options?.issueId ? routeMap.Issue : defaultRootRoute, options, true);
   },
   rootRoutes: RootRoutesList,
   ...(Object.keys(Navigators).reduce((akk, it) => {

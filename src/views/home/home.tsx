@@ -1,12 +1,15 @@
 import React from 'react';
 import {View, Image, Text, TouchableOpacity} from 'react-native';
+
 import usage from 'components/usage/usage';
 import {formatYouTrackURL} from 'components/config/config';
 import {HIT_SLOP} from 'components/common-styles';
 import {i18n} from 'components/i18n/i18n';
 import {logo, IconPencil} from 'components/icon/icon';
+
 import styles from './home.styles';
-type Props = {
+
+interface Props {
   backendUrl?: string;
   message?: string;
   error?: {
@@ -14,19 +17,19 @@ type Props = {
   };
   onChangeBackendUrl: (newUrl: string) => any;
   onRetry: () => any;
-};
+}
 
 const Home = (props: Props): JSX.Element => {
   usage.trackScreenView('Loading');
   const {backendUrl, onChangeBackendUrl, error, message, onRetry} = props;
-  const errorMessage: string | null | undefined = error?.message || message;
+  const msg: string | null | undefined = error?.message || message || i18n('Connecting to YouTrack...');
   return (
     <View style={styles.container}>
       <Image style={styles.logoImage} source={logo} />
       <View style={styles.info}>
-        {Boolean(errorMessage) && (
+        {Boolean(msg) && (
           <Text style={[styles.message, error && styles.messageError]}>
-            {errorMessage}
+            {msg}
           </Text>
         )}
         {Boolean(backendUrl) && (

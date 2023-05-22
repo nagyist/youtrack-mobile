@@ -10,8 +10,7 @@ import {
   initialState,
 } from '../issue-base-reducer';
 import {createCommandDialogReducers} from 'components/command-dialog/command-dialog-reducer';
-import {ON_NAVIGATE_BACK} from 'actions/action-types';
-import {routeMap} from '../../../app-routes';
+
 import type {IssueState} from '../issue-base-reducer';
 export type {IssueState as State}; //TODO
 
@@ -22,25 +21,6 @@ const {actions, reducer}: typeof Slice = createIssueReduxSlice(
   {
     ...createAttachmentReducer(attachmentTypes),
     ...createCommandDialogReducers(commandDialogNamespace),
-    [ON_NAVIGATE_BACK]: (
-      state: IssueState,
-      action: {
-        closingView: {
-          routeName: string;
-          params: {
-            issueId?: string;
-          };
-        };
-      },
-    ): IssueState => {
-      if (action.closingView.routeName === routeMap.Issue) {
-        return state.unloadedIssueState
-          ? state.unloadedIssueState
-          : initialState;
-      }
-
-      return state;
-    },
   },
 );
 export {actions};

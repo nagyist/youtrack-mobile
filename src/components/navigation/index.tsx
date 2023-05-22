@@ -10,9 +10,6 @@ import {
 
 import {routeMap} from 'app-routes';
 
-export type BottomTabsScreen = Record<NavigationRootNames, any>;
-export type NavigationRootNames = keyof typeof routeMap;
-
 enum Navigators {
   AgileRoot = 'AgileRoot',
   BottomTabs = 'BottomTabs',
@@ -24,6 +21,8 @@ enum Navigators {
 }
 
 export type NavigatorKey = keyof Navigators;
+export type NavigationRootNames = keyof typeof routeMap & NavigatorKey;
+export type BottomTabsScreen = Record<NavigationRootNames, any>;
 
 export interface INavigationParams {
   navigation: NavigationScreenProp<NavigationState>,

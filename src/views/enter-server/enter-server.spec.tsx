@@ -3,9 +3,11 @@ import React from 'react';
 import {fireEvent, render, waitFor} from '@testing-library/react-native';
 
 import * as appActions from 'actions/app-actions';
+import * as navigator from 'components/navigation/navigator';
 import EnterServer from './enter-server';
 import {DEFAULT_THEME} from 'components/theme/theme';
 import {ThemeContext} from 'components/theme/theme-context';
+import {StorageState} from 'components/storage/storage';
 
 
 const mockDispatch = jest.fn();
@@ -25,23 +27,39 @@ describe('EnterServer', () => {
     it('should render screen', () => {
       const {getByTestId} = doRender();
       expect(getByTestId('test:id/enterServer')).toBeTruthy();
-      expect(getByTestId('test:id/enterServerBackButton')).toBeTruthy();
       expect(getByTestId('test:id/server-url')).toBeTruthy();
       expect(getByTestId('test:id/enterServerHint')).toBeTruthy();
       expect(getByTestId('test:id/next')).toBeTruthy();
       expect(getByTestId('test:id/enterServerHint')).toBeTruthy();
       expect(getByTestId('test:id/enterServerHelpLink')).toBeTruthy();
     });
+
+    it('should render back button', () => {
+      jest.spyOn(navigator, 'canGoBack').mockReturnValueOnce(true);
+      const {getByTestId} = doRender();
+
+      expect(getByTestId('test:id/enterServerBackButton')).toBeTruthy();
+    });
   });
 
 
   describe('Connect to a server', () => {
-    it('should connect to server', async () => {
+    it('should connect to some server', async () => {
       const {getByTestId} = doRender(serverUrl);
       fireEvent.press(getByTestId('test:id/next'));
 
       await waitFor(() => {
-        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(serverUrl);
+        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(serverUrl, undefined);
+      });
+    });
+
+    it('should connect to server and show back button', async () => {
+      const accountMock = {};
+      const {getByTestId} = doRender(serverUrl, accountMock);
+      fireEvent.press(getByTestId('test:id/next'));
+
+      await waitFor(() => {
+        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(serverUrl, accountMock);
       });
     });
 
@@ -51,7 +69,7 @@ describe('EnterServer', () => {
       fireEvent.press(getByTestId('test:id/next'));
 
       await waitFor(() => {
-        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(`https://${urlNoProtocol}`);
+        expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(`https://${urlNoProtocol}`, undefined);
       });
     });
 
@@ -60,19 +78,20 @@ describe('EnterServer', () => {
       fireEvent.press(getByTestId('test:id/next'));
       expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith(
         'https://foo.myjetbrains.com',
+        undefined
       );
     });
 
     it('should trim white spaces', () => {
       const {getByTestId} = doRender('   foo.bar ');
       fireEvent.press(getByTestId('test:id/next'));
-      expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('https://foo.bar');
+      expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('https://foo.bar', undefined);
     });
 
     it('should remove tailing slash from URL', () => {
       const {getByTestId} = doRender('http://foo.bar/');
       fireEvent.press(getByTestId('test:id/next'));
-      expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar');
+      expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar', undefined);
     });
 
     it('should try next URL on failure if protocol is entered', async () => {
@@ -86,8 +105,8 @@ describe('EnterServer', () => {
       const {getByTestId} = doRender('http://foo.bar/');
       fireEvent.press(getByTestId('test:id/next'));
 
-      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar');
-      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar/youtrack');
+      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar', undefined);
+      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar/youtrack', undefined);
     });
 
     it('should try next URL on failure if no protocol entered', async () => {
@@ -100,10 +119,10 @@ describe('EnterServer', () => {
       const {getByTestId} = doRender('foo.bar');
       fireEvent.press(getByTestId('test:id/next'));
 
-      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('https://foo.bar');
-      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('https://foo.bar/youtrack',);
-      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar');
-      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar/youtrack');
+      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('https://foo.bar', undefined);
+      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('https://foo.bar/youtrack', undefined);
+      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar', undefined);
+      await expect(appActions.connectToNewYoutrack).toHaveBeenCalledWith('http://foo.bar/youtrack', undefined);
     });
   });
 
@@ -127,14 +146,14 @@ describe('EnterServer', () => {
     });
   });
 
-  function doRender(url = '') {
+  function doRender(url = '', account?: Partial<StorageState>) {
     return render(
       <ThemeContext.Provider
         value={{
           uiTheme: DEFAULT_THEME,
         }}
       >
-        <EnterServer serverUrl={url}/>
+        <EnterServer serverUrl={url} currentAccount={account}/>
       </ThemeContext.Provider>,
     );
   }

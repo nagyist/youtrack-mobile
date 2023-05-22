@@ -21,6 +21,7 @@ import log from 'components/log/log';
 import Popup from 'components/popup/popup';
 import Router from 'components/router/router';
 import usage from 'components/usage/usage';
+import {canGoBack} from 'components/navigation/navigator';
 import {connectToNewYoutrack, openDebugView} from 'actions/app-actions';
 import {formStyles} from 'components/common-styles/form';
 import {getPossibleUrls, isValidURL} from 'views/enter-server/enter-server-helper';
@@ -29,6 +30,7 @@ import {i18n} from 'components/i18n/i18n';
 import {logo, IconBack} from 'components/icon/icon';
 import {NETWORK_PROBLEM_TIPS} from 'components/error-message/error-text-messages';
 import {resolveErrorMessage} from 'components/error/error-resolver';
+import {StorageState} from 'components/storage/storage';
 import {ThemeContext} from 'components/theme/theme-context';
 
 import styles from './enter-server.styles';
@@ -39,6 +41,7 @@ import {INavigationParams, mixinNavigationProps} from 'components/navigation';
 
 interface Props extends INavigationParams {
   serverUrl: string;
+  currentAccount?: StorageState;
 }
 
 interface State {
@@ -83,7 +86,7 @@ const EnterServer = (props: Props) => {
     for (const url of getPossibleUrls(trimmedUrl)) {
       log.log(`Trying: "${url}"`);
       try {
-        await dispatch(connectToNewYoutrack(url));
+        await dispatch(connectToNewYoutrack(url, props.currentAccount));
         log.log(`Successfully connected to ${url}`);
         break;
       } catch (error) {
@@ -138,7 +141,7 @@ const EnterServer = (props: Props) => {
             contentContainerStyle={styles.scrollContainer}
           >
             <View style={styles.container}>
-              <View style={styles.backIconButtonContainer}>
+              {canGoBack() && <View style={styles.backIconButtonContainer}>
                 <TouchableOpacity
                   testID="test:id/enterServerBackButton"
                   onPress={Router.pop}
@@ -146,7 +149,7 @@ const EnterServer = (props: Props) => {
                 >
                   <IconBack/>
                 </TouchableOpacity>
-              </View>
+              </View>}
 
               <View style={styles.formContent}>
                 <TouchableWithoutFeedback

@@ -3,9 +3,13 @@ import {Linking} from 'react-native';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 
-import LoginStackNavigator from 'components/navigation/navigation-login-stack';
+import EnterServer from 'views/enter-server/enter-server';
+import Home from 'views/home/home';
+import LogIn from 'views/log-in/log-in';
 import NavigationBottomTabs from 'components/navigation/navigation-bottom-tabs';
+import {AppState} from 'reducers';
 import {navigationRef} from 'components/navigation/navigator';
 import {Navigators} from 'components/navigation/index';
 import {populateStorage, StorageState} from 'components/storage/storage';
@@ -39,21 +43,21 @@ export default function Navigation() {
       'https://*.myjetbrains.com',
     ],
     config,
+    async getInitialURL() {
+      const initialUrl: string | null = await Linking.getInitialURL();
+      if (initialUrl != null) {
+        return initialUrl;
+      }
+    },
   };
 
-  const [isReady, setIsReady] = React.useState<boolean>(false);
+  const isPermissionsLoaded: boolean = useSelector((state: AppState) => !!state.app.issuePermissions);
+
+  const [hasAccount, setHasAccount] = React.useState<boolean | null>(null);
+
   const init = async () => {
-    try {
-      const initialUrl: string | null = await Linking.getInitialURL();
-      if (!initialUrl) {
-        populateStorage()
-          .then((storageState: StorageState) => {
-            setIsReady(!!storageState.config);
-          });
-      }
-    } finally {
-      setIsReady(true);
-    }
+    const storageState: StorageState = await populateStorage();
+    setHasAccount(!!storageState?.config);
   };
 
   React.useEffect(() => {
@@ -65,27 +69,40 @@ export default function Navigation() {
       linking={linking}
       ref={navigationRef}
     >
+      <Stack.Navigator
+        initialRouteName={routeMap.Home}
+      >
+        <Stack.Screen
+          options={{
+            ...defaultScreenOptions,
+            animation: 'none',
+          }}
+          navigationKey={Navigators.BottomTabs}
+          name={Navigators.BottomTabs}
+          component={NavigationBottomTabs}
+        />
 
-      <Stack.Navigator>
-        {
-          isReady ? (
-            <Stack.Screen
-              options={{
-                ...defaultScreenOptions,
-                animation: 'none',
-              }}
-              name={Navigators.BottomTabs}
-              component={NavigationBottomTabs}
-            />
-            )
-        : (
+        <Stack.Screen
+          name={routeMap.Home}
+          component={Home}
+          options={defaultScreenOptions}
+        />
+
+        <Stack.Group navigationKey={hasAccount && isPermissionsLoaded ? 'user' : 'guest'}>
           <Stack.Screen
-            name={Navigators.LoginRoot}
-            options={defaultScreenOptions}
-            component={LoginStackNavigator}
+            name={routeMap.EnterServer}
+            component={EnterServer}
+            options={{
+              ...defaultScreenOptions,
+              animation: 'none',
+            }}
           />
-            )
-        }
+          <Stack.Screen
+            name={routeMap.LogIn}
+            component={LogIn}
+            options={defaultScreenOptions}
+          />
+        </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import KeyboardSpacer from 'react-native-keyboard-spacer';
+import {useDispatch} from 'react-redux';
 
 import clicksToShowCounter from 'components/debug-view/clicks-to-show-counter';
 import ErrorMessageInline from 'components/error-message/error-message-inline';
@@ -26,6 +27,8 @@ import {i18n} from 'components/i18n/i18n';
 import {logo, IconBack} from 'components/icon/icon';
 import {openDebugView, onLogIn} from 'actions/app-actions';
 import {resolveErrorMessage} from 'components/error/error-resolver';
+import {routeMap} from 'app-routes';
+import {StorageState} from 'components/storage/storage';
 import {ThemeContext} from 'components/theme/theme-context';
 
 import styles from './log-in.styles';
@@ -35,14 +38,13 @@ import type {OAuthParams2} from 'types/Auth';
 import type {CustomError} from 'types/Error';
 import type {Theme, UIThemeColors} from 'types/Theme';
 import {INavigationParams, mixinNavigationProps} from 'components/navigation';
-import {useDispatch} from 'react-redux';
-import {routeMap} from 'app-routes';
 
 interface Props extends INavigationParams {
   config: AppConfig;
   onChangeServerUrl: (url: string) => any;
   errorMessage?: string;
   error?: CustomError;
+  currentAccount?: StorageState;
 }
 
 interface State {
@@ -92,7 +94,8 @@ const LogIn = (props: Props) => {
       setState({loggingIn: true});
       const authParams: OAuthParams2 = await OAuth2.obtainTokenWithOAuthCode(config) as OAuthParams2;
       usage.trackEvent(CATEGORY_NAME, logMsg, 'Success');
-      dispatch(onLogIn(authParams));
+      dispatch(onLogIn(authParams, config, props.currentAccount));
+
     } catch (err) {
       usage.trackEvent(CATEGORY_NAME, logMsg, 'Error');
       log.warn(logMsg, err);
@@ -107,7 +110,7 @@ const LogIn = (props: Props) => {
         });
       }
     }
-  }, [changeYouTrackUrl, config, dispatch]);
+  }, [changeYouTrackUrl, config, dispatch, props.currentAccount]);
 
   React.useEffect(() => {
     const doLogInViaHub = async () => {
@@ -129,7 +132,6 @@ const LogIn = (props: Props) => {
         config,
       ) as OAuthParams2;
       usage.trackEvent(CATEGORY_NAME, 'Login via credentials', 'Success');
-      authParams.inAppLogin = true;
 
       if (!authParams.accessTokenExpirationDate && authParams.expires_in) {
         authParams.accessTokenExpirationDate = Date.now() + authParams.expires_in * 1000;

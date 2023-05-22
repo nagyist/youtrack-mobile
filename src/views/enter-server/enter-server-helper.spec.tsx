@@ -42,6 +42,10 @@ describe('isValidURL', () => {
     expect(isValidURL(' ')).toEqual(false);
   });
 
+  it('should process NUll', async () => {
+    expect(isValidURL(null)).toEqual(false);
+  });
+
   it('should validate server URL', () => {
     expect(isValidURL('ab/')).toEqual(true);
     expect(isValidURL('ab.c')).toEqual(true);

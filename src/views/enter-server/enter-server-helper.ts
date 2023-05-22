@@ -27,9 +27,12 @@ const getPossibleUrls = (enteredUrl: string): string[] => {
   return urls;
 };
 
-const isValidURL = (url: string = ''): boolean => {
-  const str: string = url.trim();
-  return str.length > 0 && !str.match(/@/g);
+const isValidURL = (url: string | null): boolean => {
+  if (url != null) {
+    const str: string = url.trim();
+    return str.length > 0 && !str.match(/@/g);
+  }
+  return false;
 };
 
 
