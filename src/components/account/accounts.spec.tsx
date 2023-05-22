@@ -18,8 +18,6 @@ describe('<Accounts/>', () => {
     __setStorageState(createAccountMock('http://server.org'));
     accountsMock = [createAccountMock(), createAccountMock()];
   });
-  const testIdAccountElement = 'accountsAccount';
-  const testIdAddAccountButton = 'test:id/accountsAddAccount';
 
 
   describe('Account', () => {
@@ -29,7 +27,7 @@ describe('<Accounts/>', () => {
         isChangingAccount: false,
       });
 
-      fireEvent.press(getByTestId(testIdAddAccountButton));
+      fireEvent.press(getByTestId('test:id/accountsAddAccount'));
 
       expect(Router.EnterServer).toHaveBeenCalled();
     });
@@ -40,7 +38,7 @@ describe('<Accounts/>', () => {
         isChangingAccount: true,
       });
 
-      const addAccountButton = getByTestId(testIdAddAccountButton);
+      const addAccountButton = getByTestId('test:id/accountsAddAccount');
       fireEvent.press(addAccountButton);
 
       expect(Router.EnterServer).not.toHaveBeenCalled();
@@ -63,7 +61,7 @@ describe('<Accounts/>', () => {
         otherAccounts: accountsMock,
       });
 
-      expect(getAllByTestId(testIdAccountElement)).toHaveLength(3);
+      expect(getAllByTestId('test:id/accountsAccount')).toHaveLength(3);
     });
 
     it('should not render accounts without `config`', () => {
@@ -71,7 +69,7 @@ describe('<Accounts/>', () => {
         otherAccounts: [{}],
       });
 
-      expect(getAllByTestId('accountsAccount')).toHaveLength(1);
+      expect(getAllByTestId('test:id/accountsAccount')).toHaveLength(1);
     });
   });
 
