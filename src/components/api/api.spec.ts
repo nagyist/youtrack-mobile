@@ -8,6 +8,9 @@ import type Auth from 'components/auth/oauth2';
 import {AppConfig} from 'types/AppConfig';
 import {AuthParams, RequestHeaders} from 'types/Auth';
 import {IssueComment} from 'types/CustomFields';
+import Router from 'components/router/router';
+import {HTTP_STATUS} from 'components/error/error-http-codes';
+import {CustomError} from 'types/Error';
 
 
 describe('API', () => {
@@ -16,7 +19,9 @@ describe('API', () => {
     token_type: 'token type',
     access_token: 'fake token',
   } as AuthParams;
-  let authMock: Auth;
+  let authMock: Auth & {
+    refreshToken: jest.Mock
+  };
 
   const createApiInstance = (auth: Auth = authMock) => new Api(auth);
 
@@ -60,26 +65,89 @@ describe('API', () => {
     expect(res.foo).toEqual(bodyMock.foo);
   });
 
-  it('should refresh token and make request again if outdated', async () => {
-    const requestResponseMock = {foo: 'bar'};
+  it('should refresh token', async () => {
     const callSpy = jest.fn();
     let isFirst = true;
-    fetchMock.mock(`${serverUrl}?$top=-1`, (...args: any[]) => {
-      callSpy(...args);
-
+    fetchMock.mock(`${serverUrl}?$top=-1`, () => {
+      callSpy();
       if (isFirst) {
         isFirst = false;
-        return 401;
+        return {status: HTTP_STATUS.UNAUTHORIZED};
       }
-
-      return requestResponseMock;
+      return {foo: 'bar'};
     });
-    const res = await createApiInstance().makeAuthorizedRequest(serverUrl);
+
+    await createApiInstance().makeAuthorizedRequest(serverUrl);
 
     expect(authMock.refreshToken).toHaveBeenCalled();
     expect(callSpy).toHaveBeenCalledTimes(2);
-    expect(res.foo).toEqual(requestResponseMock.foo);
+  });
 
+  it('should set `isRefreshingToken` to false when a request is successful', async () => {
+    const instance: Api = createApiInstance();
+    instance.isRefreshingToken = true;
+    fetchMock.mock(`${serverUrl}?$top=-1`, {});
+
+    await instance.makeAuthorizedRequest(serverUrl);
+
+    expect(instance.isRefreshingToken).toEqual(false);
+  });
+
+
+  describe('Response Error and Re-login', () => {
+    let error: CustomError;
+    let instance: Api;
+    beforeEach(() => {
+      Router.EnterServer = jest.fn();
+      instance = createApiInstance();
+
+      error = new Error('') as CustomError;
+      error.status = HTTP_STATUS.UNAUTHORIZED;
+      error.error_description = 'token is invalid';
+      error.json = jest.fn();
+    });
+
+    it('should not return a response', async () => {
+      prepareUnsuccesfulRequest();
+      await performRequest();
+
+      expect(error.json).not.toHaveBeenCalled();
+    });
+
+    it('should redirect to login screen if refreshing token failed', async () => {
+      prepareUnsuccesfulRequest();
+      await performRequest();
+
+      expect(instance.isRefreshingToken).toEqual(true);
+      expect(Router.EnterServer).toHaveBeenCalledWith({serverUrl: authMock.config.backendUrl});
+
+    });
+
+    it('should not redirect to login screen several times', async () => {
+      prepareUnsuccesfulRequest();
+
+      expect(instance.isRefreshingToken).toEqual(false);
+
+      await performRequest();
+      expect(Router.EnterServer).toHaveBeenCalled();
+      expect(instance.isRefreshingToken).toEqual(true);
+
+      await performRequest();
+      expect(instance.isRefreshingToken).toEqual(true);
+
+      expect(Router.EnterServer).toHaveBeenCalledTimes(1);
+    });
+
+
+    function prepareUnsuccesfulRequest() {
+      fetchMock.mock(`${serverUrl}?$top=-1`, error);
+      authMock.refreshToken.mockRejectedValueOnce(error);
+    }
+    async function performRequest() {
+      try {
+        await instance.makeAuthorizedRequest(serverUrl);
+      } catch (e) {}
+    }
   });
 
 

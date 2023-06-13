@@ -72,6 +72,12 @@ const ArticleActivities = (props: Props) => {
   );
 
   useEffect(() => {
+    return () => {
+      dispatch(articleActions.resetArticleCommentDraft());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
     dispatch(setDraftCommentData(
       articleActions.updateArticleCommentDraft,
       () => async () => await articleCommentDraft,
@@ -126,14 +132,8 @@ const ArticleActivities = (props: Props) => {
           <ArticleAddComment
             article={article}
             comment={articleCommentDraft}
-            onCommentChange={(
-              comment: IssueComment,
-            ): ((...args: any[]) => any) =>
-              dispatch(articleActions.updateArticleCommentDraft(comment))
-            }
-            onSubmitComment={async (
-              comment: IssueComment,
-            ): Promise<void> => {
+            onCommentChange={(comment: IssueComment) => dispatch(articleActions.updateArticleCommentDraft(comment))}
+            onSubmitComment={async (comment: IssueComment) => {
               updateActivities(comment);
               await dispatch(articleActions.submitArticleCommentDraft(comment));
               refreshActivities(false);

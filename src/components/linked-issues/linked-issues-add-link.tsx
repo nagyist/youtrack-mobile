@@ -6,29 +6,31 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import ErrorMessage from '../error-message/error-message';
-import Header from '../header/header';
-import issueCommonLinksActions from '../issue-actions/issue-links-actions';
+import ErrorMessage from 'components/error-message/error-message';
+import Header from 'components/header/header';
+import issueCommonLinksActions from 'components/issue-actions/issue-links-actions';
 import IssueRow from 'views/issues/issues__row';
-import QueryAssistPanel from '../query-assist/query-assist-panel';
-import QueryPreview from '../query-assist/query-preview';
-import Select from '../select/select';
-import SelectButton from '../select/select-button';
+import QueryAssistPanel from 'components/query-assist/query-assist-panel';
+import QueryPreview from 'components/query-assist/query-preview';
+import Select from 'components/select/select';
+import SelectButton from 'components/select/select-button';
 import {createLinkTypes} from './linked-issues-helper';
-import {ERROR_MESSAGE_DATA} from '../error/error-message-data';
-import {getApi} from '../api/api__instance';
-import {getAssistSuggestions} from '../query-assist/query-assist-helper';
-import {getReadableID} from '../issue-formatter/issue-formatter';
+import {ERROR_MESSAGE_DATA} from 'components/error/error-message-data';
+import {getApi} from 'components/api/api__instance';
+import {getAssistSuggestions} from 'components/query-assist/query-assist-helper';
+import {getReadableID} from 'components/issue-formatter/issue-formatter';
 import {i18n} from 'components/i18n/i18n';
 import {
   ICON_PICTOGRAM_DEFAULT_SIZE,
   IconNothingFound,
-} from '../icon/icon-pictogram';
-import {IconBack} from '../icon/icon';
-import {ThemeContext} from '../theme/theme-context';
+} from 'components/icon/icon-pictogram';
+import {IconBack} from 'components/icon/icon';
+import {ThemeContext} from 'components/theme/theme-context';
 import {UNIT} from 'components/variables';
 import {View as AnimatedView} from 'react-native-animatable';
+
 import styles from './linked-issues.style';
+
 import type {IssueLinkTypeExtended} from './linked-issues-helper';
 import type {IssueLinkType} from 'types/CustomFields';
 import type {IssueOnList, TransformedSuggestion} from 'types/Issue';
@@ -53,7 +55,7 @@ const LinkedIssuesAddLink = (props: Props): JSX.Element => {
   const theme: Theme = useContext(ThemeContext);
 
   const [issues, updateIssues] = useState<IssueOnList[]>([]);
-  const [isLoading, updateLoading] = useState(false);
+  const [isLoading, updateLoading] = useState<boolean>(false);
   const [issueLinkTypes, updateIssueLinkTypes] = useState<IssueLinkTypeExtended[]>([]);
   const [
     currentIssueLinkTypeExtended,
@@ -101,7 +103,7 @@ const LinkedIssuesAddLink = (props: Props): JSX.Element => {
         .split('')
         .some((char: string) => char >= '0' && char <= '9');
     return isSingleIssueQuery
-      ? _issues.find((issue: IssueOnList) => issue.idReadable.toLowerCase() === issueToLinkIdReadable)
+      ? _issues.find((issue: IssueOnList) => issue.idReadable?.toLowerCase() === issueToLinkIdReadable)
       : null;
   }, []);
   const doSearch = useCallback(
@@ -291,7 +293,7 @@ const LinkedIssuesAddLink = (props: Props): JSX.Element => {
           />
         }
         scrollEventThrottle={50}
-        keyExtractor={(issue: Partial<IssueOnList>) => issue.id as string}
+        keyExtractor={(issue: Partial<IssueOnList>): string => issue.id as string}
         renderItem={(info: {item: any}) => renderIssue(info.item)}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListFooterComponent={

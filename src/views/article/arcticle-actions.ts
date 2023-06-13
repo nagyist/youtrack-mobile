@@ -34,7 +34,7 @@ import type ActionSheet from '@expo/react-native-action-sheet';
 import type Api from 'components/api/api';
 import type {ActionSheetOption} from 'components/action-sheet/action-sheet';
 import type {Activity, ActivityPositionData} from 'types/Activity';
-import type {AppState} from '../../reducers';
+import type {AppState} from 'reducers';
 import type {Article, ArticleDraft} from 'types/Article';
 import type {ArticleState} from './article-reducers';
 import type {Attachment, IssueComment} from 'types/CustomFields';
@@ -458,9 +458,12 @@ const updateArticleCommentDraft = (
 ) => Promise<null>) => {
   return async (dispatch: (arg0: any) => any, getState: () => AppState) => {
     const api: Api = getApi();
-    const article: Article = getState().article.article;
+    const articleId: string | undefined = comment?.article?.id || getState()?.article?.article?.id;
+    if (!articleId) {
+      return null;
+    }
     const [error, updatedCommentDraft] = await until(
-      api.articles.updateCommentDraft(article.id, comment),
+      api.articles.updateCommentDraft(articleId, comment),
     );
 
     if (error) {
@@ -470,6 +473,18 @@ const updateArticleCommentDraft = (
     }
 
     return error ? null : updatedCommentDraft;
+  };
+};
+
+const resetArticleCommentDraft = (): ((
+  dispatch: (arg0: any) => any,
+  getState: () => AppState,
+) => Promise<void>) => {
+  return async (
+    dispatch: (arg0: any) => any,
+    getState: () => AppState,
+  ): Promise<void> => {
+    dispatch(setArticleCommentDraft(null));
   };
 };
 
@@ -484,14 +499,17 @@ const submitArticleCommentDraft = (
     getState: () => AppState,
   ): Promise<void> => {
     const api: Api = getApi();
-    const {article} = getState().article;
+    const articleId: string | undefined = commentDraft?.article?.id || getState()?.article?.article?.id;
     logEvent({
       message: 'Submit article draft',
       analyticsId: ANALYTICS_ARTICLE_PAGE,
     });
+    if (!articleId) {
+      return;
+    }
     await dispatch(updateArticleCommentDraft(commentDraft));
     const [error] = await until(
-      api.articles.submitCommentDraft(article.id, commentDraft.id),
+      api.articles.submitCommentDraft(articleId, commentDraft.id),
     );
 
     if (error) {
@@ -501,28 +519,33 @@ const submitArticleCommentDraft = (
         message: 'Comment added',
         analyticsId: ANALYTICS_ARTICLE_PAGE,
       });
-      dispatch(setArticleCommentDraft(null));
+      dispatch(resetArticleCommentDraft());
     }
   };
 };
 
 const updateArticleComment = (
   comment: IssueComment,
+  isAttachmentChange: boolean,
 ): ((
   dispatch: (arg0: any) => any,
   getState: () => AppState,
 ) => Promise<void>) => {
   return async (dispatch: (arg0: any) => any, getState: () => AppState) => {
     const api: Api = getApi();
-    const article: Article = getState().article.article;
+    const articleId: string | undefined = comment?.article?.id || getState()?.article?.article?.id;
     logEvent({
       message: 'Update article comment',
       analyticsId: ANALYTICS_ARTICLE_PAGE,
     });
-    const [error] = await until(
-      api.articles.updateComment(article.id, comment),
-    );
+    if (!articleId) {
+      return;
+    }
+    const [error] = await until(api.articles.updateComment(articleId, comment));
 
+    if (isAttachmentChange) {
+      notify(i18n('Comment updated'));
+    }
     if (error) {
       notifyError(error);
     } else {
@@ -922,4 +945,5 @@ export {
   deleteAttachment,
   onCheckboxUpdate,
   onReactionSelect,
+  resetArticleCommentDraft,
 };

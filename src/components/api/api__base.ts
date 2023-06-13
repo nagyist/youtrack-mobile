@@ -2,19 +2,19 @@ import qs from 'qs';
 
 import ApiHelper from './api__helper';
 import log from 'components/log/log';
-import {fetch2, requestController} from './api__request-controller';
+import Router from 'components/router/router';
+import {fetch2, RequestController, requestController} from './api__request-controller';
 import {handleRelativeUrl} from 'components/config/config';
 import {HTTP_STATUS} from 'components/error/error-http-codes';
-import {routeMap} from 'app-routes';
 
 import Auth from 'components/auth/oauth2';
 import type {AppConfig} from 'types/AppConfig';
-import type {CustomError} from 'types/Error';
 import type {RequestHeaders} from 'types/Auth';
 
 const MAX_QUERY_LENGTH = 2048;
+
 type RequestOptions = {
-  controller?: {[key in keyof typeof routeMap]?: AbortController};
+  controller?: RequestController;
   parseJson?: boolean;
 };
 
@@ -63,6 +63,7 @@ export default class BaseAPI {
   youTrackUrl: string;
   youTrackIssueUrl: string;
   youTrackApiUrl: string;
+  isRefreshingToken: boolean;
 
   constructor(auth: Auth) {
     this.auth = auth;
@@ -79,6 +80,7 @@ export default class BaseAPI {
     this.youTrackUrl = this.config.backendUrl;
     this.youTrackApiUrl = `${this.youTrackUrl}/api`;
     this.youTrackIssueUrl = `${this.youTrackApiUrl}/issues`;
+    this.isRefreshingToken = false;
   }
 
   static createFieldsQuery(
@@ -101,17 +103,8 @@ export default class BaseAPI {
     return handleRelativeUrl(url, this.config.backendUrl) as string;
   }
 
-  shouldRefreshToken(response: Response | CustomError): boolean {
-    let errText: string = '';
-    const responseError: CustomError = response as CustomError;
-    if (typeof responseError?.error === 'string') {
-      errText = responseError.error;
-    }
-    return (
-      response.status === HTTP_STATUS.UNAUTHORIZED ||
-      ['invalid_grant', 'invalid_request', 'invalid_token'].includes(errText) ||
-      this.auth.isTokenInvalid()
-    );
+  isTokenOutdated(): boolean {
+    return this.auth.isTokenOutdated();
   }
 
   isError(response: Response): boolean {
@@ -161,24 +154,32 @@ export default class BaseAPI {
       );
     };
 
-    let response: Response = await sendRequest();
-
-    if (
-      response.status !== HTTP_STATUS.SUCCESS &&
-      response.status !== HTTP_STATUS.SUCCESS_NO_CONTENT &&
-      this.shouldRefreshToken(response)
-    ) {
-      log.debug('Token has expired');
-      await this.auth.refreshToken();
-      response = await sendRequest();
-      log.debug('Repeat a request', url);
-    }
+    let response: any = await sendRequest();
 
     if (this.isError(response)) {
-      log.warn('Request failed', response);
-      throw response;
+      const isNotAuthorized: boolean = response.status === HTTP_STATUS.UNAUTHORIZED || this.isTokenOutdated();
+      if (!isNotAuthorized) {
+        log.warn('Request failed', response);
+        throw response;
+      } else {
+        log.debug('Unauthorised. Refreshing token...');
+        try {
+          await this.auth.refreshToken();
+          log.debug('Repeat a request', url);
+          response = await sendRequest();
+        } catch (e) {
+          if (!this.isRefreshingToken) {
+            log.debug('Unauthorised. Token refresh failed. Logging in...', e);
+            this.isRefreshingToken = true;
+            Router.EnterServer({serverUrl: this.config.backendUrl});
+          }
+          throw e;
+        }
+      }
+    } else {
+      this.isRefreshingToken = false;
     }
 
-    return options.parseJson === false ? response : await response.json();
+    return options.parseJson === false ? response : await response?.json?.();
   }
 }
