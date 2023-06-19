@@ -1,6 +1,8 @@
 import EStyleSheet from 'react-native-extended-stylesheet';
-import {UNIT} from 'components/variables';
-import {SECONDARY_FONT_SIZE} from 'components/common-styles';
+
+import {SECONDARY_FONT_SIZE, UNIT} from 'components/common-styles';
+
+
 export default EStyleSheet.create({
   attachesScroll: {
     paddingLeft: UNIT * 2,
@@ -31,6 +33,7 @@ export default EStyleSheet.create({
     left: UNIT,
   },
   attachmentType: {
+    maxWidth: UNIT * 10,
     borderRadius: 3,
     paddingVertical: 1,
     paddingHorizontal: UNIT / 2,
