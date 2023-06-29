@@ -184,6 +184,10 @@ msgstr "Bugsnag adatvédelmi szabályzata"
 msgid "By logging in, you agree to the Privacy Policy."
 msgstr "Bejelentkezésével elfogadja az Adatvédelmi szabályzatot."
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Camera"
+msgstr ""
+
 #: src/components/account/accounts.tsx
 #: src/components/confirmation/confirmation.ts
 #: src/components/tags/tags.tsx
@@ -199,11 +203,6 @@ msgstr "Bejelentkezésével elfogadja az Adatvédelmi szabályzatot."
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "Mégsem"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Choose from library…"
-msgstr "Válasszon a könyvtárból…"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -411,6 +410,10 @@ msgstr ""
 
 #: src/components/account/accounts.tsx
 msgid "Do you really want to remove this account?"
+msgstr ""
+
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Document"
 msgstr ""
 
 #: src/views/settings/settings-helper.ts
@@ -749,6 +752,10 @@ msgstr "További csoportok és csapatok"
 msgid "Password"
 msgstr "Jelszó"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Photo and video library"
+msgstr ""
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "Probléma"
@@ -969,11 +976,6 @@ msgid "Tag"
 msgid_plural "Tags"
 msgstr[0] "Címke"
 msgstr[1] "Címkék"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Take a picture…"
-msgstr ""
 
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"

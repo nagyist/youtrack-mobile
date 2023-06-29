@@ -180,6 +180,10 @@ msgstr "Bugsnag 개인정보 보호정책"
 msgid "By logging in, you agree to the Privacy Policy."
 msgstr "로그인하면 개인정보 보호정책에 동의하는 것입니다."
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Camera"
+msgstr "카메라"
+
 #: src/components/account/accounts.tsx
 #: src/components/confirmation/confirmation.ts
 #: src/components/tags/tags.tsx
@@ -195,11 +199,6 @@ msgstr "로그인하면 개인정보 보호정책에 동의하는 것입니다."
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "취소"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Choose from library…"
-msgstr "라이브러리에서 선택…"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -408,6 +407,10 @@ msgstr "로그아웃하시겠어요?"
 #: src/components/account/accounts.tsx
 msgid "Do you really want to remove this account?"
 msgstr "이 계정을 삭제하시겠어요?"
+
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Document"
+msgstr "문서"
 
 #: src/views/settings/settings-helper.ts
 msgid "Don't send logs"
@@ -744,6 +747,10 @@ msgstr "기타 그룹 및 팀"
 msgid "Password"
 msgstr "비밀번호"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Photo and video library"
+msgstr "사진 및 비디오 라이브러리"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "문제"
@@ -963,11 +970,6 @@ msgstr "OS와 동기화"
 msgid "Tag"
 msgid_plural "Tags"
 msgstr[0] "태그"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Take a picture…"
-msgstr "사진 찍기…"
 
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"

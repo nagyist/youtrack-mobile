@@ -192,6 +192,10 @@ msgstr "Политикa конфиденциальности Bugsnag"
 msgid "By logging in, you agree to the Privacy Policy."
 msgstr "Входя в систему, вы соглашаетесь с Политикой конфиденциальности."
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Camera"
+msgstr "Камера"
+
 #: src/components/account/accounts.tsx
 #: src/components/confirmation/confirmation.ts
 #: src/components/tags/tags.tsx
@@ -207,11 +211,6 @@ msgstr "Входя в систему, вы соглашаетесь с Поли�
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "Отмена"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Choose from library…"
-msgstr "Выбрать из библиотеки…"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -420,6 +419,10 @@ msgstr "Вы действительно хотите выйти?"
 #: src/components/account/accounts.tsx
 msgid "Do you really want to remove this account?"
 msgstr "Вы действительно хотите удалить этот аккаунт?"
+
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Document"
+msgstr "Документ"
 
 #: src/views/settings/settings-helper.ts
 msgid "Don't send logs"
@@ -759,6 +762,10 @@ msgstr "Другие группы и команды"
 msgid "Password"
 msgstr "Пароль"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Photo and video library"
+msgstr "Библиотека Фото/видео"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "Сообщить о проблеме"
@@ -981,11 +988,6 @@ msgstr[0] "Тег"
 msgstr[1] "Теги"
 msgstr[2] "Теги"
 msgstr[3] "Теги"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Take a picture…"
-msgstr "Сделать фото…"
 
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
