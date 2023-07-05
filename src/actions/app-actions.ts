@@ -497,11 +497,15 @@ function loadWorkTimeSettings(): Action {
     getState: () => AppState,
     getApi: () => Api,
   ) => {
-    const workTimeSettings: WorkTimeSettings = await getApi().getWorkTimeSettings();
-    await dispatch({
-      type: types.RECEIVE_WORK_TIME_SETTINGS,
-      workTimeSettings,
-    });
+    try {
+      const workTimeSettings: WorkTimeSettings = await getApi().getWorkTimeSettings();
+      await dispatch({
+        type: types.RECEIVE_WORK_TIME_SETTINGS,
+        workTimeSettings,
+      });
+    } catch (error) {
+      notifyError(error);
+    }
   };
 }
 
@@ -902,18 +906,15 @@ const inboxCheckUpdateStatus = (): Action => {
         | InboxThread
         | null
         | undefined = getFirstCachedThread();
-      const [error, folders]: [
-        CustomError | null | undefined,
-        Array<InboxFolder>,
-      ] = await until(
+      const [error, folders]: [CustomError | null, InboxFolder[]] = await until(
         getApi().inbox.getFolders(
           typeof firstCachedThread?.notified === 'number'
             ? firstCachedThread?.notified + 1
             : undefined,
         ),
-      );
+      ) as [CustomError | null, InboxFolder[]];
 
-      if (!error) {
+      if (!error && Array.isArray(folders)) {
         const sorted: InboxFolder[] = folders.reduce(
           (flds: InboxFolder[], folder: InboxFolder) => {
             if (folder.id === folderIdMap[2]) {

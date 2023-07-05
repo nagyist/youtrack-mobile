@@ -109,15 +109,15 @@ msgstr "外观"
 msgid "Apply command…"
 msgstr "应用命令…"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete all article drafts?"
 msgstr "确定要删除所有文章草稿吗?"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete this article?"
 msgstr "确定要删除此文章吗?"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete this draft?"
 msgstr "是否确实要删除此草稿?"
 
@@ -180,6 +180,10 @@ msgstr "Bugsnag 隐私政策"
 msgid "By logging in, you agree to the Privacy Policy."
 msgstr "登录，即表示您同意《隐私政策》。"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Camera"
+msgstr "相机"
+
 #: src/components/account/accounts.tsx
 #: src/components/confirmation/confirmation.ts
 #: src/components/tags/tags.tsx
@@ -195,11 +199,6 @@ msgstr "登录，即表示您同意《隐私政策》。"
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "取消"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Choose from library…"
-msgstr "从库中选择…"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -352,15 +351,16 @@ msgstr "日期"
 msgid "Decline"
 msgstr "数据库大小<br>(不带 blobs)"
 
+#: src/components/confirmation/confirmation.ts
 #: src/views/article/arcticle-actions.ts
 #: src/views/article/arcticle-actions.ts
-#: src/views/article/arcticle-helper.ts
 #: src/views/article/article__activity-stream.tsx
 #: src/views/issue/activity/issue__activity-stream.tsx
 #: src/views/issue/activity/issue__activity.tsx
 #: src/views/issue/activity/issue-activity__actions.ts
 #: src/views/issue/activity/issue-activity__comment-actions.ts
 #: src/views/issue/activity/issue-activity__comment-actions.ts
+#: src/views/issue/issue-base-actions-creater.ts
 msgid "Delete"
 msgstr "删除"
 
@@ -371,6 +371,10 @@ msgstr "永久删除评论?"
 #: src/views/article-create/article-create.tsx
 msgid "Delete draft"
 msgstr "删除草稿"
+
+#: src/components/confirmation/issue-confirmations.ts
+msgid "Delete issue {{issueId}}?"
+msgstr "删除问题 {{issueId}}?"
 
 #: src/components/comment/comment.tsx
 msgid "Delete permanently"
@@ -408,6 +412,10 @@ msgstr "确实要退出登录吗?"
 #: src/components/account/accounts.tsx
 msgid "Do you really want to remove this account?"
 msgstr "确实要移除此帐户吗?"
+
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Document"
+msgstr "文档"
 
 #: src/views/settings/settings-helper.ts
 msgid "Don't send logs"
@@ -744,6 +752,10 @@ msgstr "其他群组和团队"
 msgid "Password"
 msgstr "密码"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Photo and video library"
+msgstr "照片和视频库"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "问题"
@@ -964,11 +976,6 @@ msgid "Tag"
 msgid_plural "Tags"
 msgstr[0] "标签"
 
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Take a picture…"
-msgstr "拍照…"
-
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "感谢您的反馈!"
@@ -1037,7 +1044,7 @@ msgstr "VCS 用户名与 YouTrack 中的多个用户匹配。要链接未来的�
 msgid "There was an error retrieving information about the change's author from TeamCity. The most probable reason is that TeamCity user that integration runs on behalf of does not have the required permissions."
 msgstr "从 TeamCity 检索有关更改作者的信息时出错。最可能的原因是代表集成运行的 TeamCity 用户没有所需的权限。"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "This action deletes all drafts, including unpublished sub-articles"
 msgstr "此操作将删除所有草稿，包括未发布的子文章"
 

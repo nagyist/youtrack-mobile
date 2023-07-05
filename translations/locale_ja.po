@@ -109,15 +109,15 @@ msgstr "外観"
 msgid "Apply command…"
 msgstr "コマンドを適用…"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete all article drafts?"
 msgstr "記事の下書きをすべて削除してもよろしいですか？"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete this article?"
 msgstr "この記事を削除してもよろしいですか？"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete this draft?"
 msgstr "この下書きを削除してもよろしいですか？"
 
@@ -180,6 +180,10 @@ msgstr "Bugsnag プライバシーポリシー"
 msgid "By logging in, you agree to the Privacy Policy."
 msgstr "ログインすることで、プライバシーポリシーに同意したことになります。"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Camera"
+msgstr "カメラ"
+
 #: src/components/account/accounts.tsx
 #: src/components/confirmation/confirmation.ts
 #: src/components/tags/tags.tsx
@@ -195,11 +199,6 @@ msgstr "ログインすることで、プライバシーポリシーに同意し
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "取り消す"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Choose from library…"
-msgstr "ライブラリから選択…"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -352,15 +351,16 @@ msgstr "日付"
 msgid "Decline"
 msgstr "拒否"
 
+#: src/components/confirmation/confirmation.ts
 #: src/views/article/arcticle-actions.ts
 #: src/views/article/arcticle-actions.ts
-#: src/views/article/arcticle-helper.ts
 #: src/views/article/article__activity-stream.tsx
 #: src/views/issue/activity/issue__activity-stream.tsx
 #: src/views/issue/activity/issue__activity.tsx
 #: src/views/issue/activity/issue-activity__actions.ts
 #: src/views/issue/activity/issue-activity__comment-actions.ts
 #: src/views/issue/activity/issue-activity__comment-actions.ts
+#: src/views/issue/issue-base-actions-creater.ts
 msgid "Delete"
 msgstr "削除"
 
@@ -371,6 +371,10 @@ msgstr "コメントを永久に削除しますか？"
 #: src/views/article-create/article-create.tsx
 msgid "Delete draft"
 msgstr "下書きを削除"
+
+#: src/components/confirmation/issue-confirmations.ts
+msgid "Delete issue {{issueId}}?"
+msgstr "課題 {{issueId}} を削除しますか？"
 
 #: src/components/comment/comment.tsx
 msgid "Delete permanently"
@@ -408,6 +412,10 @@ msgstr "本当にログアウトしますか？"
 #: src/components/account/accounts.tsx
 msgid "Do you really want to remove this account?"
 msgstr "本当にこのアカウントを除去しますか？"
+
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Document"
+msgstr "ドキュメント"
 
 #: src/views/settings/settings-helper.ts
 msgid "Don't send logs"
@@ -744,6 +752,10 @@ msgstr "その他のグループとチーム"
 msgid "Password"
 msgstr "パスワード"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Photo and video library"
+msgstr "写真とビデオのライブラリ"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "問題"
@@ -964,11 +976,6 @@ msgid "Tag"
 msgid_plural "Tags"
 msgstr[0] "タグ"
 
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Take a picture…"
-msgstr "撮影する…"
-
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "フィードバックをありがとうございます！"
@@ -1037,7 +1044,7 @@ msgstr "VCS ユーザー名が YouTrack の複数のユーザーと一致して�
 msgid "There was an error retrieving information about the change's author from TeamCity. The most probable reason is that TeamCity user that integration runs on behalf of does not have the required permissions."
 msgstr "TeamCity から変更者に関する情報を取得中にエラーが発生しました。最も可能性の高い理由は、代わりに統合を実行する TeamCity ユーザーに必要な権限がないことです。"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "This action deletes all drafts, including unpublished sub-articles"
 msgstr "この操作は未公開のサブ記事を含むすべての下書きを削除します"
 

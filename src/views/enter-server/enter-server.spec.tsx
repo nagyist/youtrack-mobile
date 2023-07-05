@@ -17,6 +17,7 @@ jest.mock('react-redux', () => ({
 }));
 
 const serverUrl = 'http://example.com';
+
 describe('EnterServer', () => {
   beforeEach(() => {
     jest.spyOn(appActions, 'connectToNewYoutrack');

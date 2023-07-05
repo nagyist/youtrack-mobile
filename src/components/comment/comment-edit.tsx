@@ -48,6 +48,7 @@ import type {NormalizedAttachment} from 'types/Attachment';
 import type {Theme} from 'types/Theme';
 import type {User} from 'types/User';
 import type {Visibility, VisibilityGroups} from 'types/Visibility';
+import IssueVisibility from 'components/visibility/issue-visibility';
 
 type UserMentions = {
   users: User[];
@@ -199,9 +200,13 @@ const CommentEdit = (props: Props) => {
         const comment: EditingComment = {...state.editingComment, ...props.editingComment};
         setEditingComment(comment);
         changeState({commentCaret: comment.text?.length});
+        if (props.editingComment.reply) {
+          focus();
+        }
       }
     },
-    [props.editingComment, setEditingComment, state.editingComment]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [props.editingComment, setEditingComment]
   );
 
   const focus = (): void => {
@@ -271,7 +276,7 @@ const CommentEdit = (props: Props) => {
           mentions={state.mentions}
           onApply={(user: User) => {
             applySuggestion(user);
-            setTimeout(focus, 150);
+            focus();
           }}
         />
       );
@@ -468,11 +473,12 @@ const CommentEdit = (props: Props) => {
       editingComment,
     } = state;
     const hasText: boolean = !!editingComment.text;
-    const showVisibilityControl: boolean =
-      !mentionsVisible &&
-      (!!editingComment.visibility ||
-        isVisibilitySelectVisible ||
-        isVisibilityControlVisible);
+    const showVisibilityControl: boolean = !mentionsVisible && (
+      IssueVisibility.isSecured(editingComment.visibility) ||
+      !!editingComment.text ||
+      !!editingComment?.attachments?.length ||
+      (isVisibilitySelectVisible || isVisibilityControlVisible)
+    );
 
     const hideAttachActionsPanel = () =>
       changeState({

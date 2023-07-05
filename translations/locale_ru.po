@@ -118,15 +118,15 @@ msgstr "Тема интерфейса"
 msgid "Apply command…"
 msgstr "Применить команду…"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete all article drafts?"
 msgstr "Вы действительно хотите удалить все черновики?"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete this article?"
 msgstr "Вы действительно хотите удалить эту статью?"
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "Are you sure you want to delete this draft?"
 msgstr "Вы действительно хотите удалить черновик?"
 
@@ -192,6 +192,10 @@ msgstr "Политикa конфиденциальности Bugsnag"
 msgid "By logging in, you agree to the Privacy Policy."
 msgstr "Входя в систему, вы соглашаетесь с Политикой конфиденциальности."
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Camera"
+msgstr "Камера"
+
 #: src/components/account/accounts.tsx
 #: src/components/confirmation/confirmation.ts
 #: src/components/tags/tags.tsx
@@ -207,11 +211,6 @@ msgstr "Входя в систему, вы соглашаетесь с Поли�
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "Отмена"
-
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Choose from library…"
-msgstr "Выбрать из библиотеки…"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -364,15 +363,16 @@ msgstr "Дата"
 msgid "Decline"
 msgstr "Отклонить"
 
+#: src/components/confirmation/confirmation.ts
 #: src/views/article/arcticle-actions.ts
 #: src/views/article/arcticle-actions.ts
-#: src/views/article/arcticle-helper.ts
 #: src/views/article/article__activity-stream.tsx
 #: src/views/issue/activity/issue__activity-stream.tsx
 #: src/views/issue/activity/issue__activity.tsx
 #: src/views/issue/activity/issue-activity__actions.ts
 #: src/views/issue/activity/issue-activity__comment-actions.ts
 #: src/views/issue/activity/issue-activity__comment-actions.ts
+#: src/views/issue/issue-base-actions-creater.ts
 msgid "Delete"
 msgstr "Удалить"
 
@@ -383,6 +383,10 @@ msgstr "Удалить комментарий навсегда?"
 #: src/views/article-create/article-create.tsx
 msgid "Delete draft"
 msgstr "Удалить черновик"
+
+#: src/components/confirmation/issue-confirmations.ts
+msgid "Delete issue {{issueId}}?"
+msgstr "Удалить задачу {{issueId}}?"
 
 #: src/components/comment/comment.tsx
 msgid "Delete permanently"
@@ -420,6 +424,10 @@ msgstr "Вы действительно хотите выйти?"
 #: src/components/account/accounts.tsx
 msgid "Do you really want to remove this account?"
 msgstr "Вы действительно хотите удалить этот аккаунт?"
+
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Document"
+msgstr "Документ"
 
 #: src/views/settings/settings-helper.ts
 msgid "Don't send logs"
@@ -759,6 +767,10 @@ msgstr "Другие группы и команды"
 msgid "Password"
 msgstr "Пароль"
 
+#: src/components/attach-file/attach-file-dialog.tsx
+msgid "Photo and video library"
+msgstr "Библиотека Фото/видео"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "Сообщить о проблеме"
@@ -982,11 +994,6 @@ msgstr[1] "Теги"
 msgstr[2] "Теги"
 msgstr[3] "Теги"
 
-#: src/components/attach-file/attach-file-dialog.tsx
-#: src/components/attachments-row/attachment-actions.ts
-msgid "Take a picture…"
-msgstr "Сделать фото…"
-
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "Спасибо за отзыв!"
@@ -1055,7 +1062,7 @@ msgstr "Имя пользователя в VCS соответствует нес
 msgid "There was an error retrieving information about the change's author from TeamCity. The most probable reason is that TeamCity user that integration runs on behalf of does not have the required permissions."
 msgstr "Не удалось получить информацию об авторе изменения из TeamCity. Скорее всего, у пользователя TeamCity, от имени которого выполняется интеграция, недостаточно разрешений."
 
-#: src/views/article/arcticle-helper.ts
+#: src/components/confirmation/article-confirmations.ts
 msgid "This action deletes all drafts, including unpublished sub-articles"
 msgstr "Будут удалены все черновики, включая неопубликованные вложенные статьи"
 

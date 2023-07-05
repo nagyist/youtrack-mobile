@@ -69,7 +69,10 @@ import type {IssuesState} from './issues-reducers';
 import type {Theme, UIThemeColors} from 'types/Theme';
 import {INavigationRoute, Navigators} from 'components/navigation';
 
+import {NetInfoState} from '@react-native-community/netinfo';
+
 type IssuesActions = typeof issueActions;
+
 type Props = IssuesState &
   IssuesActions & {
     auth: Auth;
@@ -77,8 +80,10 @@ type Props = IssuesState &
     onOpenContextSelect: () => any;
     issueId?: string;
     searchQuery?: string;
+    networkState: NetInfoState,
     navigation: NavigationScreenProp<NavigationState>,
   };
+
 type State = {
   isEditQuery: boolean;
   clearSearchQuery: boolean;
@@ -86,6 +91,8 @@ type State = {
   isSplitView: boolean;
   isCreateModalVisible: boolean;
 };
+
+
 export class Issues extends Component<Props, State> {
   issueId: string | undefined;
   searchPanelNode: Record<string, any> | undefined;
@@ -165,7 +172,8 @@ export class Issues extends Component<Props, State> {
   shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
     if (
       Object.keys(initialState).some(
-        (stateKey: string) => this.props[stateKey] !== nextProps[stateKey],
+        // @ts-ignore
+        (stateKey: string) => (this.props)[stateKey] !== nextProps[stateKey],
       )
     ) {
       return true;
@@ -192,15 +200,11 @@ export class Issues extends Component<Props, State> {
     );
   }
 
-  isMatchesQuery: (issueId: string) => Promise<boolean> = async (
-    issueIdReadable: string,
-  ): ((...args: any[]) => any) => {
+  isMatchesQuery = async (issueIdReadable: string) => {
     return await this.props.isIssueMatchesQuery(issueIdReadable);
   };
-  renderModalPortal: ()=> React.ReactNode | null | undefined = ():
-    | Node
-    | null
-    | undefined => {
+
+  renderModalPortal = () => {
     const onHide = () =>
       this.setState({
         isCreateModalVisible: false,
@@ -253,7 +257,8 @@ export class Issues extends Component<Props, State> {
       </TouchableOpacity>
     );
   };
-  _renderRow = ({item}) => {
+
+  _renderRow = ({item}: {item: IssueOnList}) => {
     const {focusedIssue} = this.state;
 
     if (isReactElement(item)) {
@@ -303,8 +308,8 @@ export class Issues extends Component<Props, State> {
     );
   }
 
-  _renderSeparator = item => {
-    if (isReactElement(item.leadingItem)) {
+  _renderSeparator = (item: unknown) => {
+    if (isReactElement((item as any).leadingItem)) {
       return null;
     }
 
@@ -392,8 +397,8 @@ export class Issues extends Component<Props, State> {
     );
   }
 
-  searchPanelRef: (instance: QueryAssistPanel | null | undefined) => void = (
-    instance: QueryAssistPanel | null | undefined,
+  searchPanelRef: (instance: QueryAssistPanel | undefined) => void = (
+    instance: QueryAssistPanel | undefined,
   ) => {
     if (instance) {
       this.searchPanelNode = instance;
@@ -528,7 +533,7 @@ export class Issues extends Component<Props, State> {
       </View>
     );
   };
-  renderIssuesFooter: () => null | Node = () => {
+  renderIssuesFooter = () => {
     const {isLoadingMore} = this.props;
 
     if (isLoadingMore) {
@@ -554,7 +559,7 @@ export class Issues extends Component<Props, State> {
       );
     }
 
-    const listData: Array<Record<string, any>> = [
+    const listData = [
       contextButton,
       searchQuery,
     ].concat(issues || []);
@@ -588,7 +593,7 @@ export class Issues extends Component<Props, State> {
       return null;
     }
 
-    const props: Partial<ErrorMessageProps> = Object.assign(
+    const props: ErrorMessageProps = Object.assign(
       {},
       loadingError
         ? {
@@ -607,7 +612,7 @@ export class Issues extends Component<Props, State> {
             },
           }
         : null,
-    );
+    ) as ErrorMessageProps;
 
     if (Object.keys(props).length > 0) {
       return <ErrorMessage testID="issuesLoadingError" {...props} />;
@@ -701,19 +706,17 @@ const mapStateToProps = (
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     ...bindActionCreators(issueActions, dispatch),
-    onQueryUpdate: query => dispatch(issueActions.onQueryUpdate(query)),
+    onQueryUpdate: (query: string) => dispatch(issueActions.onQueryUpdate(query)),
     onOpenContextSelect: () => dispatch(issueActions.openContextSelect()),
-    openSavedSearchesSelect: () =>
-      dispatch(issueActions.openSavedSearchesSelect()),
-    updateSearchContextPinned: isSearchScrolledUp =>
-      dispatch(issueActions.updateSearchContextPinned(isSearchScrolledUp)),
-    setIssuesCount: (count: number | null) =>
-      dispatch(issueActions.setIssuesCount(count)),
-    updateIssue: (issueId: string) =>
-      dispatch(issueActions.updateIssue(issueId)),
+    openSavedSearchesSelect: () => dispatch(issueActions.openSavedSearchesSelect()),
+    updateSearchContextPinned: isSearchScrolledUp => dispatch(
+      issueActions.updateSearchContextPinned(isSearchScrolledUp)
+    ),
+    setIssuesCount: (count: number | null) => dispatch(issueActions.setIssuesCount(count)),
+    updateIssue: (issueId: string) => dispatch(issueActions.updateIssue(issueId)),
   };
 };
 

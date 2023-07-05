@@ -22,7 +22,7 @@ export type IIssueTabbedState = {
 };
 
 
-export default class IssueTabbed<P, S extends IIssueTabbedState> extends React.PureComponent<P, S> {
+export default class IssueTabbed<P = {}, S = IIssueTabbedState> extends React.PureComponent<P, S> {
   initialWindowDimensions: any = Dimensions.get('window');
   tabRoutes: TabRoute[] = [
     this.getMainTabText(),
@@ -31,7 +31,7 @@ export default class IssueTabbed<P, S extends IIssueTabbedState> extends React.P
     key: name,
     title: name,
   }));
-  unsubscribeOnDimensionsChange: EventSubscription;
+  unsubscribeOnDimensionsChange: EventSubscription | undefined;
   state: IIssueTabbedState = {
     index: 0,
     routes: this.tabRoutes,
@@ -48,7 +48,7 @@ export default class IssueTabbed<P, S extends IIssueTabbedState> extends React.P
   }
 
   componentWillUnmount(): void {
-    this.unsubscribeOnDimensionsChange.remove();
+    this.unsubscribeOnDimensionsChange?.remove?.();
   }
 
   getMainTabText(): string {

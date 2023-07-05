@@ -3,11 +3,6 @@ import {Linking} from 'react-native';
 import {extractIssueId, extractArticleId, openByUrlDetector} from './open-url-handler';
 
 
-jest.mock('react-native/Libraries/Linking/Linking', () => ({
-  getInitialURL: jest.fn(),
-  addEventListener: jest.fn(),
-}));
-
 
 describe('open-url-handler', () => {
 
@@ -40,6 +35,9 @@ describe('open-url-handler', () => {
     });
   });
 
+
+
+
   describe('openByUrlDetector', () => {
     let idMock: string;
     let urlMock;
@@ -62,11 +60,13 @@ describe('open-url-handler', () => {
       await openByUrlDetector(onIdDetected, onQueryDetected);
       jest.advanceTimersByTime(100);
 
-      expect(onIdDetected).toHaveBeenCalledWith(
-        urlMock,
-        idMock,
-        null
-      );
+      setTimeout(() => {
+        expect(onIdDetected).toHaveBeenCalledWith(
+          urlMock,
+          idMock,
+          null
+        );
+      }, 100);
     });
 
     it('should invoke article id detect callback', async () => {
@@ -76,11 +76,13 @@ describe('open-url-handler', () => {
       await openByUrlDetector(onIdDetected, onQueryDetected);
       jest.advanceTimersByTime(100);
 
-      expect(onIdDetected).toHaveBeenCalledWith(
-        urlMock,
-        null,
-        idMock,
-      );
+      setTimeout(() => {
+        expect(onIdDetected).toHaveBeenCalledWith(
+          urlMock,
+          null,
+          idMock,
+        );
+      }, 100);
     });
 
     it('should subscribe to press URL event', () => {

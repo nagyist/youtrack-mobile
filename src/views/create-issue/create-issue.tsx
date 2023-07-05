@@ -74,6 +74,7 @@ type AdditionalProps = {
   onHide?: () => void;
   isMatchesQuery?: () => boolean;
   isConnected: boolean;
+  starId: string;
 };
 
 type Props = CreateIssueState &
@@ -83,10 +84,10 @@ type Props = CreateIssueState &
   isSplitView?: boolean;
 };
 
-type State = {
+interface State {
   modalChildren: any;
   showAddTagSelect: boolean;
-};
+}
 
 
 class CreateIssue extends PureComponent<Props, State> {
@@ -404,6 +405,7 @@ class CreateIssue extends PureComponent<Props, State> {
       onHide = () => Router.pop(true),
       isMatchesQuery,
       isConnected,
+      starId,
     } = this.props;
     const isAttaching = attachingImage !== null;
     const isProcessing = processing || isAttaching;
@@ -548,6 +550,7 @@ class CreateIssue extends PureComponent<Props, State> {
                       )}
                       {this.state.showAddTagSelect && (
                         <TagAddSelect
+                          starId={starId}
                           existed={issue?.tags}
                           projectId={issue.project?.id}
                           onAdd={(tags: Tag[]) =>
@@ -602,6 +605,7 @@ const mapStateToProps = (state: AppState, ownProps: { predefinedDraftId?: string
     predefinedDraftId: ownProps.predefinedDraftId,
     issuePermissions: state.app.issuePermissions,
     isConnected: !!state.app.networkState?.isConnected,
+    starId: state.app.user?.profiles?.general?.star?.id,
   };
 };
 

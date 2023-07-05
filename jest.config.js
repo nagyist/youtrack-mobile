@@ -11,6 +11,7 @@ module.exports = {
   'moduleNameMapper': {
     '^.+.(svg)$': '<rootDir>/test/svg-mock.js',
     '^@jetbrains/icons/(.*)$': '<rootDir>/test/svg-mock.js',
+    '^components/icon/icon/(.*)$': '<rootDir>/test/svg-mock.js',
   },
   'setupFilesAfterEnv': [
     '<rootDir>/test/jest-setup.js',

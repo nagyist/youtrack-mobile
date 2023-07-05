@@ -17,6 +17,7 @@ describe('<Diff/>', () => {
 
   afterEach(cleanup);
 
+
   describe('Render', () => {
     it('should render component', () => {
       const {getByTestId} = render(<Diff text1={text1} text2={text2}/>);

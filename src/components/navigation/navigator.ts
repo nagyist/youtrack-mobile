@@ -28,14 +28,16 @@ const goBack = () => {
   }
 };
 
-const canGoBack = navigationRef.canGoBack;
-const isNavigatorReady = navigationRef.isReady;
+const canGoBack = () => {
+  if (navigationRef.isReady()) {
+    navigationRef.canGoBack();
+  }
+};
 
 
 export {
   canGoBack,
   goBack,
-  isNavigatorReady,
   navigate,
   navigationRef,
   replace,
