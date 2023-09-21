@@ -221,7 +221,21 @@ const ISSUE_XSHORT_FIELDS: any = toField([
     project: ISSUE_PROJECT_FIELDS,
   },
 ]);
-const ISSUE_SHORT_FIELDS: any = toField([
+const ISSUE_SSHORT_FIELDS: any = toField([
+  'id',
+  'idReadable',
+  'summary',
+  'resolved',
+  {
+    fields: ISSUE_FIELD_SHORT_FIELDS,
+  },
+  {
+    reporter: [
+      'avatarUrl',
+    ],
+  },
+]);
+const ISSUE_MEDIUM_FIELDS: any = toField([
   ISSUE_XSHORT_FIELDS,
   {
     reporter: ISSUE_USER_FIELDS,
@@ -232,6 +246,10 @@ const ISSUE_SHORT_FIELDS: any = toField([
   {
     tags: ISSUE_TAGS_FIELDS,
   },
+]);
+const ISSUE_LARGE_FIELDS: any = toField([
+  ISSUE_MEDIUM_FIELDS,
+  'trimmedDescription',
 ]);
 const ISSUE_LINKED_ISSUE_FIELDS: any = toField([
   'id',
@@ -275,14 +293,13 @@ const ISSUE_LINKS_FIELDS: any = toField([
   },
 ]);
 const ISSUE_FOLDER_FIELDS: any = toField([
+  '$type',
   'id',
+  'issuesUrl',
   'name',
-  'localizedName',
+  'pinned',
   'query',
-  'isUpdatable',
-  {
-    owner: ['id', 'ringId'],
-  },
+  'shortName',
 ]);
 const SUGGESTION_FIELDS = toField([
   'id',
@@ -392,7 +409,9 @@ const MENTIONS_FIELDS: any = toField([
 export default {
   attachments: ISSUE_ATTACHMENTS_FIELDS,
   attachmentsBase: ISSUE_ATTACHMENTS_BASE_FIELDS,
-  issuesOnList: ISSUE_SHORT_FIELDS,
+  issuesOnListS: ISSUE_SSHORT_FIELDS,
+  issuesOnList: ISSUE_MEDIUM_FIELDS,
+  issuesOnListL: ISSUE_LARGE_FIELDS,
   singleIssueLinks: ISSUE_LINKS_FIELDS,
   issueLinkBase: ISSUE_LINKS_FIELDS_BASE,
   issueLinkTypes: ISSUE_LINK_TYPES_FIELDS,

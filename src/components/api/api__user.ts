@@ -1,4 +1,5 @@
 import ApiBase from './api__base';
+import issueFields from './api__issue-fields';
 import {ResourceTypes} from './api__resource-types';
 
 import type Auth from '../auth/oauth2';
@@ -6,19 +7,17 @@ import type {Folder, User, UserAppearanceProfile} from 'types/User';
 import type {IssueComment} from 'types/CustomFields';
 import type {Reaction} from 'types/Reaction';
 
+const appearanceProfileFields = [
+  'naturalCommentsOrder',
+  'useAbsoluteDates',
+  'firstDayOfWeek',
+  'liteUiFilters',
+];
+
+
 export default class UserAPI extends ApiBase {
   apiUrl: string;
   SEARCH_CONTEXT_FIELDS: string[] = ['id', 'name', 'shortName', 'query'];
-  USER_FOLDERS_FIELDS: string[] = [
-    'id',
-    '$type',
-    'shortName',
-    'name',
-    'query',
-    'pinned',
-    'star(id)',
-    'shortName',
-  ];
 
   constructor(auth: Auth) {
     super(auth);
@@ -47,14 +46,14 @@ export default class UserAPI extends ApiBase {
             dateFieldFormat: ['dateNoYearPattern', 'datePattern', 'pattern'],
             locale: ['language', 'locale'],
           },
-          appearance: [
-            'naturalCommentsOrder',
-            'useAbsoluteDates',
-            'firstDayOfWeek',
-          ],
+          appearance: appearanceProfileFields,
           articles: {
             lastVisitedArticle: ['id,idReadable,summary,project(id,ringId)'],
           },
+          helpdesk: [
+            'isAgent',
+            'isReporter',
+          ],
         },
       },
     ]);
@@ -68,13 +67,8 @@ export default class UserAPI extends ApiBase {
     };
   }
 
-  async getUserFolders(
-    folderId: string = '',
-    fields?: string[],
-  ): Promise<Array<Folder>> {
-    const queryString = ApiBase.createFieldsQuery(
-      fields || this.USER_FOLDERS_FIELDS,
-    );
+  async getUserFolders(folderId: string = '', fields?: string[]): Promise<Folder[]> {
+    const queryString = ApiBase.createFieldsQuery(fields || issueFields.issueFolder);
     return await this.makeAuthorizedRequest(
       `${this.youTrackApiUrl}/userIssueFolders/${folderId}?${queryString}`,
     );
@@ -84,7 +78,7 @@ export default class UserAPI extends ApiBase {
     userId: string = 'me',
     appearanceProfile: UserAppearanceProfile,
   ): Promise<UserAppearanceProfile> {
-    const queryString = ApiBase.createFieldsQuery(['naturalCommentsOrder']);
+    const queryString = ApiBase.createFieldsQuery(appearanceProfileFields);
     return await this.makeAuthorizedRequest(
       `${this.youTrackApiUrl}/users/${userId}/profiles/appearance?${queryString}`,
       'POST',

@@ -3,6 +3,8 @@ import AgileAPI from './api__agile';
 import ApiHelper from './api__helper';
 import ArticlesAPI from './api__articles';
 import BaseAPI from './api__base';
+import CustomFieldsAPI from './api__custom-fields';
+import FilterFields from 'components/api/api__filter-fields';
 import InboxAPI from './api__inbox';
 import IssueAPI from './api__issue';
 import issueFields from './api__issue-fields';
@@ -10,7 +12,7 @@ import IssueFolderAPI from './api__issue-folder';
 import IssuesAPI from './api__issues';
 import MentionsAPI from './api__mention';
 import ProjectsAPI from './api__projects';
-import CustomFieldsAPI from './api__custom-fields';
+import SavedQueries from 'components/api/api__saved-queries';
 import SearchAPI from './api__search';
 import UserAPI from './api__user';
 import UserGroupAPI from './api__user-group';
@@ -18,8 +20,8 @@ import UserGroupAPI from './api__user-group';
 import type Auth from '../auth/oauth2';
 import type {EndUserAgreement} from 'types/AppConfig';
 import type {IssueProject} from 'types/CustomFields';
-import type {SavedQuery, CommandSuggestionResponse} from 'types/Issue';
-import type {Folder, User} from 'types/User';
+import type {CommandSuggestionResponse} from 'types/Issue';
+import type {User} from 'types/User';
 
 
 class API extends BaseAPI {
@@ -28,12 +30,14 @@ class API extends BaseAPI {
   agile: AgileAPI;
   articles: ArticlesAPI;
   customFields: CustomFieldsAPI;
+  filterFields: FilterFields;
   inbox: InboxAPI;
   issue: IssueAPI;
   issueFolder: IssueFolderAPI;
   issues: IssuesAPI;
   mentions: MentionsAPI;
   projects: ProjectsAPI;
+  savedQueries: SavedQueries;
   search: SearchAPI;
   user: UserAPI;
   userGroup: UserGroupAPI;
@@ -43,12 +47,14 @@ class API extends BaseAPI {
     this.agile = new AgileAPI(auth);
     this.articles = new ArticlesAPI(auth);
     this.customFields = new CustomFieldsAPI(auth);
+    this.filterFields = new FilterFields(auth);
     this.inbox = new InboxAPI(auth);
     this.issue = new IssueAPI(auth);
     this.issueFolder = new IssueFolderAPI(auth);
     this.issues = new IssuesAPI(auth);
     this.mentions = new MentionsAPI(auth);
     this.projects = new ProjectsAPI(auth);
+    this.savedQueries = new SavedQueries(auth);
     this.search = new SearchAPI(auth);
     this.user = new UserAPI(auth);
     this.userGroup = new UserGroupAPI(auth);
@@ -90,20 +96,20 @@ class API extends BaseAPI {
     );
   }
 
-  async getCustomFieldUserValues(bundleId: string): Promise<Array<User>> {
+  async getCustomFieldUserValues(bundleId: string): Promise<User[]> {
     const queryString = qs.stringify({
       banned: false,
       sort: true,
       fields: issueFields.user.toString(),
     });
-    const values = await this.makeAuthorizedRequest(
+    const values: User[] = await this.makeAuthorizedRequest(
       `${this.youtTrackFieldBundleUrl}/user/${bundleId}/aggregatedUsers?${queryString}`,
     );
     return ApiHelper.convertRelativeUrls(
       values,
       'avatarUrl',
       this.config.backendUrl,
-    );
+    ) as User[];
   }
 
   async getCustomFieldValues(
@@ -168,40 +174,6 @@ class API extends BaseAPI {
           id,
         })),
       },
-    );
-  }
-
-  async getSavedQueries(): Promise<Array<SavedQuery>> {
-    const queryString = qs.stringify({
-      fields: issueFields.issueFolder.toString(),
-    });
-    return await this.makeAuthorizedRequest(
-      `${this.youTrackUrl}/api/savedQueries?${queryString}`,
-    );
-  }
-
-  async getIssueFolders(
-    pinnedOnly: boolean | null | undefined = null,
-  ): Promise<Folder[]> {
-    const fields = ApiHelper.toField([
-      'id',
-      '$type',
-      'name',
-      'query',
-      'pinned',
-      {
-        owner: ['id', 'ringId'],
-      },
-      {
-        color: ['id'],
-      },
-    ]);
-    const queryString = qs.stringify({
-      fields: fields.toString(),
-      pinned: pinnedOnly,
-    });
-    return await this.makeAuthorizedRequest(
-      `${this.youTrackUrl}/api/issueFolders?${queryString}`,
     );
   }
 

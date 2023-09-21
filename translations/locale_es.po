@@ -102,6 +102,10 @@ msgstr "ha añadido una reacción"
 msgid "All"
 msgstr "Todo"
 
+#: src/views/issues/issues__filters-filter.tsx
+msgid "All projects"
+msgstr "Todos los proyectos"
+
 #: src/views/settings/settings__appearance.tsx
 #: src/views/settings/settings.tsx
 msgid "Appearance"
@@ -203,6 +207,10 @@ msgstr "Cámara"
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "Cancelar"
+
+#: src/components/error/error-message-data.ts
+msgid "Clear the current search context"
+msgstr "Borrar el contexto de búsqueda actual"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -492,9 +500,10 @@ msgstr "Filtrar proyectos"
 msgid "Filter projects, saved searches, and tags"
 msgstr "Filtrar proyectos, búsquedas guardadas y etiquetas"
 
-#: src/views/issues/issues-actions.ts
-msgid "Filter saved searches"
-msgstr "Filtrar búsquedas guardadas"
+#: src/views/issues/issues__filters-settings__list.tsx
+#: src/views/issues/issues__settings.tsx
+msgid "Filter Settings"
+msgstr "Ajustes del filtro"
 
 #: src/views/agile-board/board-actions.ts
 msgid "Filter sprints by name"
@@ -509,9 +518,17 @@ msgstr "Filtrar etiquetas"
 msgid "Filter users, groups, and teams"
 msgstr "Filtrar usuarios, grupos y equipos"
 
+#: src/views/issues/index.ts
+msgid "Filters"
+msgstr "Filtros"
+
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Find favorite projects"
 msgstr "Buscar proyectos favoritos"
+
+#: src/views/issues/issues.tsx
+msgid "Find issues that contain key words"
+msgstr "Buscar incidencias que contengan palabras clave"
 
 #: src/views/enter-server/enter-server.tsx
 msgid "Get help"
@@ -540,10 +557,6 @@ msgstr "Además de nuestro informe de errores integrado, YouTrack Mobile utiliza
 #: src/views/article/article.tsx
 msgid "in revision"
 msgstr "en revisión"
-
-#: src/components/error/error-message-data.ts
-msgid "Invalid query"
-msgstr "Consulta no válida"
 
 #: src/views/issue/issue-base-actions-creater.ts
 msgid "Issue deleted"
@@ -584,6 +597,10 @@ msgstr "ahora mismo"
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Knowledge Base"
 msgstr "Base de conocimiento"
+
+#: src/views/issues/index.ts
+msgid "Large"
+msgstr "Large"
 
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-message-data.ts
@@ -658,6 +675,10 @@ msgid_plural "Matches {{issuesCount}} issues"
 msgstr[0] "Coincide con {{issuesCount}} incidencia"
 msgstr[1] "Coincide con {{issuesCount}} incidencias"
 
+#: src/views/issues/index.ts
+msgid "Medium"
+msgstr "Medium"
+
 #: src/components/activity-stream/activity__stream-history.tsx
 #: src/views/inbox-threads/inbox-threads__mention.tsx
 msgid "mentioned you"
@@ -711,7 +732,6 @@ msgstr "Sin borradores aún"
 msgid "No favorites projects found"
 msgstr "No se han encontrado proyectos favoritos"
 
-#: src/components/error/error-message-data.ts
 #: src/views/issues/issues.tsx
 msgid "No issues found"
 msgstr "No se ha encontrado ninguna incidencia."
@@ -761,6 +781,10 @@ msgstr "Contraseña"
 msgid "Photo and video library"
 msgstr "Biblioteca de fotos y vídeos"
 
+#: src/views/issues/issues__settings.tsx
+msgid "Preview Size"
+msgstr "Tamaño de vista previa"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "Problema"
@@ -769,6 +793,7 @@ msgstr "Problema"
 msgid "Project"
 msgstr "Proyecto"
 
+#: src/views/issues/issues-actions.ts
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Projects"
 msgstr "Proyectos"
@@ -781,8 +806,11 @@ msgstr "Proyectos contraídos"
 msgid "Projects expanded"
 msgstr "Proyectos ampliados"
 
+#: src/views/issues/index.ts
+msgid "Query"
+msgstr "Consulta"
+
 #: src/components/query-assist/query-assist-helper.ts
-#: src/views/issues/issues-actions.ts
 msgid "Recent searches"
 msgstr "Búsquedas recientes"
 
@@ -832,6 +860,10 @@ msgstr "Restaurar"
 msgid "Retry"
 msgstr "Reintentar"
 
+#: src/views/issues/issues-actions.ts
+msgid "Saved Searches"
+msgstr "Búsquedas guardadas"
+
 #: src/views/knowledge-base/knowledge-base__search.tsx
 msgid "Search articles"
 msgstr "Buscar artículos"
@@ -843,6 +875,10 @@ msgstr "Buscar un valor diferente"
 #: src/components/custom-fields-panel/custom-fields-panel.tsx
 msgid "Search for the project"
 msgstr "Buscar el proyecto"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Search Input Mode"
+msgstr "Buscar modo de entrada"
 
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Select an article from the list"
@@ -921,6 +957,10 @@ msgstr "Mostrar todas las incidencias etiquetadas con «{{tagName}}»..."
 msgid "Show more"
 msgstr "Mostrar más"
 
+#: src/views/issues/index.ts
+msgid "Small"
+msgstr "Pequeño"
+
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-messages.ts
 msgid "Something went wrong"
@@ -929,6 +969,10 @@ msgstr "Algo ha salido mal."
 #: src/views/issues/issues__sortby_list.tsx
 msgid "Sort Attributes"
 msgstr "Ordenar atributos"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Sort Order"
+msgstr "Orden de clasificación"
 
 #: src/views/issue/activity/issue__activity-settings.tsx
 msgid "Sort: oldest first"
@@ -982,6 +1026,10 @@ msgid_plural "Tags"
 msgstr[0] "Etiqueta"
 msgstr[1] "Etiquetas"
 
+#: src/views/issues/issues-actions.ts
+msgid "Tags"
+msgstr "Etiquetas"
+
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "¡Gracias por sus comentarios!"
@@ -1025,6 +1073,10 @@ msgstr "El autor de confirmación ha especificado una dirección de correo elect
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "The commit author is not an assignee in the project."
 msgstr "El autor de la confirmación no es un usuario asignado al proyecto."
+
+#: src/components/error/error-message-data.ts
+msgid "The search query contains unknown values"
+msgstr "La consulta de búsqueda contiene valores desconocidos"
 
 #: src/actions/app-actions.ts
 msgid "The selected account is no longer authorized to use YouTrack Mobile. Please log in again."
@@ -1163,6 +1215,10 @@ msgstr "Visible para todos los lectores del artículo"
 msgid "Visible to issue readers"
 msgstr "Visible para todos los lectores de la incidencia"
 
+#: src/components/error/error-message-data.ts
+msgid "We didn't find any issues in the current search context that match your query"
+msgstr "No hemos encontrado ninguna incidencia en el contexto de búsqueda actual que coincida con su consulta"
+
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "When integrating TeamCity and YouTrack, the users are matched by their email addresses. TeamCity has not provided any email address of the committer."
 msgstr "Al integrar TeamCity y YouTrack, los usuarios se emparejarán con sus direcciones de correo electrónico. TeamCity no ha suministrado ninguna dirección de correo electrónico del autor."
@@ -1174,6 +1230,10 @@ msgstr "Al integrar TeamCity y YouTrack, los usuarios se emparejan con sus direc
 #: src/components/error/error-message-data.ts
 msgid "Woah, you can't touch this!"
 msgstr "¡No, no lo toque!"
+
+#: src/components/error/error-message-data.ts
+msgid "Wrap attribute values that contain spaces in braces {like this}."
+msgstr "Envuelva los valores de los atributos que contengan espacios entre llaves {como estas}."
 
 #: src/components/comment/comment-edit.tsx
 #: src/views/issue/activity/activity__add-spent-time.tsx

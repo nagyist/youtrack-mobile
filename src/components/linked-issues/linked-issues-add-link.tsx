@@ -38,7 +38,6 @@ import type {Theme} from 'types/Theme';
 import type {ViewStyleProp} from 'types/Internal';
 import {mixinNavigationProps, INavigationParams} from 'components/navigation';
 import {goBack} from 'components/navigation/navigator';
-import {IssueFull} from 'types/Issue';
 
 interface Props extends INavigationParams {
   issuesGetter: (linkTypeName: string, q: string) => any;
@@ -70,8 +69,7 @@ const LinkedIssuesAddLink = (props: Props): JSX.Element => {
   const [isQASelectVisible, updateQASelectVisible] = useState(false);
   const [suggestions, updateSuggestions] = useState<TransformedSuggestion[]>([]);
   const loadLinkTypes = useCallback(async (): Promise<Array<IssueLinkType>> => {
-    const linkTypes: IssueLinkType[] = await issueCommonLinksActions({} as Partial<IssueFull>).loadIssueLinkTypes();
-    return linkTypes.filter((it: IssueLinkType) => !it.readOnly);
+    return await issueCommonLinksActions({}).loadIssueLinkTypes();
   }, []);
   const doLinkIssue = useCallback(
     async (issue: IssueOnList) => {
@@ -216,7 +214,6 @@ const LinkedIssuesAddLink = (props: Props): JSX.Element => {
     return (
       <AnimatedView useNativeDriver duration={500} animation="fadeIn">
         <IssueRow
-          style={[styles.linkedIssueItem, styles.linkedIssue]}
           issue={issue}
           onClick={doLinkIssue}
         />

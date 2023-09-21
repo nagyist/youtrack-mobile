@@ -4,8 +4,9 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import log from 'components/log/log';
 import {getAuthParamsKey} from './storage__oauth';
 import {i18n} from 'components/i18n/i18n';
+import {IssuesSettings, issuesSettingsDefault} from 'views/issues';
 import {notify} from 'components/notification/notification';
-import {routeMap} from '../../app-routes';
+import {routeMap} from 'app-routes';
 
 import type {Activity, ActivityType} from 'types/Activity';
 import type {AnyIssue} from 'types/Issue';
@@ -67,7 +68,7 @@ export type StorageState = TipsState & FeatureState & {
   creationTimestamp: number | null;
   config: AppConfig | null;
   query: string | null;
-  searchContext: Folder | null;
+  searchContext: Folder;
   lastQueries: string[] | null;
   issuesCache: AnyIssue[] | null;
   inboxCache: Notification[] | null;
@@ -94,6 +95,7 @@ export type StorageState = TipsState & FeatureState & {
   themeMode: string | null;
   vcsChanges: boolean | null;
   forceHandsetMode: boolean | null;
+  issuesSettings: IssuesSettings;
 };
 
 const storageKeys: StorageStateKeys & (typeof tipsKeys) & (typeof featuresKeys) = {
@@ -129,6 +131,7 @@ const storageKeys: StorageStateKeys & (typeof tipsKeys) & (typeof featuresKeys) 
   permissions: 'YT_USER_PERMISSIONS',
   themeMode: THEME_MODE_KEY,
   vcsChanges: 'YT_VCS_CHANGES',
+  issuesSettings: 'YT_ISSUES_SETTINGS',
 };
 let storageState: StorageState | null = null;
 
@@ -178,6 +181,7 @@ export const initialState: Readonly<StorageState> = {
   themeMode: null,
   vcsChanges: null,
   forceHandsetMode: null,
+  issuesSettings: issuesSettingsDefault,
 };
 
 function cleanAndLogState(message, state?: StorageState) {
@@ -260,6 +264,7 @@ export async function clearCachesAndDrafts(): Promise<StorageState> {
     storageKeys.permissions,
     storageKeys.agileDefaultBoard,
     storageKeys.projects,
+    storageKeys.issuesSettings,
     ...Object.values(tipsKeys),
     ...Object.values(featuresKeys),
   ] as string[]);

@@ -1,4 +1,4 @@
-import {Linking} from 'react-native';
+import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
 import DeviceInfo from 'react-native-device-info';
 import UrlParse from 'url-parse';
@@ -26,7 +26,7 @@ import {getErrorMessage} from 'components/error/error-resolver';
 import {getStoredSecurelyAuthParams} from 'components/storage/storage__oauth';
 import {hasType} from 'components/api/api__resource-types';
 import {i18n} from 'components/i18n/i18n';
-import {isIOSPlatform, until} from 'util/util';
+import {isAndroidPlatform, isIOSPlatform, until} from 'util/util';
 import {loadConfig} from 'components/config/config';
 import {loadTranslation} from 'components/i18n/i18n-translation';
 import {logEvent} from 'components/log/log-helper';
@@ -60,6 +60,7 @@ import {UserGeneralProfileLocale} from 'types/User';
 import {AnyIssue} from 'types/Issue';
 
 type Action = (dispatch: (arg0: any) => any, getState: () => AppState, getApi: () => Api) => Promise<any>;
+
 
 export function setNetworkState(networkState: NetInfoState): Action {
   return async (
@@ -307,7 +308,10 @@ export function activateAccount(
     return otherAccounts;
   };
 }
-export function changeAccount(account: StorageState, removeCurrentAccount: boolean = false): Action {
+export function changeAccount(
+  account: StorageState,
+  removeCurrentAccount: boolean = false,
+  ): Action {
   return async (
     dispatch: (arg0: any) => any,
     getState: () => AppState,
@@ -518,11 +522,14 @@ export function acceptUserAgreement(): Action {
     log.info('User agreement accepted');
     usage.trackEvent('EUA is accepted');
     const api: Api = getApi();
-    await api.acceptUserAgreement();
-    dispatch({
-      type: types.HIDE_USER_AGREEMENT,
-    });
-    dispatch(completeInitialization());
+    try {
+      await api.acceptUserAgreement();
+      dispatch(completeInitialization());
+    } catch (e) {
+      dispatch(removeAccountOrLogOut());
+    } finally {
+      dispatch({type: types.HIDE_USER_AGREEMENT});
+    }
   };
 }
 export function declineUserAgreement(): Action {
@@ -633,15 +640,13 @@ export function cacheProjects(): (
     getState: () => AppState,
     getApi: () => Api,
   ) => {
-    const userFolders: Folder[] = await getApi().user.getUserFolders('', [
-      '$type,id,shortName,name,pinned',
-    ]);
-    const projects: Folder[] = userFolders.filter((it: Folder) =>
-      hasType.project(it),
-    );
-    await storage.flushStoragePart({
-      projects: projects,
-    });
+    const [error, userFolders]: [CustomError | null, Folder[]] = await until(
+      getApi().user.getUserFolders('', ['$type,id,shortName,name,pinned'])
+    ) as [CustomError | null, Folder[]];
+    const projects: Folder[] = (error ? [] : userFolders).filter((it: Folder) => hasType.project(it));
+    if (projects.length > 0) {
+      await storage.flushStoragePart({projects});
+    }
     return projects;
   };
 }
@@ -687,6 +692,45 @@ export function subscribeToURL(): Action {
   };
 }
 
+export function migrateToIssuesFilterSearch(): (
+  dispatch: (arg0: any) => any,
+  getState: () => AppState,
+  getApi: () => Api,
+) => void {
+  return async (
+    dispatch: (arg0: any) => any,
+    getState: () => AppState,
+    getApi: () => Api,
+  ) => {
+    const storageState: StorageState = storage.getStorageState();
+    let shouldMigrate;
+    try {
+      const curAppVer = (storageState.currentAppVersion || '')?.split('.');
+      const nextAppVer = packageJson.version.split('.');
+      const curr = curAppVer.map(it => parseInt(it, 10));
+      const next = nextAppVer.map(it => parseInt(it, 10));
+      const isNextVerToMigrate: boolean = next[0] === 2023 && next[1] === 3 && next[2] === 1;
+      shouldMigrate = (
+        !storageState.currentAppVersion ||
+        curr[0] < next[0] && isNextVerToMigrate ||
+        curr[0] === next[0] && isNextVerToMigrate && curr[1] < 3
+      );
+    } catch (e) {
+      shouldMigrate = false;
+    }
+    if (shouldMigrate) {
+      const doUpdate = (it: StorageState): StorageState => ({...it, query: ''}) as StorageState;
+      await storage.flushStorage(doUpdate(storageState));
+      const otherAccounts: StorageState[] = await storage.getOtherAccounts();
+      if (otherAccounts.length > 0) {
+        const updatedOtherAccounts: StorageState[] = otherAccounts.map(doUpdate);
+        await storage.storeAccounts(updatedOtherAccounts);
+        dispatch(receiveOtherAccounts(updatedOtherAccounts));
+      }
+    }
+  };
+}
+
 async function refreshConfig(backendUrl: string): Promise<AppConfig> {
   const updatedConfig: AppConfig = await doConnect(backendUrl);
   await storeConfig(updatedConfig);
@@ -725,13 +769,12 @@ export function initializeApp(config: AppConfig): Action {
     const currentAppVersion: string | null | undefined = account.currentAppVersion;
     const versionHasChanged: boolean = currentAppVersion != null && packageJson.version !== currentAppVersion;
 
+    await dispatch(migrateToIssuesFilterSearch());
+    storage.flushStoragePart({currentAppVersion: packageJson.version});
+
     try {
       if (versionHasChanged) {
-        log.info(
-          `App upgraded from ${currentAppVersion || 'NOTHING'} to "${
-            packageJson.version
-          }"; reloading config`,
-        );
+        log.info(`App upgraded to "${packageJson.version}"; reloading config`);
         configCurrent = await refreshConfig(config.backendUrl);
       }
       const auth: OAuth2 = await dispatch(initializeAuth(configCurrent));
@@ -850,15 +893,31 @@ export function subscribeToPushNotifications(): Action {
       return;
     }
 
-    try {
-      await PushNotifications.register();
-      PushNotifications.initialize(onSwitchAccount);
-      setRegisteredForPush(true);
-      log.info('Successfully registered for push notifications');
-    } catch (err) {
-      notifyError(err as CustomError);
+    if (isAndroidPlatform() && Platform.Version >= 33) {
+      try {
+        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          await doSubscribe(onSwitchAccount);
+          log.info('Push notifications permission granted');
+        } else {
+          log.warn('Push notifications permission is not allowed');
+        }
+      } catch (err) {
+        log.warn(err);
+      }
+    } else {
+      await doSubscribe(onSwitchAccount);
     }
   };
+}
+async function doSubscribe(onSwitchAccount: (account: StorageState, issueId?: string, articleId?: string) => any) {
+  try {
+    await PushNotifications.register();
+    PushNotifications.initialize(onSwitchAccount);
+    setRegisteredForPush(true);
+  } catch (err) {
+    notifyError(err as CustomError);
+  }
 }
 
 function isRegisteredForPush(): boolean {

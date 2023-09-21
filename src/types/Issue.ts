@@ -25,6 +25,7 @@ export type IssueOnList = Partial<Omit<IssueFull, 'fields'>> & {
     value: Record<string, any>;
   };
   fields: CustomFieldShort[];
+  trimmedDescription: string;
 };
 export type IssueFull = {
   $type: string;
@@ -138,18 +139,7 @@ export type CommandSuggestionResponse = {
   commands: SuggestedCommand[];
   suggestions: CommandSuggestion[];
 };
-export type SavedQuery = {
-  $type: string;
-  id: string;
-  name: string;
-  query: string;
-  isUpdatable: boolean;
-  pinned?: boolean;
-  owner: {
-    id: string;
-    ringId: string;
-  };
-};
+
 export type TabRoute = {
   key: string | number;
   title: string;

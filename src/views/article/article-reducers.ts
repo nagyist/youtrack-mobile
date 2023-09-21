@@ -9,14 +9,15 @@ import type {IssueComment} from 'types/CustomFields';
 
 export type ArticleState = {
   activityPage: Activity[] | null;
-  article: Article;
+  article: Article | null;
   articleCommentDraft: IssueComment | null;
   articlesList: ArticlesList;
-  error: CustomError;
+  error: CustomError | null;
   isLoading: boolean;
   isProcessing: boolean;
   issuePermissions: IssuePermissions;
   prevArticleState: ArticleState | null | undefined;
+  lastVisitedArticle?: Partial<Article>;
 };
 export const articleInitialState: ArticleState = {
   activityPage: null,
@@ -37,7 +38,7 @@ const {reducer, actions} = createSlice({
       state.isProcessing = action.payload;
     },
 
-    setError(state: ArticleState, action: PayloadAction<boolean>) {
+    setError(state: ArticleState, action: PayloadAction<CustomError>) {
       state.error = action.payload;
     },
 
@@ -58,7 +59,7 @@ const {reducer, actions} = createSlice({
 
     setArticleCommentDraft(
       state: ArticleState,
-      action: PayloadAction<Article>,
+      action: PayloadAction<IssueComment>,
     ) {
       state.articleCommentDraft = action.payload;
     },

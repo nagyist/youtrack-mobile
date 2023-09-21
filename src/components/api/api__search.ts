@@ -8,6 +8,8 @@ import type {
   ServersideSuggestionLegacy,
   TransformedSuggestion,
 } from 'types/Issue';
+
+
 export default class SearchAPI extends ApiBase {
   constructor(auth: Auth) {
     super(auth);

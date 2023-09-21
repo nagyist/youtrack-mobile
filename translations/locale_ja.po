@@ -99,6 +99,10 @@ msgstr "がリアクションを追加しました"
 msgid "All"
 msgstr "すべて"
 
+#: src/views/issues/issues__filters-filter.tsx
+msgid "All projects"
+msgstr "すべてのプロジェクト"
+
 #: src/views/settings/settings__appearance.tsx
 #: src/views/settings/settings.tsx
 msgid "Appearance"
@@ -199,6 +203,10 @@ msgstr "カメラ"
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "取り消す"
+
+#: src/components/error/error-message-data.ts
+msgid "Clear the current search context"
+msgstr "現在の検索範囲をクリア"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -488,9 +496,10 @@ msgstr "プロジェクトをフィルタリング"
 msgid "Filter projects, saved searches, and tags"
 msgstr "プロジェクト、保存した検索条件、タグで絞り込む"
 
-#: src/views/issues/issues-actions.ts
-msgid "Filter saved searches"
-msgstr "保存した検索条件で絞り込む"
+#: src/views/issues/issues__filters-settings__list.tsx
+#: src/views/issues/issues__settings.tsx
+msgid "Filter Settings"
+msgstr "フィルター設定"
 
 #: src/views/agile-board/board-actions.ts
 msgid "Filter sprints by name"
@@ -505,9 +514,17 @@ msgstr "タグで絞り込む"
 msgid "Filter users, groups, and teams"
 msgstr "ユーザー、グループ、チームを絞り込む"
 
+#: src/views/issues/index.ts
+msgid "Filters"
+msgstr "フィルタ"
+
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Find favorite projects"
 msgstr "お気に入りプロジェクトを検索"
+
+#: src/views/issues/issues.tsx
+msgid "Find issues that contain key words"
+msgstr "キーワードを含む課題の検索"
 
 #: src/views/enter-server/enter-server.tsx
 msgid "Get help"
@@ -536,10 +553,6 @@ msgstr "組み込みのエラー報告機能に加えて、YouTrack Mobile で�
 #: src/views/article/article.tsx
 msgid "in revision"
 msgstr "リビジョン内"
-
-#: src/components/error/error-message-data.ts
-msgid "Invalid query"
-msgstr "クエリが無効です"
 
 #: src/views/issue/issue-base-actions-creater.ts
 msgid "Issue deleted"
@@ -580,6 +593,10 @@ msgstr "たった今"
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Knowledge Base"
 msgstr "ナレッジベース"
+
+#: src/views/issues/index.ts
+msgid "Large"
+msgstr "大"
 
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-message-data.ts
@@ -653,6 +670,10 @@ msgid "Matches {{issuesCount}} issue"
 msgid_plural "Matches {{issuesCount}} issues"
 msgstr[0] "{{issuesCount}} 件の課題に一致"
 
+#: src/views/issues/index.ts
+msgid "Medium"
+msgstr "中"
+
 #: src/components/activity-stream/activity__stream-history.tsx
 #: src/views/inbox-threads/inbox-threads__mention.tsx
 msgid "mentioned you"
@@ -706,7 +727,6 @@ msgstr "まだ下書きはありません"
 msgid "No favorites projects found"
 msgstr "お気に入りプロジェクトが見つかりません"
 
-#: src/components/error/error-message-data.ts
 #: src/views/issues/issues.tsx
 msgid "No issues found"
 msgstr "課題が見つかりません"
@@ -756,6 +776,10 @@ msgstr "パスワード"
 msgid "Photo and video library"
 msgstr "写真とビデオのライブラリ"
 
+#: src/views/issues/issues__settings.tsx
+msgid "Preview Size"
+msgstr "プレビューサイズ"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "問題"
@@ -764,6 +788,7 @@ msgstr "問題"
 msgid "Project"
 msgstr "プロジェクト"
 
+#: src/views/issues/issues-actions.ts
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Projects"
 msgstr "プロジェクト"
@@ -776,8 +801,11 @@ msgstr "プロジェクトが折りたたまれました"
 msgid "Projects expanded"
 msgstr "プロジェクトが展開されました"
 
+#: src/views/issues/index.ts
+msgid "Query"
+msgstr "クエリ"
+
 #: src/components/query-assist/query-assist-helper.ts
-#: src/views/issues/issues-actions.ts
 msgid "Recent searches"
 msgstr "最近の検索条件"
 
@@ -827,6 +855,10 @@ msgstr "復元"
 msgid "Retry"
 msgstr "再試行"
 
+#: src/views/issues/issues-actions.ts
+msgid "Saved Searches"
+msgstr "保存した検索条件"
+
 #: src/views/knowledge-base/knowledge-base__search.tsx
 msgid "Search articles"
 msgstr "記事を検索"
@@ -838,6 +870,10 @@ msgstr "別の月を検索"
 #: src/components/custom-fields-panel/custom-fields-panel.tsx
 msgid "Search for the project"
 msgstr "プロジェクトの検索"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Search Input Mode"
+msgstr "検索の入力モード"
 
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Select an article from the list"
@@ -916,6 +952,10 @@ msgstr "\"{{tagName}}\" のタグが付いた課題をすべて表示..."
 msgid "Show more"
 msgstr "その他を表示"
 
+#: src/views/issues/index.ts
+msgid "Small"
+msgstr "小"
+
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-messages.ts
 msgid "Something went wrong"
@@ -924,6 +964,10 @@ msgstr "不明なエラーが発生しました"
 #: src/views/issues/issues__sortby_list.tsx
 msgid "Sort Attributes"
 msgstr "並べ替え属性"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Sort Order"
+msgstr "並べ替え順"
 
 #: src/views/issue/activity/issue__activity-settings.tsx
 msgid "Sort: oldest first"
@@ -976,6 +1020,10 @@ msgid "Tag"
 msgid_plural "Tags"
 msgstr[0] "タグ"
 
+#: src/views/issues/issues-actions.ts
+msgid "Tags"
+msgstr "タグ"
+
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "フィードバックをありがとうございます！"
@@ -1019,6 +1067,10 @@ msgstr "コミット作者は別のユーザーアカウントに関連付けら
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "The commit author is not an assignee in the project."
 msgstr "そのコミット作者は当該プロジェクトの担当者ではありません。"
+
+#: src/components/error/error-message-data.ts
+msgid "The search query contains unknown values"
+msgstr "検索クエリには不明な値が含まれています"
 
 #: src/actions/app-actions.ts
 msgid "The selected account is no longer authorized to use YouTrack Mobile. Please log in again."
@@ -1157,6 +1209,10 @@ msgstr "記事の読者に表示する"
 msgid "Visible to issue readers"
 msgstr "課題の読者に表示する"
 
+#: src/components/error/error-message-data.ts
+msgid "We didn't find any issues in the current search context that match your query"
+msgstr "現在の検索範囲ではクエリに一致する課題が見つかりませんでした"
+
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "When integrating TeamCity and YouTrack, the users are matched by their email addresses. TeamCity has not provided any email address of the committer."
 msgstr "TeamCityとYouTrack を統合する際に、ユーザーはメールアドレスで結び付けられます。TeamCity はコミット者のメールアドレスを提供していません。"
@@ -1168,6 +1224,10 @@ msgstr "TeamCityとYouTrack を統合する際に、ユーザーはメールア�
 #: src/components/error/error-message-data.ts
 msgid "Woah, you can't touch this!"
 msgstr "これを触ることはできません！"
+
+#: src/components/error/error-message-data.ts
+msgid "Wrap attribute values that contain spaces in braces {like this}."
+msgstr "スペースを含む属性値は{このように}角括弧内で囲んでください。"
 
 #: src/components/comment/comment-edit.tsx
 #: src/views/issue/activity/activity__add-spent-time.tsx

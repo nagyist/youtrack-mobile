@@ -102,6 +102,10 @@ msgstr "ha aggiunto una reazione"
 msgid "All"
 msgstr "Tutti"
 
+#: src/views/issues/issues__filters-filter.tsx
+msgid "All projects"
+msgstr "Tutti i progetti"
+
 #: src/views/settings/settings__appearance.tsx
 #: src/views/settings/settings.tsx
 msgid "Appearance"
@@ -166,7 +170,7 @@ msgstr "Allegato eliminato"
 
 #: src/components/activity/activity__history-title.ts
 msgid "Attachment name"
-msgstr ""
+msgstr "Nome allegato"
 
 #: src/views/issue/activity/activity__add-spent-time.tsx
 msgid "Author"
@@ -186,7 +190,7 @@ msgstr "Effettuando l'accesso, accetti la politica sulla privacy."
 
 #: src/components/attach-file/attach-file-dialog.tsx
 msgid "Camera"
-msgstr ""
+msgstr "Fotocamera"
 
 #: src/components/account/accounts.tsx
 #: src/components/confirmation/confirmation.ts
@@ -203,6 +207,10 @@ msgstr ""
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "Annulla"
+
+#: src/components/error/error-message-data.ts
+msgid "Clear the current search context"
+msgstr "Cancella il contesto di ricerca attuale"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -260,11 +268,11 @@ msgstr "ha fatto il committ delle modifiche"
 
 #: src/components/account/accounts.tsx
 msgid "Confirm logout"
-msgstr ""
+msgstr "Conferma la disconnessione"
 
 #: src/components/account/accounts.tsx
 msgid "Confirmation required"
-msgstr ""
+msgstr "Conferma richiesta"
 
 #: src/actions/app-actions.ts
 msgid "Connecting to YouTrack..."
@@ -282,7 +290,7 @@ msgstr "Contenuto"
 
 #: src/components/activity/activity__history-title.ts
 msgid "Content revised"
-msgstr ""
+msgstr "Contenuto revisionato"
 
 #: src/components/user/user-card.tsx
 #: src/components/wiki/markdown/markdown-code-highlighter.tsx
@@ -297,11 +305,11 @@ msgstr "Copiato"
 
 #: src/views/issue/issue__details.tsx
 msgid "Copy description"
-msgstr ""
+msgstr "Copia descrizione"
 
 #: src/views/issue/issue__details.tsx
 msgid "Copy field text"
-msgstr ""
+msgstr "Copia il testo del campo"
 
 #: src/views/article/arcticle-actions.ts
 #: src/views/article/article__activity-stream.tsx
@@ -411,15 +419,15 @@ msgstr "Ignora le modifiche non pubblicate"
 
 #: src/components/account/accounts.tsx
 msgid "Do you really want to log out?"
-msgstr ""
+msgstr "Vuoi davvero disconnetterti?"
 
 #: src/components/account/accounts.tsx
 msgid "Do you really want to remove this account?"
-msgstr ""
+msgstr "Vuoi davvero rimuovere questo account?"
 
 #: src/components/attach-file/attach-file-dialog.tsx
 msgid "Document"
-msgstr ""
+msgstr "Documento"
 
 #: src/views/settings/settings-helper.ts
 msgid "Don't send logs"
@@ -469,7 +477,7 @@ msgstr "Inserisci il valore temporale"
 
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Favorites"
-msgstr ""
+msgstr "Preferiti"
 
 #: src/views/settings/settings-helper.ts
 msgid "Feature request"
@@ -492,9 +500,10 @@ msgstr "Filtra i progetti"
 msgid "Filter projects, saved searches, and tags"
 msgstr "Filtra progetti, ricerche salvate e tag"
 
-#: src/views/issues/issues-actions.ts
-msgid "Filter saved searches"
-msgstr "Filtra ricerche salvate"
+#: src/views/issues/issues__filters-settings__list.tsx
+#: src/views/issues/issues__settings.tsx
+msgid "Filter Settings"
+msgstr "Impostazioni dei filtri"
 
 #: src/views/agile-board/board-actions.ts
 msgid "Filter sprints by name"
@@ -509,9 +518,17 @@ msgstr "Filtra etichette"
 msgid "Filter users, groups, and teams"
 msgstr "Filtra utenti, gruppi e team"
 
+#: src/views/issues/index.ts
+msgid "Filters"
+msgstr "Filtri"
+
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Find favorite projects"
 msgstr "Trova i progetti preferiti"
+
+#: src/views/issues/issues.tsx
+msgid "Find issues that contain key words"
+msgstr "Trova i ticket che contengono parole chiave"
 
 #: src/views/enter-server/enter-server.tsx
 msgid "Get help"
@@ -540,10 +557,6 @@ msgstr "Oltre alla segnalazione degli errori integrata, YouTrack Mobile utilizza
 #: src/views/article/article.tsx
 msgid "in revision"
 msgstr "in revisione"
-
-#: src/components/error/error-message-data.ts
-msgid "Invalid query"
-msgstr "Query non valida"
 
 #: src/views/issue/issue-base-actions-creater.ts
 msgid "Issue deleted"
@@ -584,6 +597,10 @@ msgstr "proprio ora"
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Knowledge Base"
 msgstr "Knowledge base"
+
+#: src/views/issues/index.ts
+msgid "Large"
+msgstr "Grande"
 
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-message-data.ts
@@ -650,13 +667,17 @@ msgstr "Contrassegna come non letto"
 
 #: src/views/inbox-threads/inbox-threads-actions.ts
 msgid "Marked as read"
-msgstr ""
+msgstr "Contrassegnato come letto"
 
 #: src/views/issues/issues__count.tsx
 msgid "Matches {{issuesCount}} issue"
 msgid_plural "Matches {{issuesCount}} issues"
 msgstr[0] "Corrisponde a {{issuesCount}} ticket"
 msgstr[1] "Corrisponde a {{issuesCount}} ticket"
+
+#: src/views/issues/index.ts
+msgid "Medium"
+msgstr "Medio"
 
 #: src/components/activity-stream/activity__stream-history.tsx
 #: src/views/inbox-threads/inbox-threads__mention.tsx
@@ -685,7 +706,7 @@ msgstr "Nuovo ticket"
 
 #: src/views/inbox-threads/inbox-threads__update-button.tsx
 msgid "New messages"
-msgstr ""
+msgstr "Nuovi messaggi"
 
 #: src/views/enter-server/enter-server.tsx
 msgid "Next"
@@ -711,7 +732,6 @@ msgstr "Ancora nessuna bozza"
 msgid "No favorites projects found"
 msgstr "Nessun progetto preferito trovato"
 
-#: src/components/error/error-message-data.ts
 #: src/views/issues/issues.tsx
 msgid "No issues found"
 msgstr "Nessun ticket trovato"
@@ -738,7 +758,7 @@ msgstr "No, non riesco a trovarlo!"
 
 #: src/views/inbox-threads/inbox-threads.tsx
 msgid "Notification settings…"
-msgstr ""
+msgstr "Impostazioni delle notifiche…"
 
 #: src/views/inbox-threads/inbox-threads.tsx
 #: src/views/inbox/inbox.tsx
@@ -759,7 +779,11 @@ msgstr "Password"
 
 #: src/components/attach-file/attach-file-dialog.tsx
 msgid "Photo and video library"
-msgstr ""
+msgstr "Libreria foto e video"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Preview Size"
+msgstr "Dimensione anteprima"
 
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
@@ -769,6 +793,7 @@ msgstr "Problema"
 msgid "Project"
 msgstr "Progetto"
 
+#: src/views/issues/issues-actions.ts
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Projects"
 msgstr "Progetti"
@@ -781,8 +806,11 @@ msgstr "Progetti compressi"
 msgid "Projects expanded"
 msgstr "Progetti espansi"
 
+#: src/views/issues/index.ts
+msgid "Query"
+msgstr "Cerca"
+
 #: src/components/query-assist/query-assist-helper.ts
-#: src/views/issues/issues-actions.ts
 msgid "Recent searches"
 msgstr "Ricerche recenti"
 
@@ -832,6 +860,10 @@ msgstr "Ripristina"
 msgid "Retry"
 msgstr "Riprova"
 
+#: src/views/issues/issues-actions.ts
+msgid "Saved Searches"
+msgstr "Ricerche salvate"
+
 #: src/views/knowledge-base/knowledge-base__search.tsx
 msgid "Search articles"
 msgstr "Cerca articoli"
@@ -843,6 +875,10 @@ msgstr "Cerca un valore diverso"
 #: src/components/custom-fields-panel/custom-fields-panel.tsx
 msgid "Search for the project"
 msgstr "Cerca il progetto"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Search Input Mode"
+msgstr ""
 
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Select an article from the list"
@@ -921,6 +957,10 @@ msgstr "Mostra tutti i ticket contrassegnati con \"{{tagName}}\"..."
 msgid "Show more"
 msgstr "Visualizza di più"
 
+#: src/views/issues/index.ts
+msgid "Small"
+msgstr "Piccolo"
+
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-messages.ts
 msgid "Something went wrong"
@@ -929,6 +969,10 @@ msgstr "Qualcosa è andato storto"
 #: src/views/issues/issues__sortby_list.tsx
 msgid "Sort Attributes"
 msgstr "Attributi di ordinamento"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Sort Order"
+msgstr "Ordinamento"
 
 #: src/views/issue/activity/issue__activity-settings.tsx
 msgid "Sort: oldest first"
@@ -982,6 +1026,10 @@ msgid_plural "Tags"
 msgstr[0] "Tag"
 msgstr[1] "Tag"
 
+#: src/views/issues/issues-actions.ts
+msgid "Tags"
+msgstr "Tag"
+
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "Grazie per il tuo feedback!"
@@ -1026,6 +1074,10 @@ msgstr "L'autore del commit ha specificato un indirizzo email associato a un acc
 msgid "The commit author is not an assignee in the project."
 msgstr "L'autore del commit non è un assegnatario nel progetto."
 
+#: src/components/error/error-message-data.ts
+msgid "The search query contains unknown values"
+msgstr "La query di ricerca contiene valori sconosciuti"
+
 #: src/actions/app-actions.ts
 msgid "The selected account is no longer authorized to use YouTrack Mobile. Please log in again."
 msgstr "L'account selezionato non è più autorizzato a utilizzare YouTrack Mobile. Effettua nuovamente l'accesso."
@@ -1056,11 +1108,11 @@ msgstr "Questa azione elimina tutte le bozze, inclusi gli articoli secondari non
 
 #: src/views/inbox-threads/inbox-threads-actions.ts
 msgid "Thread muted"
-msgstr ""
+msgstr "Audio del thread disattivato"
 
 #: src/views/inbox-threads/inbox-threads-actions.ts
 msgid "Thread unmuted"
-msgstr ""
+msgstr "Audio del thread attivato"
 
 #: src/views/article-create/article-create.tsx
 msgid "Title"
@@ -1068,11 +1120,11 @@ msgstr "Titolo"
 
 #: src/components/activity/activity__history-title.ts
 msgid "Title changed"
-msgstr ""
+msgstr "Titolo modificato"
 
 #: src/views/inbox-threads/inbox-threads.tsx
 msgid "To view an item in context, select an issue, article, or update from the list"
-msgstr ""
+msgstr "Per visualizzare un elemento nel contesto, seleziona un ticket, un articolo o un aggiornamento dall'elenco"
 
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "To view articles in the knowledge base for a specific project, mark it as a favorite"
@@ -1084,7 +1136,7 @@ msgstr "Numero totale di voti"
 
 #: src/components/tip/tips/activity-touch-actions.tsx
 msgid "Touch and hold an item to view a list of available actions"
-msgstr ""
+msgstr "Tocca e tieni premuto un elemento per visualizzare un elenco di azioni disponibili"
 
 #: src/components/error-message/error-message.tsx
 msgid "Try Again"
@@ -1149,7 +1201,7 @@ msgstr "Visualizza commenti e altre attività"
 
 #: src/components/user/user-card.tsx
 msgid "View reported issues"
-msgstr ""
+msgstr "Visualizza i ticket creati"
 
 #: src/components/activity/activity__history-title.ts
 msgid "Visibility"
@@ -1163,6 +1215,10 @@ msgstr "Visibile ai lettori di articoli"
 msgid "Visible to issue readers"
 msgstr "Visibile ai lettori dei ticket"
 
+#: src/components/error/error-message-data.ts
+msgid "We didn't find any issues in the current search context that match your query"
+msgstr "Non sono stati riscontrati ticket nel contesto di ricerca attuale che corrispondono alla query"
+
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "When integrating TeamCity and YouTrack, the users are matched by their email addresses. TeamCity has not provided any email address of the committer."
 msgstr "Quando si integrano TeamCity e YouTrack, gli utenti vengono abbinati ai loro indirizzi email. TeamCity non ha fornito alcun indirizzo email del committente."
@@ -1174,6 +1230,10 @@ msgstr "Quando si integrano TeamCity e YouTrack, gli utenti vengono abbinati ai 
 #: src/components/error/error-message-data.ts
 msgid "Woah, you can't touch this!"
 msgstr "Ehi, non puoi toccarlo!"
+
+#: src/components/error/error-message-data.ts
+msgid "Wrap attribute values that contain spaces in braces {like this}."
+msgstr "Disponi i valori degli attributi che contengono spazi tra parentesi graffe {come questo}."
 
 #: src/components/comment/comment-edit.tsx
 #: src/views/issue/activity/activity__add-spent-time.tsx
@@ -1202,7 +1262,7 @@ msgstr "Il tuo account non dispone di autorizzazioni sufficienti per eseguire qu
 
 #: src/components/storage/storage.ts
 msgid "Your mobile device is running low on available storage space. Some app functionality may be unavailable."
-msgstr ""
+msgstr "Lo spazio di archiviazione disponibile del dispositivo mobile si sta esaurendo. Alcune funzionalità dell'app potrebbero non essere disponibili."
 
 #: src/components/error/error-message-data.ts
 msgid "Your YouTrack account requires that you provide a second factor of authentication to log in. This option is only available when you log in with a mobile browser. The mobile browser will also let you sign in using a third-party account (if available).\n\n"

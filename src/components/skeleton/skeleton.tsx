@@ -4,7 +4,8 @@ import {agileCard} from '../agile-card/agile-card.styles';
 import {getAgileCardHeight} from '../agile-card/agile-card';
 import {UNIT} from 'components/variables';
 type SkeletonProps = {
-  width?: number;
+  flex?: number;
+  width?: number | string;
   height?: number;
   borderRadius?: number;
   marginTop?: number;
@@ -266,8 +267,53 @@ export const SkeletonIssues = (props: SkeletonProps): JSX.Element => {
       >
         {Array(5)
           .fill(0)
-          .map((marginTop: number, index) =>
+          .map((_: number, index) =>
             skeletonIssue(`skeletonIssues-${index}`),
+          )}
+      </SkeletonPlaceholder.Item>
+    </SkeletonPlaceholder>
+  );
+};
+
+export const SkeletonIssuesS = (props: SkeletonProps): JSX.Element => {
+  return (
+    <SkeletonPlaceholder {...skeletonPlaceholderDefaultProps}>
+      <SkeletonPlaceholder.Item
+        {...props}
+        flexDirection="column"
+        marginLeft={UNIT * 2}
+        marginRight={UNIT * 2}
+        marginTop={UNIT * 1.5}
+      >
+        {Array(14)
+          .fill(0)
+          .map((_: number, index) => {
+            return <SkeletonPlaceholder.Item
+              key={`skeletonIssues-${index}`}
+              flexDirection="row"
+              marginBottom={UNIT * 2.3}
+              width="100%"
+            >
+              {SkeletonSecondaryLine({
+                width: 4,
+                marginRight: UNIT,
+                borderRadius: 10,
+                height: SKELETON_HEIGHT,
+              })}
+              {SkeletonSecondaryLine({
+                flex: 1,
+                borderRadius: 0,
+                height: SKELETON_HEIGHT,
+              })}
+              {SkeletonSecondaryLine({
+                width: SKELETON_HEIGHT,
+                marginLeft: UNIT,
+                marginRight: -UNIT / 2,
+                borderRadius: SKELETON_HEIGHT,
+                height: SKELETON_HEIGHT,
+              })}
+            </SkeletonPlaceholder.Item>;
+            },
           )}
       </SkeletonPlaceholder.Item>
     </SkeletonPlaceholder>

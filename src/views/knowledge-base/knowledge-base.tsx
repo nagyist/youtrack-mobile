@@ -28,7 +28,6 @@ import Star from 'components/star/star';
 import usage from 'components/usage/usage';
 import {addListenerGoOnline} from 'components/network/network-events';
 import {ANALYTICS_ARTICLES_PAGE} from 'components/analytics/analytics-ids';
-import {getGroupedByFieldNameAlphabetically} from 'components/search/sorting';
 import {getStorageState} from 'components/storage/storage';
 import {HIT_SLOP} from 'components/common-styles';
 import {
@@ -100,7 +99,7 @@ export class KnowledgeBase extends Component<Props, State> {
     actionSheet: Function,
   };
   listRef: any;
-  uiTheme: UITheme | undefined;
+  uiTheme!: UITheme;
   focusListener: NavigationEventSubscription | undefined;
   unsubscribeOnDimensionsChange: EventSubscription | undefined;
   goOnlineSubscription: EventSubscription | undefined;
@@ -616,21 +615,19 @@ export class KnowledgeBase extends Component<Props, State> {
           )}
         </Text>
       ),
-      cacheResults: true,
       dataSource: (q: string = '') => {
-        const sortedProjects = getGroupedByFieldNameAlphabetically(
-          projects.filter((it: ArticleProject) => it.name?.indexOf(q) !== -1),
-          'pinned',
-        );
+        const filteredProjects = q ? projects.filter((it: ArticleProject) => {
+          const value = q.toLowerCase();
+          return it.name?.toLowerCase().indexOf(value) !== -1 || it.shortName?.toLowerCase().indexOf(value) !== -1;
+        }) : projects;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const favorites = {//TODO: remove it if `Favorite` string is not needed
           title: i18n('Favorites'),
-          data: sortedProjects.favorites,
         };
         return Promise.resolve([
           {
             title: i18n('Projects'),
-            data: sortedProjects.others,
+            data: filteredProjects,
           },
         ]);
       },
@@ -774,7 +771,10 @@ export class KnowledgeBase extends Component<Props, State> {
 
     return focusedArticle ? (
       <View style={styles.content}>
-        <Article articlePlaceholder={focusedArticle} />
+        <Article
+          articlePlaceholder={focusedArticle}
+          navigateToActivity={this.props.navigateToActivity}
+        />
       </View>
     ) : (
       <NothingSelectedIconWithText

@@ -60,7 +60,7 @@ type Props = INavigationParams & ArticleState & {
   updateArticlesList: () => (...args: any[]) => any;
   lastVisitedArticle: ArticleEntity | null | undefined;
   commentId?: string;
-  navigateToActivity: string | undefined;
+  navigateToActivity?: string;
 } & typeof articleActions;
 
 type State = IIssueTabbedState & {
@@ -72,9 +72,10 @@ class Article extends IssueTabbed<Props, State> {
   static contextTypes = {
     actionSheet: Function,
   };
-  uiTheme: UITheme | undefined;
+
+  uiTheme!: UITheme;
   focusListener: NavigationEventSubscription | undefined;
-  articleDetailsList: Record<string, any> | undefined;
+  articleDetailsList: FlatList | undefined;
   goOnlineSubscription: EventSubscription | undefined;
 
   componentWillUnmount = () => {
@@ -140,9 +141,9 @@ class Article extends IssueTabbed<Props, State> {
       this.setFocusListener();
     }
 
-    if (canLoadArticle && this.props.navigateToActivity) {
+    if (canLoadArticle && (this.props.navigateToActivity || this.props.commentId)) {
       this.switchToActivityTab();
-    } else if (!canLoadArticle && !this.props.navigateToActivity) {
+    } else if (!canLoadArticle && !this.props.navigateToActivity && !this.props.commentId) {
       return Router.KnowledgeBase();
     }
   }
@@ -252,7 +253,7 @@ class Article extends IssueTabbed<Props, State> {
         {!!articleData && (
           <>
             <View style={styles.articleDetailsHeader}>
-              {issuePermissions.canUpdateArticle(article) && (
+              {issuePermissions.canUpdateArticle(article as ArticleEntity) && (
                 <VisibilityControl
                   style={breadCrumbsElement ? null : styles.visibility}
                   visibility={visibility}
@@ -362,9 +363,11 @@ class Article extends IssueTabbed<Props, State> {
       <FlatList
         testID="articleDetails"
         data={[0]}
-        ref={(instance: Record<string, any> | null | undefined) =>
-          instance && (this.articleDetailsList = instance)
-        }
+        ref={(instance: FlatList) => {
+          if (instance) {
+            this.articleDetailsList = instance;
+          }
+        }}
         removeClippedSubviews={false}
         refreshControl={this.renderRefreshControl(this.refresh)}
         keyExtractor={() => 'article-details'}
@@ -411,7 +414,7 @@ class Article extends IssueTabbed<Props, State> {
 
   canDeleteArticle = (): boolean => {
     const {article, issuePermissions} = this.props;
-    return issuePermissions.articleCanDeleteArticle(article.project.ringId);
+    return issuePermissions.articleCanDeleteArticle(article?.project?.ringId);
   };
 
   renderHeader = () => {
@@ -458,7 +461,7 @@ class Article extends IssueTabbed<Props, State> {
               excludeProject: true,
             }),
           issuePermissions.canStar(),
-          articleData.hasStar,
+          !!articleData.hasStar,
           this.state.isSplitView,
         ),
     };
@@ -519,7 +522,7 @@ const mapStateToProps = (
     issuePermissions: state.app.issuePermissions,
     lastVisitedArticle: state.app?.user?.profiles?.articles?.lastVisitedArticle,
     articlesList: createArticleList(
-      state.articles.articles || getStorageState().articles || [],
+      (state.articles.articles || getStorageState().articles || []) as ArticleEntity[],
     ),
   };
 };

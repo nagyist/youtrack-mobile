@@ -1,7 +1,13 @@
+import {arrayToMap, mapToArray, removeDuplicatesFromArray} from 'util/util';
+import {getTypes} from 'views/inbox-threads/inbox-threads-helper';
 import {isActivityCategory} from './activity__category';
+
 import type {Activity} from 'types/Activity';
+
 type MergedActivity = Activity;
 type activityMapItem = Record<string, Activity>;
+
+
 export function mergeActivities(activities: Activity[]): MergedActivity[] {
   if (!activities) {
     return [];
@@ -109,14 +115,7 @@ export function merge(A: any[], B: any[]): any[] {
     return A || B;
   }
 
-  return removeDuplicates(A.concat(B));
-}
-
-function removeDuplicates(A: any[]): any[] {
-  const idsMap: Record<string, boolean> = {};
-  return A.filter(it => {
-    return idsMap[it.id] ? false : (idsMap[it.id] = true);
-  });
+  return removeDuplicatesFromArray(A.concat(B));
 }
 
 // O(size(A) + 2*size(B))
@@ -133,15 +132,20 @@ export function disjoint(A: any, B: any): any {
   return [newA, newB];
 }
 
-function arrayToMap(items: any[]): Record<string, any> {
-  return items.reduce(function (map, item) {
-    map[item.id] = item;
-    return map;
-  }, {});
-}
+export function bubbleProjectActivity(activities: Activity[]) {
+  let projectActivity;
+  let i;
+  for (i = 0; i < activities.length; i++) {
+    if (getTypes(activities[i]).project) {
+      projectActivity = activities[i];
+      break;
+    }
+  }
 
-function mapToArray(map: Record<string, any>): any[] {
-  return Object.keys(map).map(function (id) {
-    return map[id];
-  });
+  if (!projectActivity) {
+    return activities;
+  }
+
+  const sortedEvents = [activities[i]];
+  return sortedEvents.concat(activities.slice(0, i)).concat(activities.slice(i + 1, activities.length));
 }

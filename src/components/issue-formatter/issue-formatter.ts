@@ -34,7 +34,7 @@ function getAssigneeField(issue: AnyIssue): CustomField | null | undefined {
 }
 
 function getReadableID(entity: AnyIssue | Article): string {
-  return (!!entity && (entity.idReadable || entity.id)) || '';
+  return (!!entity && entity?.idReadable) || '';
 }
 
 function getEntityPresentation(entity?: Record<string, any>): string {

@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 
+import DeviceInfo from 'react-native-device-info';
 import isEqual from 'react-fast-compare';
 import {connect} from 'react-redux';
 import {View as AnimatedView} from 'react-native-animatable';
@@ -19,7 +20,6 @@ import Auth from 'components/auth/oauth2';
 import BoardHeader from './board-header';
 import BoardScroller from 'components/board-scroller/board-scroller';
 import CreateIssue from '../create-issue/create-issue';
-import DeviceInfo from 'react-native-device-info';
 import ErrorMessage from 'components/error-message/error-message';
 import IssueModal from '../issue/modal/issue.modal';
 import log from 'components/log/log';
@@ -62,6 +62,10 @@ import type {
   Sprint,
 } from 'types/Agile';
 import type {Theme, UITheme} from 'types/Theme';
+import {
+  SectionedSelectWithItemActions,
+  SectionedSelectWithItemActionsModal,
+} from 'components/select/select-sectioned-with-item-and-star';
 import {NavigationEventSubscription} from 'react-navigation';
 
 type Props = INavigationParams & AgilePageState & {
@@ -395,10 +399,14 @@ class AgileBoard extends Component<Props, State> {
 
   _renderSelect() {
     const {selectProps} = this.props;
-    const Component: any = this.state.isSplitView ? SelectModal : Select;
+    const SelectComponent: any = (
+      this.state.isSplitView
+        ? selectProps.agileSelector ? SectionedSelectWithItemActionsModal : SelectModal
+        : selectProps.agileSelector ? SectionedSelectWithItemActions : Select
+    );
     return (
-      <Component
-        getTitle={item => item.name}
+      <SelectComponent
+        getTitle={(item: BoardOnList | Sprint) => item.name}
         onCancel={this.props.onCloseSelect}
         {...selectProps}
         onSelect={(selected: BoardOnList | Sprint) => {
@@ -594,11 +602,13 @@ class AgileBoard extends Component<Props, State> {
   };
   renderSearchPanelPreview = () => {
     return (
-      <QueryPreview
-        style={styles.searchQueryPreview}
-        query={this.query}
-        onFocus={this.onShowAssist}
-      />
+      <View>
+        <QueryPreview
+          style={styles.searchQueryPreview}
+          query={this.query}
+          onFocus={this.onShowAssist}
+        />
+      </View>
     );
   };
 

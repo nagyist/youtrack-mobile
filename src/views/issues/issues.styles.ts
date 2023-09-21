@@ -1,23 +1,31 @@
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {Platform, StyleSheet} from 'react-native';
+
 import {COLOR_FIELD_SIZE} from 'components/color-field/color-field';
-import {elevation1, MAIN_FONT_SIZE, SECONDARY_FONT_SIZE} from 'components/common-styles';
 import {
+  elevation1,
   headerTitle,
+  MAIN_FONT_SIZE,
   mainText,
+  SECONDARY_FONT_SIZE,
   secondaryText,
+  UNIT,
 } from 'components/common-styles';
 import {headerTitlePresentation} from 'components/header/header.styles';
-import {issueCard} from 'components/common-styles/issue';
+import {issueCard, issueIdResolved} from 'components/common-styles/issue';
 import {separator} from 'components/common-styles/list';
 import {splitViewStyles} from 'components/common-styles/split-view';
-import {UNIT} from 'components/variables';
+
 const rowLine = {
   flexDirection: 'row',
   alignItems: 'center',
 };
+
 const searchContextHeight = UNIT * 7;
+
+
 export default EStyleSheet.create({
+  issueIdResolved,
   listContainer: {
     flex: 1,
     backgroundColor: '$background',
@@ -27,6 +35,22 @@ export default EStyleSheet.create({
     minHeight: '100%',
     paddingBottom: UNIT * 4,
   },
+  listActions: {
+    ...rowLine,
+    justifyContent: 'space-between',
+    position: 'absolute',
+    top: UNIT,
+    right: UNIT / 2,
+    height: UNIT * 5,
+    width: UNIT * 10,
+  },
+  listActionsItem: {
+    height: UNIT * 4.5,
+    width: UNIT * 4.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   tryAgainButton: {
     alignSelf: 'center',
     paddingTop: UNIT * 2,
@@ -41,11 +65,6 @@ export default EStyleSheet.create({
   },
   row: {
     flexDirection: 'column',
-    justifyContent: 'flex-start',
-    paddingLeft: UNIT * 2,
-    paddingRight: UNIT * 2,
-    paddingTop: 13,
-    paddingBottom: UNIT * 1.5,
   },
   priorityPlaceholder: {
     width: COLOR_FIELD_SIZE,
@@ -59,26 +78,53 @@ export default EStyleSheet.create({
       },
     }),
   },
-  rowLine: rowLine,
+  priorityWrapperCompact: {
+    width: 4,
+    paddingHorizontal: 0,
+  },
+  rowLine,
+  issueRow: {
+    paddingHorizontal: UNIT * 2,
+    paddingVertical: UNIT * 1.5,
+  },
   separator: {...separator, borderBottomWidth: 0.75, borderColor: '$separator'},
   secondaryText: {...secondaryText, color: '$textSecondary'},
   mainText: {...mainText, color: '$text'},
-  headLeft: {...issueCard.issueId, color: '$textSecondary'},
-  headRight: {...rowLine, flexGrow: 1, justifyContent: 'flex-end'},
-  summary: {...issueCard.issueSummary, color: '$text'},
+  readableId: {
+    ...issueCard.issueId,
+    color: '$textSecondary',
+    marginTop: UNIT / 4,
+    marginRight: UNIT,
+  },
+  readableIdCompact: {
+    marginLeft: UNIT / 2,
+    fontSize: SECONDARY_FONT_SIZE - 1,
+  },
+  reporter: {
+    ...rowLine,
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+  },
+  reporterCompact: {
+    flexGrow: 0,
+  },
+  summary: {
+    ...issueCard.issueSummary,
+    marginTop: UNIT,
+    color: '$text',
+  },
+  summaryCompact: {
+    marginTop: 0,
+  },
+  description: {
+    marginTop: UNIT / 2,
+  },
   subtext: {
     paddingTop: 6,
     fontSize: SECONDARY_FONT_SIZE,
     color: '$textSecondary',
   },
   tags: {
-    marginTop: UNIT,
-  },
-  listHeader: {
-    minHeight: 108,
-  },
-  listHeaderTop: {
-    flexDirection: 'row',
     marginTop: UNIT,
   },
   userSearchQueryButton: {
@@ -96,36 +142,45 @@ export default EStyleSheet.create({
   searchContextPinned: {...elevation1},
   searchContextButton: {
     ...rowLine,
+    alignSelf: 'flex-start',
+    minWidth: 130,
     marginTop: UNIT,
-    marginRight: UNIT * 10,
+    marginRight: UNIT * 14,
     marginLeft: UNIT * 2,
-    paddingTop: UNIT,
-    paddingBottom: UNIT,
+    paddingVertical: UNIT,
+    backgroundColor: '$background',
   },
   contextButtonText: {
     ...headerTitle,
     color: '$text',
-    backgroundColor: '$background',
+    letterSpacing: 0.25,
+  },
+  contextButtonIcon: {
+    marginTop: 1,
+    marginLeft: 1,
   },
   searchPanel: {
-    flexGrow: 1,
-    paddingLeft: UNIT * 2,
-    paddingRight: UNIT * 1.5,
+    paddingHorizontal: UNIT * 2,
   },
-  createIssueButton: {
-    position: 'absolute',
-    top: UNIT,
-    right: UNIT / 4,
-    height: UNIT * 5,
-    width: UNIT * 5,
-    padding: UNIT,
+  searchPanelFilters: {
+    ...rowLine,
+    flexGrow: 1,
+    alignItems: 'center',
+    minHeight: UNIT * 5,
+    marginTop: UNIT,
+    paddingHorizontal: UNIT * 2,
+  },
+  searchQueryPreview: {
+    marginHorizontal: 0,
   },
   toolbar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    padding: UNIT * 2,
+    padding: UNIT * 1.5,
+    paddingLeft: UNIT * 2,
+    marginBottom: UNIT,
   },
   toolbarAction: {
     flexDirection: 'row',
@@ -136,6 +191,13 @@ export default EStyleSheet.create({
     marginRight: -1,
   },
   toolbarText: {...secondaryText, color: '$textSecondary'},
+  toolbarIcon: {
+    paddingLeft: UNIT / 2,
+    color: '$icon',
+  },
+  toolbarItemDisabled: {
+    opacity: 0.4,
+  },
   toolbarSortByText: {
     textAlign: 'right',
   },
@@ -200,4 +262,75 @@ export default EStyleSheet.create({
     paddingLeft: UNIT,
   },
   loadingIndicator: StyleSheet.absoluteFillObject,
+  settingsModal: {
+    paddingTop: UNIT / 4,
+    paddingHorizontal: 0,
+  },
+  settingsItem: {
+    marginTop: UNIT * 2,
+  },
+  settingsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: UNIT,
+    paddingHorizontal: UNIT * 2,
+    paddingVertical: UNIT * 1.1,
+  },
+  settingsItemTitle: {
+    paddingHorizontal: UNIT * 2,
+    marginBottom: UNIT * 1.5,
+    ...secondaryText,
+    fontSize: SECONDARY_FONT_SIZE - 2,
+    textTransform: 'uppercase',
+    color: '$textSecondary',
+    letterSpacing: 1,
+  },
+  settingsItemText: {
+    ...mainText,
+    paddingRight: UNIT * 2,
+    color: '$text',
+    textTransform: 'capitalize',
+  },
+  settingsItemIcon: {
+    color: '$icon',
+  },
+  settingsSeparator: {
+    borderColor: '$separator',
+    ...separator,
+    marginLeft: -UNIT * 2,
+  },
+  filters: rowLine,
+  filtersButton: {
+    ...rowLine,
+    minWidth: UNIT * 8,
+    maxWidth: UNIT * 24,
+    height: UNIT * 4,
+    paddingHorizontal: UNIT * 2,
+    marginRight: UNIT,
+    borderRadius: UNIT,
+    backgroundColor: '$boxBackground',
+  },
+  filtersButtonHighlighted: {
+    backgroundColor: '$linkLight',
+  },
+  filtersButtonAction: {
+    borderColor: '$linkLight',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+  },
+  filtersButtonText: {
+    ...secondaryText,
+    marginRight: UNIT / 2,
+    color: '$text',
+  },
+  filtersIcon: {
+    color: '$icon',
+  },
+  filtersButtonReset: {
+    padding: UNIT / 2,
+    paddingRight: UNIT,
+    marginLeft: UNIT,
+    marginRight: -UNIT,
+  },
 });

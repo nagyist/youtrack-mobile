@@ -108,6 +108,10 @@ msgstr "добавил(а) реакцию"
 msgid "All"
 msgstr "Все"
 
+#: src/views/issues/issues__filters-filter.tsx
+msgid "All projects"
+msgstr "Все проекты"
+
 #: src/views/settings/settings__appearance.tsx
 #: src/views/settings/settings.tsx
 msgid "Appearance"
@@ -211,6 +215,10 @@ msgstr "Камера"
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "Отмена"
+
+#: src/components/error/error-message-data.ts
+msgid "Clear the current search context"
+msgstr "Очистите текущую область поиска"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -500,9 +508,10 @@ msgstr "Фильтровать проекты"
 msgid "Filter projects, saved searches, and tags"
 msgstr "Фильтровать проекты, теги и сохраненные поиски"
 
-#: src/views/issues/issues-actions.ts
-msgid "Filter saved searches"
-msgstr "Фильтровать сохраненные поиски"
+#: src/views/issues/issues__filters-settings__list.tsx
+#: src/views/issues/issues__settings.tsx
+msgid "Filter Settings"
+msgstr "Настройка фильтров"
 
 #: src/views/agile-board/board-actions.ts
 msgid "Filter sprints by name"
@@ -517,9 +526,17 @@ msgstr "Фильтровать теги"
 msgid "Filter users, groups, and teams"
 msgstr "Фильтровать пользователей, группы и команды"
 
+#: src/views/issues/index.ts
+msgid "Filters"
+msgstr "Фильтры"
+
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Find favorite projects"
 msgstr "Найти проекты"
+
+#: src/views/issues/issues.tsx
+msgid "Find issues that contain key words"
+msgstr "Искать задачи, содержащие ключевые слова"
 
 #: src/views/enter-server/enter-server.tsx
 msgid "Get help"
@@ -548,10 +565,6 @@ msgstr "Помимо собственной системы сбора инфор
 #: src/views/article/article.tsx
 msgid "in revision"
 msgstr "в работе"
-
-#: src/components/error/error-message-data.ts
-msgid "Invalid query"
-msgstr "Некорректный запрос"
 
 #: src/views/issue/issue-base-actions-creater.ts
 msgid "Issue deleted"
@@ -592,6 +605,10 @@ msgstr "только что"
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Knowledge Base"
 msgstr "База знаний"
+
+#: src/views/issues/index.ts
+msgid "Large"
+msgstr "Большой"
 
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-message-data.ts
@@ -668,6 +685,10 @@ msgstr[1] "{{issuesCount}} совпадающие задачи"
 msgstr[2] "{{issuesCount}} совпадающих задач"
 msgstr[3] "{{issuesCount}} совпадающих задач"
 
+#: src/views/issues/index.ts
+msgid "Medium"
+msgstr "Средний"
+
 #: src/components/activity-stream/activity__stream-history.tsx
 #: src/views/inbox-threads/inbox-threads__mention.tsx
 msgid "mentioned you"
@@ -721,7 +742,6 @@ msgstr "Черновиков пока нет"
 msgid "No favorites projects found"
 msgstr "Избранные проекты не найдены"
 
-#: src/components/error/error-message-data.ts
 #: src/views/issues/issues.tsx
 msgid "No issues found"
 msgstr "Задачи не найдены"
@@ -771,6 +791,10 @@ msgstr "Пароль"
 msgid "Photo and video library"
 msgstr "Библиотека Фото/видео"
 
+#: src/views/issues/issues__settings.tsx
+msgid "Preview Size"
+msgstr "Превью размера"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "Сообщить о проблеме"
@@ -779,6 +803,7 @@ msgstr "Сообщить о проблеме"
 msgid "Project"
 msgstr "Проект"
 
+#: src/views/issues/issues-actions.ts
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Projects"
 msgstr "Проекты"
@@ -791,8 +816,11 @@ msgstr "Проекты свернуты"
 msgid "Projects expanded"
 msgstr "Проекты развернуты"
 
+#: src/views/issues/index.ts
+msgid "Query"
+msgstr "Запрос"
+
 #: src/components/query-assist/query-assist-helper.ts
-#: src/views/issues/issues-actions.ts
 msgid "Recent searches"
 msgstr "Недавние поиски"
 
@@ -842,6 +870,10 @@ msgstr "Восстановить"
 msgid "Retry"
 msgstr "Попробовать еще раз"
 
+#: src/views/issues/issues-actions.ts
+msgid "Saved Searches"
+msgstr "Сохраненные поиски"
+
 #: src/views/knowledge-base/knowledge-base__search.tsx
 msgid "Search articles"
 msgstr "Поиск статей"
@@ -853,6 +885,10 @@ msgstr "Поищите другое значение"
 #: src/components/custom-fields-panel/custom-fields-panel.tsx
 msgid "Search for the project"
 msgstr "Искать проект"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Search Input Mode"
+msgstr "Режим поиска"
 
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Select an article from the list"
@@ -931,6 +967,10 @@ msgstr "Показать все задачи с тегом «{{tagName}}»..."
 msgid "Show more"
 msgstr "Показать больше"
 
+#: src/views/issues/index.ts
+msgid "Small"
+msgstr "Маленький"
+
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-messages.ts
 msgid "Something went wrong"
@@ -939,6 +979,10 @@ msgstr "Что-то пошло не так"
 #: src/views/issues/issues__sortby_list.tsx
 msgid "Sort Attributes"
 msgstr "Атрибуты сортировки"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Sort Order"
+msgstr "Порядок сортировки"
 
 #: src/views/issue/activity/issue__activity-settings.tsx
 msgid "Sort: oldest first"
@@ -994,6 +1038,10 @@ msgstr[1] "Теги"
 msgstr[2] "Теги"
 msgstr[3] "Теги"
 
+#: src/views/issues/issues-actions.ts
+msgid "Tags"
+msgstr "Теги"
+
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "Спасибо за отзыв!"
@@ -1037,6 +1085,10 @@ msgstr "Автор коммита указал электронную почту
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "The commit author is not an assignee in the project."
 msgstr "Автор коммита не является исполнителем в проекте."
+
+#: src/components/error/error-message-data.ts
+msgid "The search query contains unknown values"
+msgstr "Поисковый запрос содержит неизвестные значения"
 
 #: src/actions/app-actions.ts
 msgid "The selected account is no longer authorized to use YouTrack Mobile. Please log in again."
@@ -1175,6 +1227,10 @@ msgstr "Отображается для всех читателей статьи
 msgid "Visible to issue readers"
 msgstr "Отображается для всех читателей задачи"
 
+#: src/components/error/error-message-data.ts
+msgid "We didn't find any issues in the current search context that match your query"
+msgstr "По вашему запросу не найдено ни одной задачи в текущей области поиска"
+
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "When integrating TeamCity and YouTrack, the users are matched by their email addresses. TeamCity has not provided any email address of the committer."
 msgstr "При интеграции TeamCity и YouTrack пользователи сопоставляются по адресам электронной почты. Сервер TeamCity не предоставил адрес электронной почты для этого коммитера."
@@ -1186,6 +1242,10 @@ msgstr "При интеграции TeamCity и YouTrack пользовател�
 #: src/components/error/error-message-data.ts
 msgid "Woah, you can't touch this!"
 msgstr "К сожалению, вам сюда нельзя."
+
+#: src/components/error/error-message-data.ts
+msgid "Wrap attribute values that contain spaces in braces {like this}."
+msgstr "Заключите значения атрибутов, содержащие пробелы, в скобки: {вот так}."
 
 #: src/components/comment/comment-edit.tsx
 #: src/views/issue/activity/activity__add-spent-time.tsx

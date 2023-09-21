@@ -38,22 +38,21 @@ export default EStyleSheet.create({
     marginTop: UNIT * 2,
     marginBottom: headerMinHeight,
   },
+  linkedIssue: {
+    flexGrow: 1,
+  },
   linkedList: {
     paddingHorizontal: UNIT * 2,
   },
   linkedIssueItem: {
-    flex: 1,
     flexDirection: 'row',
-    paddingVertical: UNIT * 1.5,
-  },
-  linkedIssue: {
-    flexGrow: 1,
-    flexBasis: UNIT * 4,
+    justifyContent: 'space-between',
+    marginLeft: -UNIT * 2,
   },
   linkedIssueRemoveAction: {
-    padding: UNIT / 1.5,
-    height: UNIT * 4,
+    alignSelf: 'center',
     marginLeft: UNIT,
+    padding: UNIT / 2,
     color: '$iconAccent',
   },
   separator: {

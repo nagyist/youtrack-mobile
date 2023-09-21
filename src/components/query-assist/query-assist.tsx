@@ -1,31 +1,42 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {View, TouchableOpacity, TextInput} from 'react-native';
+
 import debounce from 'lodash.debounce';
 import {View as AnimatedView} from 'react-native-animatable';
-import KeyboardSpacerIOS from '../platform/keyboard-spacer.ios';
-import ModalPortal from '../modal-view/modal-portal';
-import ModalView from '../modal-view/modal-view';
+
+import KeyboardSpacerIOS from 'components/platform/keyboard-spacer.ios';
+import ModalPortal from 'components/modal-view/modal-portal';
+import ModalView from 'components/modal-view/modal-view';
 import QueryAssistSuggestionsList from './query-assist__suggestions-list';
-import {HIT_SLOP} from '../common-styles/button';
+import {HIT_SLOP} from 'components/common-styles/button';
 import {i18n} from 'components/i18n/i18n';
-import {IconBack, IconClose} from '../icon/icon';
+import {IconBack, IconClose} from 'components/icon/icon';
+
 import styles from './query-assist.styles';
-import type {TransformedSuggestion, SavedQuery} from 'types/Issue';
+
+import type {Folder} from 'types/User';
+import type {TransformedSuggestion} from 'types/Issue';
+
 const SHOW_LIST_ANIMATION_DURATION = 500;
-type Props = {
-  suggestions: Array<TransformedSuggestion | SavedQuery>;
+
+interface Props {
+  suggestions: Array<TransformedSuggestion | Folder>;
   currentQuery: string;
   onApplyQuery: (query: string) => any;
   onChange: (query: string, caret: number) => any;
   onClose: (query: string) => any;
-};
-type State = {
+}
+
+interface State {
   inputValue: string;
   caret: number;
   queryCopy: string;
   suggestionsListTop: number;
-};
-export class QueryAssist extends Component<Props, State> {
+}
+
+
+export class QueryAssist<P extends Props, S extends State> extends React.PureComponent<P, S> {
+  searchInput: TextInput | undefined;
   queryAssistContainer: Record<string, any> | null | undefined;
   lastQueryParams: {
     query: string;
@@ -41,7 +52,7 @@ export class QueryAssist extends Component<Props, State> {
     suggestionsListTop: 0,
   };
 
-  constructor(props: Props) {
+  constructor(props: P) {
     super(props);
     this.state = Object.assign({}, this.initialState);
   }
@@ -69,11 +80,11 @@ export class QueryAssist extends Component<Props, State> {
   };
 
   blurInput() {
-    this.refs.searchInput.blur();
+    this.searchInput?.blur?.();
   }
 
   focusInput() {
-    this.refs.searchInput.focus();
+    this.searchInput?.focus?.();
   }
 
   cancelSearch() {
@@ -127,8 +138,8 @@ export class QueryAssist extends Component<Props, State> {
     this.focusInput();
     this.props.onChange(newQuery, leftPartAndNewQuery.length);
   };
-  onApplySavedQuery: (savedQuery: SavedQuery) => void = (
-    savedQuery: SavedQuery,
+  onApplySavedQuery: (savedQuery: Folder) => void = (
+    savedQuery: Folder,
   ) => {
     this.setState({
       inputValue: savedQuery.query,
@@ -140,18 +151,6 @@ export class QueryAssist extends Component<Props, State> {
     this.cancelSearch();
     this.props.onClose(this.state.inputValue);
   };
-
-  renderClearIcon(): React.ReactNode {
-    return (
-      <TouchableOpacity
-        onPress={this.resetState}
-        hitSlop={HIT_SLOP}
-        style={styles.clearIcon}
-      >
-        <IconClose size={13} color={styles.clearIcon.color} />
-      </TouchableOpacity>
-    );
-  }
 
   renderCloseButton() {
     return <IconBack color={styles.link.color} />;
@@ -174,10 +173,10 @@ export class QueryAssist extends Component<Props, State> {
         </TouchableOpacity>
 
         <TextInput
-          ref="searchInput"
+          ref={this.searchInput}
           testID="test:id/query-assist-input"
           accessible={true}
-          style={styles.searchInput}
+          style={styles.searchInputWithMinHeight}
           placeholderTextColor={styles.clearIcon.color}
           placeholder={i18n('Enter search request')}
           clearButtonMode="never"
@@ -199,7 +198,15 @@ export class QueryAssist extends Component<Props, State> {
           value={inputValue}
         />
 
-        {!!inputValue && this.renderClearIcon()}
+        {!!inputValue && (
+          <TouchableOpacity
+            onPress={this.resetState}
+            hitSlop={HIT_SLOP}
+            style={styles.clearIcon}
+          >
+            <IconClose size={18} color={styles.clearIcon.color} />
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
@@ -232,7 +239,9 @@ export class QueryAssist extends Component<Props, State> {
     );
   }
 }
-export class QueryAssistModal extends QueryAssist<Props, State> {
+
+
+export class QueryAssistModal extends QueryAssist<Props, State & { visible: boolean }> {
   constructor(props: Props) {
     super(props);
     this.state = {...this.state, visible: true};
@@ -249,7 +258,7 @@ export class QueryAssistModal extends QueryAssist<Props, State> {
     this.onHide();
   }
 
-  onApplySavedQuery(savedQuery: SavedQuery) {
+  onApplySavedQuery(savedQuery: Folder) {
     super.onApplyQuery(savedQuery.query);
     this.onHide();
   }
@@ -263,7 +272,7 @@ export class QueryAssistModal extends QueryAssist<Props, State> {
     return <IconClose size={21} color={styles.link.color} />;
   }
 
-  render(): React.ReactNode {
+  render() {
     return (
       <ModalPortal onHide={this.onClose}>
         {this._renderInput()}
@@ -272,4 +281,6 @@ export class QueryAssistModal extends QueryAssist<Props, State> {
     );
   }
 }
-export default QueryAssist as React$AbstractComponent<Props, unknown>;
+
+
+export default QueryAssist;

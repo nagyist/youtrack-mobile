@@ -1,12 +1,8 @@
 import * as React from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View,} from 'react-native';
+
+import debounce from 'lodash.debounce';
+
 import ColorField from 'components/color-field/color-field';
 import ModalPortal from 'components/modal-view/modal-portal';
 import ModalView from 'components/modal-view/modal-view';
@@ -14,13 +10,17 @@ import SelectItem from './select__item';
 import {getEntityPresentation} from 'components/issue-formatter/issue-formatter';
 import {i18n} from 'components/i18n/i18n';
 import {IconCheck, IconClose} from 'components/icon/icon';
-import {notifyError} from 'components/notification/notification';
 
 import styles, {SELECT_ITEM_HEIGHT, SELECT_ITEM_SEPARATOR_HEIGHT} from './select.styles';
 
-import {CustomError} from 'types/Error';
 
-export type IItem = Record<string, any>;
+export type IItem = {
+  [key: string]: any;
+};
+
+interface TitleRenderer<T> {
+  (item: T): React.ReactNode;
+}
 
 export interface ISelectProps {
   dataSource: (query: string) => Promise<IItem[]>;
@@ -29,18 +29,17 @@ export interface ISelectProps {
   onCancel: () => any;
   getTitle: (item: IItem) => string;
   header?: () => any;
-  titleRenderer?: (item: IItem) => any;
+  titleRenderer?: TitleRenderer<any>;
   getValue?: (item: IItem) => string;
   selectedItems: IItem[];
   placeholder?: string;
-  multi: boolean;
+  multi?: boolean;
   autoFocus?: boolean;
   emptyValue?: string | null | undefined;
   style?: any;
   noFilter?: boolean;
   getWrapperComponent?: () => any;
   getWrapperProps?: () => any;
-  cacheResults?: boolean;
 }
 
 export interface ISelectState {
@@ -51,10 +50,6 @@ export interface ISelectState {
   loaded: boolean;
 }
 
-interface SelectItemsSortData {
-  selected: IItem[];
-  other: IItem[];
-}
 
 export class Select<P extends ISelectProps, S extends ISelectState> extends React.PureComponent<P, S> {
   static defaultProps: {
@@ -100,33 +95,25 @@ export class Select<P extends ISelectProps, S extends ISelectState> extends Reac
       filteredItems: [] as IItem[],
       selectedItems: props.selectedItems || ([] as IItem[]),
       loaded: false,
-    };
+    } as S;
   }
 
   getSortedItems = (items: IItem[] = []): IItem[] => {
     const selectedItemsKey: string[] = this.state.selectedItems.map(
       (it: IItem) => this.getItemKey(it),
     );
-    const sortData: SelectItemsSortData = items.reduce(
-      (data: SelectItemsSortData, item: IItem) => {
-        if (selectedItemsKey.includes(this.getItemKey(item))) {
-          data.selected.push(item);
-        } else {
-          data.other.push(item);
-        }
-
-        return data;
-      },
-      {
-        selected: [] as IItem[],
-        other: [] as IItem[],
-      },
+    const nonSelected: IItem[] = items.reduce(
+      (data: IItem[], item: IItem) => [
+        ...data,
+        ...(selectedItemsKey.includes(this.getItemKey(item)) ? [] : [item]),
+      ],
+      [] as IItem[]
     );
-    return [...sortData.selected, ...sortData.other];
+    return [...this.state.selectedItems, ...nonSelected];
   };
 
   componentDidMount() {
-    this._loadItems(this.state.query);
+    this.onSearch(this.state.query);
   }
 
   componentDidUpdate(prevProps: ISelectProps) {
@@ -138,25 +125,15 @@ export class Select<P extends ISelectProps, S extends ISelectState> extends Reac
         selectedItems: this.props.selectedItems || [],
       });
 
-      this._loadItems(this.state.query);
+      this.onSearch(this.state.query);
     }
   }
 
-  async _loadItems(query: string) {
-    try {
-      this.setState({
-        loaded: false,
-        items: (
-          this.props.cacheResults && (this.state?.items || []).length > 0
-            ? this.state.items
-            : await this.props.dataSource(query)
-        ),
-      });
-      this._onSearch(query);
-      this.setState({loaded: true});
-    } catch (err) {
-      notifyError(err as CustomError);
-    }
+  async doLoadItems(query: string = ''): Promise<IItem[]> {
+    this.setState({loaded: false});
+    const items: IItem[] = await this.props.dataSource(query);
+    this.setState({loaded: true, items});
+    return items;
   }
 
   renderEmptyValueItem(): React.ReactElement | null {
@@ -186,14 +163,21 @@ export class Select<P extends ISelectProps, S extends ISelectState> extends Reac
     return label.toLowerCase().indexOf(query.toLowerCase()) !== -1;
   }
 
-  _onSearch(query: string = '') {
-    const filteredItems: IItem[] = (this.state.items || []).filter((it: IItem) => this.filterItemByLabel(it, query));
+  getFilteredItems(items: IItem[] = [], query: string = ''): IItem[] {
+    return items.filter((it: IItem) => this.filterItemByLabel(it, query));
+  }
+
+  async onSearch(query: string) {
+    await this.doLoadItems(query);
+    const filteredItems: IItem[] = this.getFilteredItems(this.state.items || [], query);
     this.setState({
       filteredItems: this.getSortedItems(filteredItems),
     });
   }
 
-  _renderTitle(item: IItem) {
+  _onSearch = debounce(this.onSearch, 300);
+
+  _renderTitle(item: IItem): React.ReactNode {
     const label: React.ReactElement<React.ComponentProps<any>, any> = (
       <Text style={styles.itemTitle}>{this.props.getTitle(item)}</Text>
     );
@@ -229,7 +213,6 @@ export class Select<P extends ISelectProps, S extends ISelectState> extends Reac
       this.onSelect(item);
       return [item];
     }
-
     let selectedItems = this._isSelected(item)
       ? this.state.selectedItems.filter(it => it.id !== item.id)
       : this.state.selectedItems.concat(item);
@@ -380,7 +363,7 @@ export class Select<P extends ISelectProps, S extends ISelectState> extends Reac
               returnKeyType={multi ? 'done' : 'search'}
               autoCorrect={false}
               underlineColorAndroid="transparent"
-              onSubmitEditing={() => multi ? this._onSave() : this._onSearch(this.state.query)}
+              onSubmitEditing={async () => multi ? this._onSave() : await this.onSearch(this.state.query)}
               value={this.state.query}
               onChangeText={this.onChangeText}
               autoCapitalize="none"
@@ -403,7 +386,7 @@ export class Select<P extends ISelectProps, S extends ISelectState> extends Reac
 
         {!this.state.loaded && (
           <View style={[styles.row, styles.loadingRow]}>
-            <ActivityIndicator/>
+            <ActivityIndicator color={styles.link.color}/>
             <Text style={styles.loadingMessage}>{i18n('Loading values…')}</Text>
           </View>
         )}

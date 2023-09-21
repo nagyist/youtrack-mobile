@@ -99,6 +99,10 @@ msgstr "감정 이모티콘이 추가됨"
 msgid "All"
 msgstr "전체"
 
+#: src/views/issues/issues__filters-filter.tsx
+msgid "All projects"
+msgstr "모든 프로젝트"
+
 #: src/views/settings/settings__appearance.tsx
 #: src/views/settings/settings.tsx
 msgid "Appearance"
@@ -199,6 +203,10 @@ msgstr "카메라"
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Cancel"
 msgstr "취소"
+
+#: src/components/error/error-message-data.ts
+msgid "Clear the current search context"
+msgstr "현재 검색 컨텍스트 지우기"
 
 #: src/components/debug-view/debug-view.tsx
 #: src/components/popup/popup.tsx
@@ -488,9 +496,10 @@ msgstr "프로젝트 필터링"
 msgid "Filter projects, saved searches, and tags"
 msgstr "프로젝트, 저장된 검색 및 태그 필터링"
 
-#: src/views/issues/issues-actions.ts
-msgid "Filter saved searches"
-msgstr "저장된 검색 필터링"
+#: src/views/issues/issues__filters-settings__list.tsx
+#: src/views/issues/issues__settings.tsx
+msgid "Filter Settings"
+msgstr "필터 설정"
 
 #: src/views/agile-board/board-actions.ts
 msgid "Filter sprints by name"
@@ -505,9 +514,17 @@ msgstr "태그 필터링"
 msgid "Filter users, groups, and teams"
 msgstr "사용자, 그룹 및 팀 필터링"
 
+#: src/views/issues/index.ts
+msgid "Filters"
+msgstr "필터"
+
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Find favorite projects"
 msgstr "즐겨찾는 프로젝트 찾기"
+
+#: src/views/issues/issues.tsx
+msgid "Find issues that contain key words"
+msgstr "키워드를 포함하는 이슈 찾기"
 
 #: src/views/enter-server/enter-server.tsx
 msgid "Get help"
@@ -536,10 +553,6 @@ msgstr "기본 제공 오류 보고 외에도 YouTrack Mobile은 문제를 진�
 #: src/views/article/article.tsx
 msgid "in revision"
 msgstr "수정 버전의"
-
-#: src/components/error/error-message-data.ts
-msgid "Invalid query"
-msgstr "잘못된 쿼리"
 
 #: src/views/issue/issue-base-actions-creater.ts
 msgid "Issue deleted"
@@ -580,6 +593,10 @@ msgstr "방금"
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Knowledge Base"
 msgstr "지식 베이스"
+
+#: src/views/issues/index.ts
+msgid "Large"
+msgstr "크게"
 
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-message-data.ts
@@ -653,6 +670,10 @@ msgid "Matches {{issuesCount}} issue"
 msgid_plural "Matches {{issuesCount}} issues"
 msgstr[0] " {{issuesCount}} 건이 존재합니다."
 
+#: src/views/issues/index.ts
+msgid "Medium"
+msgstr "보통"
+
 #: src/components/activity-stream/activity__stream-history.tsx
 #: src/views/inbox-threads/inbox-threads__mention.tsx
 msgid "mentioned you"
@@ -706,7 +727,6 @@ msgstr "아직 초안이 없음"
 msgid "No favorites projects found"
 msgstr "즐겨찾기 프로젝트를 찾을 수 없음"
 
-#: src/components/error/error-message-data.ts
 #: src/views/issues/issues.tsx
 msgid "No issues found"
 msgstr "이슈를 찾을 수 없습니다"
@@ -756,6 +776,10 @@ msgstr "비밀번호"
 msgid "Photo and video library"
 msgstr "사진 및 비디오 라이브러리"
 
+#: src/views/issues/issues__settings.tsx
+msgid "Preview Size"
+msgstr "미리보기 크기"
+
 #: src/views/settings/settings-helper.ts
 msgid "Problem"
 msgstr "문제"
@@ -764,6 +788,7 @@ msgstr "문제"
 msgid "Project"
 msgstr "프로젝트"
 
+#: src/views/issues/issues-actions.ts
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Projects"
 msgstr "프로젝트"
@@ -776,8 +801,11 @@ msgstr "접힌 프로젝트"
 msgid "Projects expanded"
 msgstr "확장된 프로젝트"
 
+#: src/views/issues/index.ts
+msgid "Query"
+msgstr "쿼리"
+
 #: src/components/query-assist/query-assist-helper.ts
-#: src/views/issues/issues-actions.ts
 msgid "Recent searches"
 msgstr "최근 검색"
 
@@ -827,6 +855,10 @@ msgstr "복원"
 msgid "Retry"
 msgstr "다시 시도"
 
+#: src/views/issues/issues-actions.ts
+msgid "Saved Searches"
+msgstr "저장된 검색"
+
 #: src/views/knowledge-base/knowledge-base__search.tsx
 msgid "Search articles"
 msgstr "자료 검색"
@@ -838,6 +870,10 @@ msgstr "다른 값 검색"
 #: src/components/custom-fields-panel/custom-fields-panel.tsx
 msgid "Search for the project"
 msgstr "프로젝트 검색"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Search Input Mode"
+msgstr "검색 입력 모드"
 
 #: src/views/knowledge-base/knowledge-base.tsx
 msgid "Select an article from the list"
@@ -916,6 +952,10 @@ msgstr "\"{{tagName}}\" 태그가 지정된 모든 이슈 표시…"
 msgid "Show more"
 msgstr "더보기"
 
+#: src/views/issues/index.ts
+msgid "Small"
+msgstr "작게"
+
 #: src/components/error/error-message-data.ts
 #: src/components/error/error-messages.ts
 msgid "Something went wrong"
@@ -924,6 +964,10 @@ msgstr "뭔가가 잘못되었습니다"
 #: src/views/issues/issues__sortby_list.tsx
 msgid "Sort Attributes"
 msgstr "정렬 속성"
+
+#: src/views/issues/issues__settings.tsx
+msgid "Sort Order"
+msgstr "정렬 순서"
 
 #: src/views/issue/activity/issue__activity-settings.tsx
 msgid "Sort: oldest first"
@@ -976,6 +1020,10 @@ msgid "Tag"
 msgid_plural "Tags"
 msgstr[0] "태그"
 
+#: src/views/issues/issues-actions.ts
+msgid "Tags"
+msgstr "태그"
+
 #: src/views/settings/settings__feedback-form.tsx
 msgid "Thank you for your feedback!"
 msgstr "의견을 보내 주셔서 감사합니다!"
@@ -1019,6 +1067,10 @@ msgstr "커밋 작성자가 다른 사용자 계정과 연관된 이메일 주�
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "The commit author is not an assignee in the project."
 msgstr "커밋 작성자가 프로젝트 담당자가 아닙니다."
+
+#: src/components/error/error-message-data.ts
+msgid "The search query contains unknown values"
+msgstr "검색 쿼리에 알 수 없는 값이 있습니다."
 
 #: src/actions/app-actions.ts
 msgid "The selected account is no longer authorized to use YouTrack Mobile. Please log in again."
@@ -1157,6 +1209,10 @@ msgstr "자료 리더에게 표시됨"
 msgid "Visible to issue readers"
 msgstr "이슈 리더에게 표시됨"
 
+#: src/components/error/error-message-data.ts
+msgid "We didn't find any issues in the current search context that match your query"
+msgstr "사용자 쿼리와 일치하는 현재 검색 컨텍스트에서 이슈를 찾을 수 없습니다"
+
 #: src/components/activity-stream/activity__stream-vcs-helper.ts
 msgid "When integrating TeamCity and YouTrack, the users are matched by their email addresses. TeamCity has not provided any email address of the committer."
 msgstr "TeamCity와 YouTrack을 통합할 때 사용자는 이메일 주소와 일치됩니다. TeamCity에서 커미터의 이메일 주소를 제공하지 않았습니다."
@@ -1168,6 +1224,10 @@ msgstr "TeamCity와 YouTrack을 통합할 때 사용자는 이메일 주소와 �
 #: src/components/error/error-message-data.ts
 msgid "Woah, you can't touch this!"
 msgstr "이런, 여기에 접근하실 수 없습니다."
+
+#: src/components/error/error-message-data.ts
+msgid "Wrap attribute values that contain spaces in braces {like this}."
+msgstr "공백이 있는 속성 값을 {이와 같이} 중괄호로 래핑합니다."
 
 #: src/components/comment/comment-edit.tsx
 #: src/views/issue/activity/activity__add-spent-time.tsx

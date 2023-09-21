@@ -74,7 +74,7 @@ jest.mock('react-native-document-picker', () => ({
   default: jest.fn(),
 }));
 
-/*jest.doMock('react-native', () => {
+jest.doMock('react-native', () => {
   return Object.setPrototypeOf(
     ReactNative,
     {
@@ -87,7 +87,7 @@ jest.mock('react-native-document-picker', () => ({
       },
     },
   );
-});*/
+});
 
 jest.mock('react-native/Libraries/Linking/Linking', () => ({
   getInitialURL: jest.fn().mockResolvedValue(''),

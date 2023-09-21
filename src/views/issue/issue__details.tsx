@@ -145,7 +145,7 @@ class IssueDetails extends React.Component<IssueDetailsProps, void> {
   }
 
   renderLinksBlock: () => React.ReactNode = () => {
-    const {issuePermissions, getIssueLinksTitle} = this.props;
+    const {issuePermissions, getIssueLinksTitle, navigation} = this.props;
     const issue: AnyIssue = this.getIssue();
     const props = {
       issuesGetter: this.props.issuesGetter,

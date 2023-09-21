@@ -1,13 +1,19 @@
 import {Alert} from 'react-native';
+
 import appPackage from '../../../package.json';
-import log from '../log/log';
-import {categoryName} from '../activity/activity__category';
-import {flushStoragePart, getStorageState} from '../storage/storage';
-import {getApi} from '../api/api__instance';
+import log from 'components/log/log';
+import {categoryName} from 'components/activity/activity__category';
+import {flushStoragePart, getStorageState} from 'components/storage/storage';
+import {getApi} from 'components/api/api__instance';
 import {isAndroidPlatform} from 'util/util';
+
 import type Api from '../api/api';
-import type {Token} from 'types/Notification';
 import type {StorageState} from '../storage/storage';
+import type {Token} from 'types/Notification';
+import {Notification} from 'react-native-notifications';
+import {NotificationRouteData} from 'types/Notification';
+
+
 export class PushNotifications {
   static deviceToken: null | string = null;
   static deviceTokenPromise: null | Promise<string> = null;
@@ -21,13 +27,14 @@ export class PushNotifications {
   }
 
   static subscribeOnNotificationOpen(
-    onSwitchAccount: (account: StorageState, issueId: string) => any,
+    onSwitchAccount: (account: StorageState, issueId?: string, articleId?: string) => any,
   ): void {}
 
   static unsubscribe(): void {}
 
   static init(): void {}
 }
+
 const messageDefaultButton: {
   text: string;
   onPress: () => void;
@@ -74,47 +81,35 @@ function showInfoMessage(
   });
 }
 
-function getIssueId(
-  notification: Record<string, any>,
-): string | null | undefined {
+function getIssueId(notification: Notification | null = null): string {
   return (
-    notification?.payload?.issueId ||
-    notification?.payload?.ytIssueId ||
-    notification?.ytIssueId ||
-    notification?.data?.ytIssueId ||
-    (notification?.getData && notification.getData().ytIssueId) ||
-    notification?.issueId ||
-    notification?.data?.issueId
+    getNotificationDataByField(notification, 'issueId') ||
+    getNotificationDataByField(notification, 'ytIssueId')
   );
 }
-
-function getBackendUrl(
-  notification: Record<string, any>,
-): string | null | undefined {
-  const data: Record<string, any> =
-    notification?.getData && notification.getData();
+function getArticleId(notification: Notification | null = null): string {
   return (
-    data?.backendUrl ||
-    notification?.backendUrl ||
-    notification?.data?.backendUrl ||
-    notification?.payload?.backendUrl
+    getNotificationDataByField(notification, 'articleId') ||
+    getNotificationDataByField(notification, 'ytArticleId')
   );
 }
+function getBackendURL(notification: Notification | null = null): string {
+  return getNotificationDataByField(notification, 'backendUrl');
+}
 
-function getNotificationDataByField(notification: Record<string, any>, fieldName: string) {
-  return (
+function getNotificationDataByField(notification: Record<string, any> | null, fieldName: string) {
+  return notification ? (
+    notification?.payload?.[fieldName] ||
     notification?.[fieldName] ||
     notification?.data?.[fieldName] ||
-    notification?.payload?.[fieldName] ||
+    notification?.getData?.()?.[fieldName] ||
     ''
-  ).split(',');
+  ) : '';
 }
 
-function getActivityId(
-  notification: Record<string, any>,
-): string | undefined {
-  const categories: string[] = getNotificationDataByField(notification, 'categories');
-  const eventIds: string[] = getNotificationDataByField(notification, 'eventIds');
+function getActivityId(notification: Notification | null = null): string | undefined {
+  const categories: string[] = getNotificationDataByField(notification, 'categories').split(',');
+  const eventIds: string[] = getNotificationDataByField(notification, 'eventIds').split(',');
   if (!categories?.[0] || !eventIds?.[0]) {
     return undefined;
   }
@@ -125,6 +120,9 @@ function getActivityId(
       categoryName.SUMMARY,
       categoryName.ISSUE_CREATED,
       categoryName.ISSUE_CREATED.split('_').pop(),
+      categoryName.ARTICLE_CREATED,
+      categoryName.ARTICLE_CONTENT,
+      categoryName.ARTICLE_SUMMARY,
     ].join(',').toLowerCase().split(',').includes(it.toLowerCase());
   });
 
@@ -188,17 +186,27 @@ async function loadYouTrackToken(): Promise<string | null> {
   }
 }
 
+const getNotificationRouteData = (notification?: Notification): NotificationRouteData => ({
+  issueId: getIssueId(notification),
+  articleId: getArticleId(notification),
+  backendUrl: getBackendURL(notification),
+  navigateToActivity: getActivityId(notification),
+});
+
+
 export default {
   storeDeviceToken,
   getStoredDeviceToken,
   isDeviceTokenChanged,
   showInfoMessage,
   getIssueId,
+  getArticleId,
   loadYouTrackToken,
   subscribe,
   unsubscribe,
   logPrefix,
   KONNECTOR_URL,
   getActivityId,
-  getBackendUrl,
+  getBackendURL,
+  getNotificationRouteData,
 };

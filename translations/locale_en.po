@@ -14,7 +14,7 @@ msgstr " ({{amount}} unresolved)"
 msgid " or "
 msgstr " or "
 
-#: src/views/agile-board/board-actions.ts:692
+#: src/views/agile-board/board-actions.ts:693
 msgid "(archived)"
 msgstr "(archived)"
 
@@ -26,7 +26,7 @@ msgstr "(Clear value)"
 msgid "[Removed field]"
 msgstr "[Removed field]"
 
-#: src/views/article/article__details.tsx:177
+#: src/views/article/article__details.tsx:169
 msgid "{{amount}} article"
 msgid_plural "{{amount}} articles"
 msgstr[0] "{{amount}} article"
@@ -53,7 +53,7 @@ msgstr "@Mention in a comment"
 msgid "1w 1d 1h 1m"
 msgstr "1w 1d 1h 1m"
 
-#: src/components/user-agreement/user-agreement.tsx:46
+#: src/components/user-agreement/user-agreement.tsx:47
 msgid "Accept"
 msgstr "Accept"
 
@@ -65,7 +65,7 @@ msgstr "Activity"
 msgid "Activity Settings"
 msgstr "Activity Settings"
 
-#: src/views/knowledge-base/knowledge-base.tsx:82
+#: src/views/knowledge-base/knowledge-base.tsx:87
 msgid "Add project to favorites"
 msgstr "Add project to favorites"
 
@@ -95,6 +95,10 @@ msgstr "added a reaction"
 #: src/views/inbox-threads/inbox-threads-helper.ts:91
 msgid "All"
 msgstr "All"
+
+#: src/views/issues/issues__filters-filter.tsx:31
+msgid "All projects"
+msgstr "All projects"
 
 #: src/views/settings/settings__appearance.tsx:63
 #: src/views/settings/settings.tsx:106
@@ -184,7 +188,7 @@ msgstr "Camera"
 
 #: src/components/account/accounts.tsx:51
 #: src/components/confirmation/confirmation.ts:19
-#: src/components/tags/tags.tsx:48
+#: src/components/tags/tags.tsx:55
 #: src/views/article/arcticle-actions.ts:322
 #: src/views/article/arcticle-actions.ts:693
 #: src/views/create-issue/create-issue-actions.ts:510
@@ -198,6 +202,10 @@ msgstr "Camera"
 msgid "Cancel"
 msgstr "Cancel"
 
+#: src/components/error/error-message-data.ts:15
+msgid "Clear the current search context"
+msgstr "Clear the current search context"
+
 #: src/components/debug-view/debug-view.tsx:40
 #: src/components/popup/popup.tsx:31
 msgid "Close"
@@ -207,15 +215,15 @@ msgstr "Close"
 msgid "closed the pull request"
 msgstr "closed the pull request"
 
-#: src/views/knowledge-base/knowledge-base.tsx:535
+#: src/views/knowledge-base/knowledge-base.tsx:540
 msgid "Collapse all"
 msgstr "Collapse all"
 
-#: src/views/agile-board/agile-board.tsx:360
+#: src/views/agile-board/agile-board.tsx:371
 msgid "Column collapsed"
 msgstr "Column collapsed"
 
-#: src/views/agile-board/agile-board.tsx:360
+#: src/views/agile-board/agile-board.tsx:371
 msgid "Column expanded"
 msgstr "Column expanded"
 
@@ -260,7 +268,7 @@ msgstr "Confirm logout"
 msgid "Confirmation required"
 msgstr "Confirmation required"
 
-#: src/actions/app-actions.ts:940
+#: src/actions/app-actions.ts:936
 msgid "Connecting to YouTrack..."
 msgstr "Connecting to YouTrack..."
 
@@ -270,7 +278,7 @@ msgstr "Connecting to YouTrack..."
 msgid "Contact support"
 msgstr "Contact support"
 
-#: src/views/article/article.tsx:143
+#: src/views/article/article.tsx:144
 msgid "Content"
 msgstr "Content"
 
@@ -345,7 +353,7 @@ msgstr "Dark theme"
 msgid "Date"
 msgstr "Date"
 
-#: src/components/user-agreement/user-agreement.tsx:49
+#: src/components/user-agreement/user-agreement.tsx:50
 msgid "Decline"
 msgstr "Decline"
 
@@ -419,7 +427,7 @@ msgstr "Document"
 msgid "Don't send logs"
 msgstr "Don't send logs"
 
-#: src/views/knowledge-base/knowledge-base.tsx:563
+#: src/views/knowledge-base/knowledge-base.tsx:568
 msgid "Drafts"
 msgstr "Drafts"
 
@@ -448,8 +456,8 @@ msgstr "Email address for follow-up"
 msgid "Enter command"
 msgstr "Enter command"
 
-#: src/components/query-assist/query-assist.tsx:182
-#: src/components/query-assist/query-preview.tsx:62
+#: src/components/query-assist/query-assist.tsx:181
+#: src/components/query-assist/query-preview.tsx:24
 msgid "Enter search request"
 msgstr "Enter search request"
 
@@ -461,7 +469,7 @@ msgstr "Enter the web address for a YouTrack installation where you have a regis
 msgid "Enter time value"
 msgstr "Enter time value"
 
-#: src/views/knowledge-base/knowledge-base.tsx:601
+#: src/views/knowledge-base/knowledge-base.tsx:605
 msgid "Favorites"
 msgstr "Favorites"
 
@@ -469,28 +477,29 @@ msgstr "Favorites"
 msgid "Feature request"
 msgstr "Feature request"
 
-#: src/views/agile-board/board-actions.ts:720
+#: src/views/agile-board/board-actions.ts:723
 msgid "Filter boards by name"
 msgstr "Filter boards by name"
 
-#: src/components/select/select.tsx:343
+#: src/components/select/select.tsx:326
 msgid "Filter items"
 msgstr "Filter items"
 
 #: src/views/article-create/article-create.tsx:149
-#: src/views/knowledge-base/knowledge-base.tsx:584
+#: src/views/knowledge-base/knowledge-base.tsx:589
 msgid "Filter projects"
 msgstr "Filter projects"
 
-#: src/views/issues/issues-actions.ts:272
+#: src/views/issues/issues-actions.ts:254
 msgid "Filter projects, saved searches, and tags"
 msgstr "Filter projects, saved searches, and tags"
 
-#: src/views/issues/issues-actions.ts:219
-msgid "Filter saved searches"
-msgstr "Filter saved searches"
+#: src/views/issues/issues__filters-settings__list.tsx:172
+#: src/views/issues/issues__settings.tsx:90
+msgid "Filter Settings"
+msgstr "Filter Settings"
 
-#: src/views/agile-board/board-actions.ts:685
+#: src/views/agile-board/board-actions.ts:686
 msgid "Filter sprints by name"
 msgstr "Filter sprints by name"
 
@@ -499,19 +508,27 @@ msgstr "Filter sprints by name"
 msgid "Filter tags"
 msgstr "Filter tags"
 
-#: src/components/visibility/visibility-control.tsx:183
+#: src/components/visibility/visibility-control.tsx:185
 msgid "Filter users, groups, and teams"
 msgstr "Filter users, groups, and teams"
 
-#: src/views/knowledge-base/knowledge-base.tsx:662
+#: src/views/issues/index.ts:61
+msgid "Filters"
+msgstr "Filters"
+
+#: src/views/knowledge-base/knowledge-base.tsx:665
 msgid "Find favorite projects"
 msgstr "Find favorite projects"
+
+#: src/views/issues/issues.tsx:549
+msgid "Find issues that contain key words"
+msgstr "Find issues that contain key words"
 
 #: src/views/enter-server/enter-server.tsx:289
 msgid "Get help"
 msgstr "Get help"
 
-#: src/components/visibility/visibility-control.tsx:110
+#: src/components/visibility/visibility-control.tsx:111
 msgid "Groups and teams"
 msgstr "Groups and teams"
 
@@ -519,11 +536,11 @@ msgstr "Groups and teams"
 msgid "Help us fix problems faster"
 msgstr "Help us fix problems faster"
 
-#: src/views/knowledge-base/knowledge-base.tsx:651
+#: src/views/knowledge-base/knowledge-base.tsx:654
 msgid "Here you'll see a list of articles from your favorite projects"
 msgstr "Here you'll see a list of articles from your favorite projects"
 
-#: src/components/error/error-message-data.ts:14
+#: src/components/error/error-message-data.ts:12
 msgid "If this isn't what you expected, you might try one of these solutions:"
 msgstr "If this isn't what you expected, you might try one of these solutions:"
 
@@ -534,10 +551,6 @@ msgstr "In addition to our built-in error reporting, YouTrack Mobile uses Bugsna
 #: src/views/article/article.tsx:265
 msgid "in revision"
 msgstr "in revision"
-
-#: src/components/error/error-message-data.ts:43
-msgid "Invalid query"
-msgstr "Invalid query"
 
 #: src/views/issue/issue-base-actions-creater.ts:905
 msgid "Issue deleted"
@@ -563,7 +576,7 @@ msgstr "Issue updated"
 msgid "Issues can be sorted by up to 4 attributes"
 msgstr "Issues can be sorted by up to 4 attributes"
 
-#: src/components/error/error-message-data.ts:24
+#: src/components/error/error-message-data.ts:20
 msgid "It could mean that the issue doesn't exist or you don't have permission to view it"
 msgstr "It could mean that the issue doesn't exist or you don't have permission to view it"
 
@@ -575,12 +588,16 @@ msgstr "JetBrains Privacy Policy"
 msgid "just now"
 msgstr "just now"
 
-#: src/views/knowledge-base/knowledge-base.tsx:708
+#: src/views/knowledge-base/knowledge-base.tsx:711
 msgid "Knowledge Base"
 msgstr "Knowledge Base"
 
-#: src/components/error/error-message-data.ts:37
-#: src/components/error/error-message-data.ts:39
+#: src/views/issues/index.ts:50
+msgid "Large"
+msgstr "Large"
+
+#: src/components/error/error-message-data.ts:32
+#: src/components/error/error-message-data.ts:34
 msgid "License error"
 msgstr "License error"
 
@@ -588,7 +605,7 @@ msgstr "License error"
 msgid "Light theme"
 msgstr "Light theme"
 
-#: src/components/linked-issues/linked-issues-add-link.tsx:250
+#: src/components/linked-issues/linked-issues-add-link.tsx:246
 #: src/views/create-issue/create-issue.tsx:380
 #: src/views/issue/issue-base-actions-creater.ts:702
 msgid "Link issue"
@@ -603,7 +620,7 @@ msgstr "Link to comment copied"
 msgid "Linked issues"
 msgstr "Linked issues"
 
-#: src/components/select/select.tsx:407
+#: src/components/select/select.tsx:390
 msgid "Loading values…"
 msgstr "Loading values…"
 
@@ -624,7 +641,7 @@ msgid "Logs"
 msgstr "Logs"
 
 #: src/views/knowledge-base/knowledge-base-actions.ts:493
-#: src/views/knowledge-base/knowledge-base.tsx:483
+#: src/views/knowledge-base/knowledge-base.tsx:488
 msgid "Manage Favorite Projects"
 msgstr "Manage Favorite Projects"
 
@@ -651,6 +668,10 @@ msgid "Matches {{issuesCount}} issue"
 msgid_plural "Matches {{issuesCount}} issues"
 msgstr[0] "Matches {{issuesCount}} issue"
 msgstr[1] "Matches {{issuesCount}} issues"
+
+#: src/views/issues/index.ts:46
+msgid "Medium"
+msgstr "Medium"
 
 #: src/components/activity-stream/activity__stream-history.tsx:196
 #: src/views/inbox-threads/inbox-threads__mention.tsx:101
@@ -685,15 +706,15 @@ msgstr "New messages"
 msgid "Next"
 msgstr "Next"
 
-#: src/components/activity-stream/activity__stream.tsx:421
+#: src/components/activity-stream/activity__stream.tsx:423
 msgid "No activity yet"
 msgstr "No activity yet"
 
-#: src/views/knowledge-base/knowledge-base.tsx:261
+#: src/views/knowledge-base/knowledge-base.tsx:266
 msgid "No articles"
 msgstr "No articles"
 
-#: src/views/knowledge-base/knowledge-base.tsx:85
+#: src/views/knowledge-base/knowledge-base.tsx:90
 msgid "No articles found"
 msgstr "No articles found"
 
@@ -701,16 +722,15 @@ msgstr "No articles found"
 msgid "No drafts yet"
 msgstr "No drafts yet"
 
-#: src/views/knowledge-base/knowledge-base.tsx:81
+#: src/views/knowledge-base/knowledge-base.tsx:86
 msgid "No favorites projects found"
 msgstr "No favorites projects found"
 
-#: src/components/error/error-message-data.ts:34
-#: src/views/issues/issues.tsx:576
+#: src/views/issues/issues.tsx:599
 msgid "No issues found"
 msgstr "No issues found"
 
-#: src/components/select/select.tsx:412
+#: src/components/select/select.tsx:395
 msgid "No items"
 msgstr "No items"
 
@@ -726,7 +746,7 @@ msgstr "No type"
 msgid "No user information provided by Upsource."
 msgstr "No user information provided by Upsource."
 
-#: src/components/error/error-message-data.ts:23
+#: src/components/error/error-message-data.ts:19
 msgid "Nope, can't find it!"
 msgstr "Nope, can't find it!"
 
@@ -743,7 +763,7 @@ msgstr "Notifications"
 msgid "Other"
 msgstr "Other"
 
-#: src/components/visibility/visibility-control.tsx:110
+#: src/components/visibility/visibility-control.tsx:111
 msgid "Other groups and teams"
 msgstr "Other groups and teams"
 
@@ -755,6 +775,10 @@ msgstr "Password"
 msgid "Photo and video library"
 msgstr "Photo and video library"
 
+#: src/views/issues/issues__settings.tsx:117
+msgid "Preview Size"
+msgstr "Preview Size"
+
 #: src/views/settings/settings-helper.ts:25
 msgid "Problem"
 msgstr "Problem"
@@ -763,7 +787,8 @@ msgstr "Problem"
 msgid "Project"
 msgstr "Project"
 
-#: src/views/knowledge-base/knowledge-base.tsx:606
+#: src/views/issues/issues-actions.ts:270
+#: src/views/knowledge-base/knowledge-base.tsx:609
 msgid "Projects"
 msgstr "Projects"
 
@@ -775,12 +800,15 @@ msgstr "Projects collapsed"
 msgid "Projects expanded"
 msgstr "Projects expanded"
 
+#: src/views/issues/index.ts:57
+msgid "Query"
+msgstr "Query"
+
 #: src/components/query-assist/query-assist-helper.ts:62
-#: src/views/issues/issues-actions.ts:232
 msgid "Recent searches"
 msgstr "Recent searches"
 
-#: src/components/visibility/visibility-control.tsx:106
+#: src/components/visibility/visibility-control.tsx:107
 msgid "Recommended groups and teams"
 msgstr "Recommended groups and teams"
 
@@ -796,7 +824,7 @@ msgstr "Remove favorite"
 msgid "Remove project from favorites?"
 msgstr "Remove project from favorites?"
 
-#: src/components/tags/tags.tsx:42
+#: src/components/tags/tags.tsx:49
 msgid "Remove tag"
 msgstr "Remove tag"
 
@@ -826,11 +854,15 @@ msgstr "Restore"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/views/knowledge-base/knowledge-base__search.tsx:27
+#: src/views/issues/issues-actions.ts:285
+msgid "Saved Searches"
+msgstr "Saved Searches"
+
+#: src/views/knowledge-base/knowledge-base__search.tsx:30
 msgid "Search articles"
 msgstr "Search articles"
 
-#: src/components/error/error-message-data.ts:18
+#: src/components/error/error-message-data.ts:13
 msgid "Search for a different value"
 msgstr "Search for a different value"
 
@@ -838,12 +870,16 @@ msgstr "Search for a different value"
 msgid "Search for the project"
 msgstr "Search for the project"
 
-#: src/views/knowledge-base/knowledge-base.tsx:754
+#: src/views/issues/issues__settings.tsx:66
+msgid "Search Input Mode"
+msgstr "Search Input Mode"
+
+#: src/views/knowledge-base/knowledge-base.tsx:760
 msgid "Select an article from the list"
 msgstr "Select an article from the list"
 
 #: src/views/inbox/inbox.tsx:750
-#: src/views/issues/issues.tsx:642
+#: src/views/issues/issues.tsx:664
 msgid "Select an issue from the list"
 msgstr "Select an issue from the list"
 
@@ -906,16 +942,20 @@ msgstr "Share…"
 msgid "Show all"
 msgstr "Show all"
 
-#: src/components/tags/tags.tsx:33
+#: src/components/tags/tags.tsx:41
 msgid "Show all issues tagged with \"{{tagName}}\"..."
 msgstr "Show all issues tagged with \"{{tagName}}\"..."
 
 #: src/components/activity-stream/activity__stream-vcs.tsx:206
-#: src/views/inbox-threads/inbox-threads__subscription.tsx:107
+#: src/views/inbox-threads/inbox-threads__subscription.tsx:110
 msgid "Show more"
 msgstr "Show more"
 
-#: src/components/error/error-message-data.ts:31
+#: src/views/issues/index.ts:42
+msgid "Small"
+msgstr "Small"
+
+#: src/components/error/error-message-data.ts:26
 #: src/components/error/error-messages.ts:7
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -924,11 +964,15 @@ msgstr "Something went wrong"
 msgid "Sort Attributes"
 msgstr "Sort Attributes"
 
+#: src/views/issues/issues__settings.tsx:89
+msgid "Sort Order"
+msgstr "Sort Order"
+
 #: src/views/issue/activity/issue__activity-settings.tsx:43
 msgid "Sort: oldest first"
 msgstr "Sort: oldest first"
 
-#: src/views/issues/issues__sortby.tsx:123
+#: src/views/issues/issues__sortby.tsx:51
 msgid "Sorted by"
 msgstr "Sorted by"
 
@@ -946,7 +990,7 @@ msgstr "Spent time:"
 msgid "Start a new article"
 msgstr "Start a new article"
 
-#: src/views/article/article__details.tsx:159
+#: src/views/article/article__details.tsx:151
 msgid "Sub-articles"
 msgstr "Sub-articles"
 
@@ -976,6 +1020,10 @@ msgid_plural "Tags"
 msgstr[0] "Tag"
 msgstr[1] "Tags"
 
+#: src/views/issues/issues-actions.ts:278
+msgid "Tags"
+msgstr "Tags"
+
 #: src/views/settings/settings__feedback-form.tsx:111
 msgid "Thank you for your feedback!"
 msgstr "Thank you for your feedback!"
@@ -988,7 +1036,7 @@ msgstr "The application failed to restart automatically. Please try to restart i
 msgid "The author of this commit has not been identified because they haven't specified their email address in their YouTrack profile."
 msgstr "The author of this commit has not been identified because they haven't specified their email address in their YouTrack profile."
 
-#: src/views/agile-board/agile-board.tsx:425
+#: src/views/agile-board/agile-board.tsx:440
 msgid "The board {{boardName}} has configuration errors"
 msgstr "The board {{boardName}} has configuration errors"
 
@@ -1020,11 +1068,15 @@ msgstr "The commit author has specified an email address that is associated with
 msgid "The commit author is not an assignee in the project."
 msgstr "The commit author is not an assignee in the project."
 
-#: src/actions/app-actions.ts:483
+#: src/components/error/error-message-data.ts:38
+msgid "The search query contains unknown values"
+msgstr "The search query contains unknown values"
+
+#: src/actions/app-actions.ts:487
 msgid "The selected account is no longer authorized to use YouTrack Mobile. Please log in again."
 msgstr "The selected account is no longer authorized to use YouTrack Mobile. Please log in again."
 
-#: src/components/error/error-message-data.ts:61
+#: src/components/error/error-message-data.ts:56
 msgid "The server is overloaded or down for maintenance"
 msgstr "The server is overloaded or down for maintenance"
 
@@ -1068,7 +1120,7 @@ msgstr "Title changed"
 msgid "To view an item in context, select an issue, article, or update from the list"
 msgstr "To view an item in context, select an issue, article, or update from the list"
 
-#: src/views/knowledge-base/knowledge-base.tsx:588
+#: src/views/knowledge-base/knowledge-base.tsx:593
 msgid "To view articles in the knowledge base for a specific project, mark it as a favorite"
 msgstr "To view articles in the knowledge base for a specific project, mark it as a favorite"
 
@@ -1080,7 +1132,7 @@ msgstr "Total votes"
 msgid "Touch and hold an item to view a list of available actions"
 msgstr "Touch and hold an item to view a list of available actions"
 
-#: src/components/error-message/error-message.tsx:87
+#: src/components/error-message/error-message.tsx:95
 msgid "Try Again"
 msgstr "Try Again"
 
@@ -1113,11 +1165,11 @@ msgstr "updated"
 msgid "Updated by"
 msgstr "Updated by"
 
-#: src/components/error/error-message-data.ts:19
+#: src/components/error/error-message-data.ts:14
 msgid "Use fewer search parameters"
 msgstr "Use fewer search parameters"
 
-#: src/components/error/error-message-data.ts:47
+#: src/components/error/error-message-data.ts:42
 msgid "User account is banned"
 msgstr "User account is banned"
 
@@ -1125,7 +1177,7 @@ msgstr "User account is banned"
 msgid "Username or email"
 msgstr "Username or email"
 
-#: src/components/visibility/visibility-control.tsx:114
+#: src/components/visibility/visibility-control.tsx:115
 msgid "Users"
 msgstr "Users"
 
@@ -1157,6 +1209,10 @@ msgstr "Visible to article readers"
 msgid "Visible to issue readers"
 msgstr "Visible to issue readers"
 
+#: src/components/error/error-message-data.ts:29
+msgid "We didn't find any issues in the current search context that match your query"
+msgstr "We didn't find any issues in the current search context that match your query"
+
 #: src/components/activity-stream/activity__stream-vcs-helper.ts:16
 msgid "When integrating TeamCity and YouTrack, the users are matched by their email addresses. TeamCity has not provided any email address of the committer."
 msgstr "When integrating TeamCity and YouTrack, the users are matched by their email addresses. TeamCity has not provided any email address of the committer."
@@ -1168,6 +1224,10 @@ msgstr "When integrating TeamCity and YouTrack, the users are matched by their e
 #: src/components/error/error-message-data.ts:8
 msgid "Woah, you can't touch this!"
 msgstr "Woah, you can't touch this!"
+
+#: src/components/error/error-message-data.ts:16
+msgid "Wrap attribute values that contain spaces in braces {like this}."
+msgstr "Wrap attribute values that contain spaces in braces {like this}."
 
 #: src/components/comment/comment-edit.tsx:431
 #: src/views/issue/activity/activity__add-spent-time.tsx:426
@@ -1198,11 +1258,11 @@ msgstr ""
 msgid "Your account has insufficient permission to perform this operation."
 msgstr "Your account has insufficient permission to perform this operation."
 
-#: src/components/storage/storage.ts:362
+#: src/components/storage/storage.ts:367
 msgid "Your mobile device is running low on available storage space. Some app functionality may be unavailable."
 msgstr "Your mobile device is running low on available storage space. Some app functionality may be unavailable."
 
-#: src/components/error/error-message-data.ts:50
+#: src/components/error/error-message-data.ts:45
 msgid ""
 "Your YouTrack account requires that you provide a second factor of authentication to log in. This option is only available when you log in with a mobile browser. The mobile browser will also let you sign in using a third-party account (if available).\n"
 "\n"

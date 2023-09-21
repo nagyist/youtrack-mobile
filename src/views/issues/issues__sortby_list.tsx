@@ -15,7 +15,7 @@ import {
   doAssist,
   getSortPropertyName,
   isRelevanceSortProperty,
-} from './issues__sortby-helper';
+} from './issues-helper';
 import {
   EllipsisVertical,
   IconAdd,
@@ -223,14 +223,11 @@ const IssuesSortByList = (props: Props) => {
         getItemLayout={Select.getItemLayout}
       />
 
-      <ModalPortal onHide={() => updateModalChildren()} hasOverlay={false}>
+      <ModalPortal onHide={() => updateModalChildren(null)} hasOverlay={false}>
         {modalChildren}
       </ModalPortal>
     </View>
   );
 };
 
-export default React.memo<Props>(IssuesSortByList) as React$AbstractComponent<
-  Props,
-  unknown
->;
+export default React.memo<Props>(IssuesSortByList);

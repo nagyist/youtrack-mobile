@@ -7,6 +7,10 @@ import appPackage from '../../package.json';
 import {getStorageState} from 'components/storage/storage';
 import type {CustomError} from 'types/Error';
 import type {StorageState} from 'components/storage/storage';
+
+type RequestPromise = { status: 'fulfilled' | 'rejected', value: any[] };
+
+
 export const AppVersion: any = appPackage.version.split('-')[0];
 export const isTablet: boolean = DeviceInfo.isTablet();
 export const isReactElement = (element: any): boolean => {
@@ -64,25 +68,32 @@ export const createBtoa = (str: string): any => {
 
   return base64.fromByteArray(byteArray);
 };
+
 export const until = (
   promises: any,
   combine: boolean = false,
-): Promise<unknown[] | [CustomError, unknown[]]> => {
+  anyPromiseSuccess: boolean = false,
+): Promise<any[] | [CustomError, any[]]> => {
   if (!promises) {
     return Promise.reject(['No promises are provided']);
   }
 
   if (Array.isArray(promises)) {
-    return Promise.all(promises)
-      .then(data => {
-        if (combine) {
-          return [
-            null,
-            data.reduce((list: any[], it: any) => list.concat(it)),
-          ];
+    const resolveMethod = anyPromiseSuccess ? Promise.allSettled : Promise.all;
+    return resolveMethod(promises)
+      .then((data: any[]) => {
+        const fulfilled: RequestPromise[] = anyPromiseSuccess ? data.filter((it) => it.status === 'fulfilled') : data;
+        if (!fulfilled.length) {
+          throw 'No fulfilled promises';
         }
-
-        return [null, data];
+        return [
+          null,
+          (
+            combine
+              ? fulfilled.reduce((list: any[], it: any) => list.concat(anyPromiseSuccess ? it.value : it), [])
+              : anyPromiseSuccess ? fulfilled.map((it: RequestPromise) => it.value) : fulfilled
+          ),
+        ];
       })
       .catch((err: CustomError) => {
         return [err, promises.map<typeof undefined>(() => undefined)];
@@ -129,3 +140,26 @@ export const createNullProjectCustomField = (
 };
 export const isURLPattern: (str: string) => boolean = (str: string): boolean =>
   /^(http(s?)):\/\/|(www.)/i.test(str);
+
+export const removeDuplicatesFromArray = (A: any[]): any[] => {
+  const idsMap: Record<string, boolean> = {};
+  return A.filter(it => {
+    return idsMap[it.id] ? false : (idsMap[it.id] = true);
+  });
+};
+
+export const arrayToMap = (
+  items: any[],
+  keyName: string | null,
+  lowerCaseKey: boolean = false,
+): Record<string, any> => {
+  const key: string = keyName != null ? keyName : 'id';
+  return items.reduce(
+    (map, item) => ({...map, [lowerCaseKey ? item[key].toLowerCase() : item[key]]: item}),
+    {}
+  );
+};
+
+export const mapToArray = (map: Record<string, any>): any[] => Object.keys(map).map(function (id) {
+  return map[id];
+});

@@ -21,27 +21,25 @@ import {connect} from 'react-redux';
 import * as issueActions from './issues-actions';
 import CreateIssue from 'views/create-issue/create-issue';
 import ErrorMessage from 'components/error-message/error-message';
-import IconBookmark from 'components/icon/assets/bookmark.svg';
 import Issue from 'views/issue/issue';
-import IssueRow from './issues__row';
+import IssueRow, {IssueRowCompact} from './issues__row';
 import IssuesCount from './issues__count';
-import IssuesSortBy from './issues__sortby';
+import IssuesFilters from 'views/issues/issues__filters';
+import IssuesListSettings from './issues__settings';
 import log from 'components/log/log';
 import ModalPortal from 'components/modal-view/modal-portal';
 import NothingSelectedIconWithText from 'components/icon/nothing-selected-icon-with-text';
 import QueryAssistPanel from 'components/query-assist/query-assist-panel';
 import QueryPreview from 'components/query-assist/query-preview';
 import Router from 'components/router/router';
-import Select, {SelectModal} from 'components/select/select';
-import SelectSectioned from 'components/select/select-sectioned';
 import usage from 'components/usage/usage';
 import {addListenerGoOnline} from 'components/network/network-events';
 import {ANALYTICS_ISSUES_PAGE} from 'components/analytics/analytics-ids';
 import {ERROR_MESSAGE_DATA} from 'components/error/error-message-data';
 import {getIssueFromCache} from './issues-actions';
-import {HIT_SLOP} from 'components/common-styles';
+import {hasType} from 'components/api/api__resource-types';
 import {i18n} from 'components/i18n/i18n';
-import {IconAdd, IconAngleDown} from 'components/icon/icon';
+import {IconAdd, IconAngleDown, IconSettings} from 'components/icon/icon';
 import {
   ICON_PICTOGRAM_DEFAULT_SIZE,
   IconNothingFound,
@@ -49,11 +47,21 @@ import {
 import {initialState} from './issues-reducers';
 import {isReactElement} from 'util/util';
 import {isSplitView} from 'components/responsive/responsive-helper';
+import {
+  FilterSetting,
+  issuesSearchSettingMode,
+  issuesViewSettingMode,
+} from 'views/issues/index';
 import {logEvent} from 'components/log/log-helper';
 import {notify} from 'components/notification/notification';
 import {requestController} from 'components/api/api__request-controller';
 import {routeMap} from 'app-routes';
-import {SkeletonIssues} from 'components/skeleton/skeleton';
+import {SkeletonIssues, SkeletonIssuesS} from 'components/skeleton/skeleton';
+import {Select, SelectModal} from 'components/select/select';
+import {
+  SectionedSelectWithItemActions,
+  SectionedSelectWithItemActionsModal,
+} from 'components/select/select-sectioned-with-item-and-star';
 import {ThemeContext} from 'components/theme/theme-context';
 import {UNIT} from 'components/variables';
 
@@ -64,7 +72,7 @@ import type Auth from 'components/auth/oauth2';
 import type {AnyIssue, IssueOnList} from 'types/Issue';
 import type {AppState} from 'reducers';
 import type {ErrorMessageProps} from 'components/error-message/error-message';
-import type {Folder} from 'types/User';
+import type {Folder, User} from 'types/User';
 import type {IssuesState} from './issues-reducers';
 import type {Theme, UIThemeColors} from 'types/Theme';
 import {INavigationRoute, Navigators} from 'components/navigation';
@@ -82,6 +90,9 @@ type Props = IssuesState &
     searchQuery?: string;
     networkState: NetInfoState,
     navigation: NavigationScreenProp<NavigationState>,
+    isInProgress: boolean,
+    user: User,
+    onFilterPress: (filterField: FilterSetting) => any,
   };
 
 type State = {
@@ -90,6 +101,7 @@ type State = {
   focusedIssue: AnyIssue | null | undefined;
   isSplitView: boolean;
   isCreateModalVisible: boolean;
+  settingsVisible: boolean;
 };
 
 
@@ -109,6 +121,7 @@ export class Issues extends Component<Props, State> {
       focusedIssue: null,
       isSplitView: false,
       isCreateModalVisible: false,
+      settingsVisible: false,
     };
     usage.trackScreenView('Issue list');
   }
@@ -222,16 +235,36 @@ export class Issues extends Component<Props, State> {
       </ModalPortal>
     ) : null;
   };
-  renderCreateIssueButton: (isDisabled: boolean)=> React.ReactNode = (
-    isDisabled: boolean,
-  ) => {
+
+  renderSettingsButton() {
     return (
       <TouchableOpacity
-        hitSlop={HIT_SLOP}
+        style={[
+          styles.listActionsItem,
+          styles.rowLine,
+        ]}
+        disabled={this.props.isInProgress}
+        onPress={() => {
+          this.toggleSettingsVisibility(true);
+        }}
+      >
+        <IconSettings
+          size={20}
+          color={this.props.isInProgress
+            ? this.getThemeColors().$disabled
+            : this.getThemeColors().$link}
+        />
+      </TouchableOpacity>
+    );
+  }
+
+  renderCreateIssueButton: () => React.ReactNode = () => {
+    return (
+      <TouchableOpacity
         testID="test:id/create-issue-button"
         accessibilityLabel="create-issue-button"
         accessible={true}
-        style={styles.createIssueButton}
+        style={styles.listActionsItem}
         onPress={() => {
           if (this.state.isSplitView) {
             this.setState({
@@ -244,12 +277,12 @@ export class Issues extends Component<Props, State> {
             });
           }
         }}
-        disabled={isDisabled}
+        disabled={this.props.isInProgress}
       >
         <IconAdd
-          size={20}
+          size={22}
           color={
-            isDisabled
+            this.props.isInProgress
               ? this.getThemeColors().$disabled
               : this.getThemeColors().$link
           }
@@ -258,26 +291,41 @@ export class Issues extends Component<Props, State> {
     );
   };
 
-  _renderRow = ({item}: {item: IssueOnList}) => {
-    const {focusedIssue} = this.state;
+  _renderRow = ({item}: { item: IssueOnList }) => {
+    const {settings} = this.props;
+    const {focusedIssue, isSplitView} = this.state;
 
     if (isReactElement(item)) {
       return item;
     }
 
+    const IssueRowComponent = settings.view.mode === issuesViewSettingMode.S ? IssueRowCompact : IssueRow;
+    const contextIsProject: any = hasType.project(this.props.searchContext);
+    const filterFieldProject: FilterSetting | undefined = settings.search.filters?.project;
+    const selectedProjects: string[] | undefined = filterFieldProject?.selectedValues;
+    const hideId: boolean = (
+      contextIsProject && selectedProjects?.length === 0 ||
+      !contextIsProject && selectedProjects?.length === 1 ||
+      (
+        contextIsProject &&
+        selectedProjects?.length === 1 &&
+        this.props.searchContext.id === filterFieldProject.filterField?.[0]?.customField?.id
+      )
+    );
     return (
       <View
         style={[
-          styles.row,
-          focusedIssue?.id === item.id || focusedIssue?.id === item.idReadable
+          focusedIssue?.id === item.id || item.idReadable && focusedIssue?.id === item.idReadable
             ? styles.splitViewMainFocused
             : null,
         ]}
       >
-        <IssueRow
+        <IssueRowComponent
+          hideId={hideId}
+          settings={settings}
           issue={item}
           onClick={issue => {
-            if (this.state.isSplitView) {
+            if (isSplitView) {
               this.updateFocusedIssue(issue);
             } else {
               this.goToIssue(issue);
@@ -292,6 +340,7 @@ export class Issues extends Component<Props, State> {
       </View>
     );
   };
+
   getKey: (item: any) => string = (item: Record<string, any>) => {
     return `${isReactElement(item) ? item.key : item.id}`;
   };
@@ -299,7 +348,8 @@ export class Issues extends Component<Props, State> {
   _renderRefreshControl() {
     return (
       <RefreshControl
-        refreshing={false}   onRefresh={this.props.refreshIssues}
+        refreshing={false}
+        onRefresh={this.props.refreshIssues}
         tintColor={this.theme.uiTheme.colors.$link}
         testID="refresh-control"
         accessibilityLabel="refresh-control"
@@ -313,7 +363,7 @@ export class Issues extends Component<Props, State> {
       return null;
     }
 
-    return <View style={styles.separator} />;
+    return <View style={styles.separator}/>;
   };
   onEndReached: () => void = () => {
     this.props.loadMoreIssues();
@@ -323,7 +373,7 @@ export class Issues extends Component<Props, State> {
     return this.theme.uiTheme.colors;
   }
 
-  renderContextButton: ()=> React.ReactNode = () => {
+  renderContextButton: () => React.ReactNode = () => {
     const {
       onOpenContextSelect,
       isRefreshing,
@@ -331,8 +381,7 @@ export class Issues extends Component<Props, State> {
       isSearchContextPinned,
       networkState,
     } = this.props;
-    const isDisabled: boolean =
-      isRefreshing || !searchContext || !networkState?.isConnected;
+    const isDisabled: boolean = isRefreshing || !searchContext || !networkState?.isConnected;
     return (
       <TouchableOpacity
         key="issueListContext"
@@ -346,17 +395,21 @@ export class Issues extends Component<Props, State> {
         onPress={onOpenContextSelect}
       >
         <View style={styles.searchContextButton}>
-          <Text numberOfLines={1} style={styles.contextButtonText}>
-            {`${searchContext?.name || ''} `}
+          <Text
+            numberOfLines={1}
+            style={styles.contextButtonText}
+          >
+            {`${searchContext?.name || ''}`}
           </Text>
           {searchContext && (
             <IconAngleDown
+              style={styles.contextButtonIcon}
               color={
                 isDisabled
                   ? this.getThemeColors().$disabled
                   : this.getThemeColors().$text
               }
-              size={17}
+              size={19}
             />
           )}
         </View>
@@ -366,44 +419,24 @@ export class Issues extends Component<Props, State> {
 
   renderContextSelect(): any {
     const {selectProps} = this.props;
-    const {onSelect, ...restSelectProps} = selectProps;
-    const sp: any = {
-      ...restSelectProps,
-      onSelect: async (selectedContext: Folder) => {
-        this.updateFocusedIssue(null);
-        onSelect(selectedContext);
-      },
-    };
-
-    if (selectProps.isOwnSearches) {
-      return (
-        <SelectSectioned
-          getTitle={item =>
-            item.name + (item.shortName ? ` (${item.shortName})` : '')
-          }
-          {...sp}
-        />
-      );
-    }
-
-    const SelectComponent = isSplitView() ? SelectModal : Select;
+    const {onSelect, isSectioned, ...restProps} = selectProps;
+    const SelectComponent = (
+      isSplitView()
+        ? isSectioned ? SectionedSelectWithItemActionsModal : SelectModal
+        : isSectioned ? SectionedSelectWithItemActions : Select
+    );
     return (
       <SelectComponent
-        getTitle={item =>
-          item.name + (item.shortName ? ` (${item.shortName})` : '')
-        }
-        {...sp}
+        getTitle={item => item.name + (item.shortName ? ` (${item.shortName})` : '')}
+        onSelect={async (selectedContext: Folder) => {
+          this.updateFocusedIssue(null);
+          onSelect?.(selectedContext);
+        }}
+        {...restProps}
       />
     );
   }
 
-  searchPanelRef: (instance: QueryAssistPanel | undefined) => void = (
-    instance: QueryAssistPanel | undefined,
-  ) => {
-    if (instance) {
-      this.searchPanelNode = instance;
-    }
-  };
   onScroll: (nativeEvent: any) => void = (nativeEvent: Record<string, any>) => {
     const newY = nativeEvent.contentOffset.y;
     const isPinned: boolean = newY >= UNIT;
@@ -441,7 +474,7 @@ export class Issues extends Component<Props, State> {
     this.setEditQueryMode(true);
     this.clearSearchQuery(clearSearchQuery);
   };
-  onQueryUpdate: (query: string) => void = (query: string) => {
+  onQueryUpdate = (query: string) => {
     logEvent({
       message: 'Apply search',
       analyticsId: ANALYTICS_ISSUES_PAGE,
@@ -450,15 +483,13 @@ export class Issues extends Component<Props, State> {
     this.props.setIssuesCount(null);
     this.props.onQueryUpdate(query);
   };
-  renderSearchPanel: ()=> React.ReactNode = () => {
+
+  renderSearchQueryAssist: () => React.ReactNode = () => {
     const {query, suggestIssuesQuery, queryAssistSuggestions} = this.props;
-
     const _query = this.state.clearSearchQuery ? '' : query;
-
     return (
       <QueryAssistPanel
         key="QueryAssistPanel"
-        ref={this.searchPanelRef}
         queryAssistSuggestions={queryAssistSuggestions}
         query={_query}
         suggestIssuesQuery={suggestIssuesQuery}
@@ -480,89 +511,82 @@ export class Issues extends Component<Props, State> {
       />
     );
   };
-  hasIssues: () => boolean = (): boolean => this.props.issues?.length > 0;
-  renderSearchQuery: ()=> React.ReactNode = () => {
-    const {
-      query,
-      issuesCount,
-      openSavedSearchesSelect,
-      searchContext,
-      networkState,
-    } = this.props;
-    return (
-      <View style={styles.listHeader}>
-        <View style={styles.listHeaderTop}>
-          <QueryPreview
-            style={styles.searchPanel}
-            query={query}
-            onFocus={this.onSearchQueryPanelFocus}
-          />
-          <TouchableOpacity
-            style={styles.userSearchQueryButton}
-            testID="test:id/user-search-query-button"
-            accessibilityLabel="user-search-query-button"
-            accessible={true}
-            onPress={openSavedSearchesSelect}
-            disabled={!networkState?.isConnected}
-          >
-            <IconBookmark
-              style={styles.bookmarkIcon}
-              width={20}
-              height={20}
-              color={
-                networkState?.isConnected
-                  ? this.getThemeColors().$link
-                  : this.getThemeColors().$disabled
-              }
-            />
-          </TouchableOpacity>
-        </View>
 
-        {this.hasIssues() && (
-          <View style={styles.toolbar}>
-            <IssuesCount issuesCount={issuesCount} />
-            <IssuesSortBy
-              context={searchContext}
-              onApply={(q: string) => {
-                this.onQueryUpdate(q);
-              }}
-              query={query}
-            />
-          </View>
-        )}
+  isFilterSearchMode() {
+    return this.props.settings.search.mode === issuesSearchSettingMode.filter;
+  }
+
+  renderSearchPanel() {
+    return (
+      <>
+        <View style={styles.searchPanel}>
+          {this.state.isEditQuery ? this.renderSearchQueryAssist() : this.renderSearchQueryPreview()}
+        </View>
+        {this.isFilterSearchMode() && <IssuesFilters/>}
+      </>
+    );
+  }
+
+  hasIssues: () => boolean = (): boolean => this.props.issues?.length > 0;
+
+  toggleSettingsVisibility = (settingsVisible: boolean) => {
+    this.setState({settingsVisible});
+  };
+
+  renderToolbar() {
+    return (
+      <View style={styles.toolbar}>
+        {this.hasIssues() ? <IssuesCount issuesCount={this.props.issuesCount}/> : <View/>}
       </View>
     );
-  };
+  }
+
+  renderSearchQueryPreview() {
+    const {isRefreshing} = this.props;
+    const isFilterSearchMode: boolean = this.isFilterSearchMode();
+    return (
+      <QueryPreview
+        style={styles.searchQueryPreview}
+        editable={!isRefreshing}
+        placeholder={isFilterSearchMode ? i18n('Find issues that contain key words') : undefined}
+        query={this.props.query}
+        onSubmit={isFilterSearchMode ? this.props.onQueryUpdate : undefined}
+        onFocus={!isFilterSearchMode ? this.onSearchQueryPanelFocus : undefined}
+      />
+    );
+  }
+
+  renderSkeleton() {
+    return this.props.settings.view.mode === issuesViewSettingMode.S ? <SkeletonIssuesS/> : <SkeletonIssues/>;
+  }
+
   renderIssuesFooter = () => {
     const {isLoadingMore} = this.props;
-
-    if (isLoadingMore) {
-      return <SkeletonIssues />;
-    }
-
-    return this.renderError();
+    return isLoadingMore ? this.renderSkeleton() : this.renderError();
   };
 
   renderIssueList(): React.ReactNode {
     const {issues, isRefreshing} = this.props;
     const contextButton = this.renderContextButton();
-    const searchQuery = this.renderSearchQuery();
+    const searchPanel: React.ReactNode = <>
+      {this.renderSearchPanel()}
+      {this.renderToolbar()}
+    </>;
 
     if (isRefreshing && (!issues || issues.length === 0)) {
       return (
         <View style={styles.list}>
           {contextButton}
-          {this.renderSearchQuery()}
-
-          <SkeletonIssues />
+          {searchPanel}
+          {this.renderSkeleton()}
         </View>
       );
     }
 
-    const listData = [
+    const listData: React.ReactNode[] = [
       contextButton,
-      searchQuery,
-    ].concat(issues || []);
+      searchPanel,
+    ].concat((issues || []) as any);
     return (
       <FlatList
         style={styles.list}
@@ -571,15 +595,14 @@ export class Issues extends Component<Props, State> {
         removeClippedSubviews={false}
         data={listData}
         keyExtractor={this.getKey}
-        renderItem={this._renderRow}
+        renderItem={this._renderRow as any}
         ItemSeparatorComponent={this._renderSeparator}
         ListEmptyComponent={() => {
           return <Text>{i18n('No issues found')}</Text>;
         }}
-        ListFooterComponent={this.renderIssuesFooter}
+        ListFooterComponent={this.renderIssuesFooter as any}
         refreshControl={this._renderRefreshControl()}
         onScroll={params => this.onScroll(params.nativeEvent)}
-        tintColor={this.theme.uiTheme.colors.$link}
         onEndReached={this.onEndReached}
         onEndReachedThreshold={0.1}
       />
@@ -597,10 +620,10 @@ export class Issues extends Component<Props, State> {
       {},
       loadingError
         ? {
-            error: loadingError,
-          }
+          error: loadingError,
+        }
         : !this.hasIssues()
-        ? {
+          ? {
             errorMessageData: {
               ...ERROR_MESSAGE_DATA.NO_ISSUES_FOUND,
               icon: () => (
@@ -611,7 +634,7 @@ export class Issues extends Component<Props, State> {
               ),
             },
           }
-        : null,
+          : null,
     ) as ErrorMessageProps;
 
     if (Object.keys(props).length > 0) {
@@ -621,20 +644,20 @@ export class Issues extends Component<Props, State> {
     return null;
   }
 
-  renderIssues: ()=> React.ReactNode = () => {
-    const {isIssuesContextOpen, isRefreshing} = this.props;
+  renderIssues: () => React.ReactNode = () => {
+    const {isIssuesContextOpen} = this.props;
     return (
       <View style={styles.listContainer} testID="test:id/issueListPhone">
         {isIssuesContextOpen && this.renderContextSelect()}
-        {this.state.isEditQuery && this.renderSearchPanel()}
-
         {this.renderIssueList()}
-
-        {this.renderCreateIssueButton(isRefreshing)}
+        <View style={styles.listActions}>
+          {this.renderCreateIssueButton()}
+          {this.renderSettingsButton()}
+        </View>
       </View>
     );
   };
-  renderFocusedIssue: ()=> React.ReactNode = () => {
+  renderFocusedIssue: () => React.ReactNode = () => {
     const {focusedIssue} = this.state;
 
     if (!focusedIssue || !this.hasIssues()) {
@@ -657,7 +680,7 @@ export class Issues extends Component<Props, State> {
       </View>
     );
   };
-  renderSplitView: ()=> React.ReactNode = () => {
+  renderSplitView: () => React.ReactNode = () => {
     return (
       <>
         <View style={styles.splitViewSide}>{this.renderIssues()}</View>
@@ -665,6 +688,15 @@ export class Issues extends Component<Props, State> {
       </>
     );
   };
+
+  renderSettings(): React.JSX.Element | null {
+    return this.state.settingsVisible ? (
+      <IssuesListSettings
+        onQueryUpdate={this.onQueryUpdate}
+        toggleVisibility={this.toggleSettingsVisibility}
+      />
+    ) : null;
+  }
 
   render(): React.ReactNode {
     const {isSplitView} = this.state;
@@ -683,6 +715,7 @@ export class Issues extends Component<Props, State> {
               {isSplitView && this.renderSplitView()}
               {!isSplitView && this.renderIssues()}
               {this.renderModalPortal()}
+              {this.renderSettings()}
             </View>
           );
         }}
@@ -703,6 +736,7 @@ const mapStateToProps = (
     ...ownProps,
     ...state.app,
     searchContext: state.issueList.searchContext,
+    user: state.app.user,
   };
 };
 
@@ -711,7 +745,6 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     ...bindActionCreators(issueActions, dispatch),
     onQueryUpdate: (query: string) => dispatch(issueActions.onQueryUpdate(query)),
     onOpenContextSelect: () => dispatch(issueActions.openContextSelect()),
-    openSavedSearchesSelect: () => dispatch(issueActions.openSavedSearchesSelect()),
     updateSearchContextPinned: isSearchScrolledUp => dispatch(
       issueActions.updateSearchContextPinned(isSearchScrolledUp)
     ),
