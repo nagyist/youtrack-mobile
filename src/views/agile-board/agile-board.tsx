@@ -481,25 +481,21 @@ class AgileBoard extends Component<Props, State> {
           networkState?.isConnected === false
             ? null
             : async (...args): Promise<void> => {
-              const draft: Partial<IssueOnList> = await createCardForCell.apply(
-                null,
-                [...args, this.state.isSplitView],
-              );
-
-              if (this.state.isSplitView) {
-                this.toggleModalChildren(
-                  <CreateIssue
-                    isSplitView={this.state.isSplitView}
-                    onHide={this.clearModalChildren}
-                    predefinedDraftId={draft.id}
-                  />,
-                );
-              } else {
-                Router.CreateIssue({
-                  predefinedDraftId: draft.id,
-                });
+                const draft: Partial<IssueOnList> | null = await createCardForCell(...args);
+                if (this.state.isSplitView) {
+                  this.toggleModalChildren(
+                    <CreateIssue
+                      isSplitView={this.state.isSplitView}
+                      onHide={this.clearModalChildren}
+                      predefinedDraftId={draft.id}
+                    />,
+                  );
+                } else {
+                  Router.CreateIssue({
+                    predefinedDraftId: draft.id,
+                  });
+                }
               }
-            }
         }
         onCollapseToggle={onRowCollapseToggle}
         uiTheme={this.uiTheme}
