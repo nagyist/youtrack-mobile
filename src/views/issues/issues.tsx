@@ -22,6 +22,7 @@ import * as issueActions from './issues-actions';
 import CreateIssue from 'views/create-issue/create-issue';
 import ErrorMessage from 'components/error-message/error-message';
 import Issue from 'views/issue/issue';
+import IssuePermissions from 'components/issue-permissions/issue-permissions';
 import IssueRow, {IssueRowCompact} from './issues__row';
 import IssuesCount from './issues__count';
 import IssuesFilters from 'views/issues/issues__filters';
@@ -93,7 +94,8 @@ type Props = IssuesState &
     isInProgress: boolean,
     user: User,
     onFilterPress: (filterField: FilterSetting) => any,
-  };
+    issuePermissions: IssuePermissions,
+};
 
 type State = {
   isEditQuery: boolean;
@@ -259,7 +261,7 @@ export class Issues extends Component<Props, State> {
   }
 
   renderCreateIssueButton: () => React.ReactNode = () => {
-    return (
+    return this.props?.issuePermissions?.canCreateProject?.() ? (
       <TouchableOpacity
         testID="test:id/create-issue-button"
         accessibilityLabel="create-issue-button"
@@ -288,7 +290,7 @@ export class Issues extends Component<Props, State> {
           }
         />
       </TouchableOpacity>
-    );
+    ) : null;
   };
 
   _renderRow = ({item}: { item: IssueOnList }) => {
@@ -737,6 +739,7 @@ const mapStateToProps = (
     ...state.app,
     searchContext: state.issueList.searchContext,
     user: state.app.user,
+    issuePermissions: state.app?.issuePermissions,
   };
 };
 
